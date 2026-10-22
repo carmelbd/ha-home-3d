@@ -1,12 +1,12 @@
 # Home 3D: floor designer for Home Assistant
 
-Draw your home, walk around it in 3D, and control your real devices from the plan. Everything runs inside Home Assistant as a dashboard in the sidebar. There's no add-on, no HACS and no YAML to write.
+Draw your home, walk around it in 3D, and control your real devices from the plan. Everything runs inside Home Assistant as a dashboard in the sidebar. Install it with **HACS** in a couple of clicks; there's no add-on, nothing to copy and no coding.
 
 ![Whole house, exploded 3D view](screenshots/3d-explode.png)
 
 ## 🆕 What's new
 
-**Already installed?** Jump to [Updating](#updating-to-a-new-version). It takes a minute and your design is kept.
+**Now on HACS!** [Install with HACS](#install-with-hacs-about-2-minutes) and future updates arrive as one click. **Already installed by hand?** See [Updating](#updating-to-a-new-version). Your design is kept.
 
 - **🪜 Stairs that connect to the floor above.** Stairs now cut a matching opening in the floor above automatically, with a glass railing around it, so they go up *through* the floor and look right in 3D. On the upper floor's 2D plan the opening shows as "↓ stairs". Don't want it? Set **Opening in the floor above → No**.
 - **⬇️ Stairs going down.** Set a stair's **Direction → Down to the floor below** and it starts on the floor you're on, sinks through it and lands on the floor below (great for a basement). The floor gets the opening and railing automatically, and the floor below shows where the stairs land. In "Whole house" 3D it's one continuous staircase.
@@ -46,21 +46,20 @@ The full list of changes is in [CHANGELOG.md](CHANGELOG.md).
 |---|---|
 | ![Night mode](screenshots/3d-night.png) | ![2D editor](screenshots/2d-editor.png) |
 
-## Install (about 5 minutes)
+## Install with HACS (about 2 minutes)
 
-### 1. Copy the file into Home Assistant
+[![Open your Home Assistant instance and add this repository to HACS.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=carmelbd&repository=ha-home-3d&category=plugin)
 
-Download [`floor-designer.html`](floor-designer.html) (click it, then the download button ⤓). Put it in the **`www`** folder inside your Home Assistant config folder (the folder that has `configuration.yaml`). If there is no `www` folder, create it and restart Home Assistant once.
+### 1. Download it in HACS
 
-Ways to get the file there:
-- **Home Assistant OS:** the *File editor* or *Studio Code Server* add-on (upload into `/config/www`), or the *Samba share* add-on.
-- **Docker / NAS:** Finder, Windows Explorer or Cyberduck (SFTP/SMB) into the folder you mapped as `/config`.
+- **Easiest:** click the button above, choose your Home Assistant, then **Add** → **Download**.
+- **Or by hand:** in Home Assistant open **HACS** → ⋮ (top right) → **Custom repositories**. Paste `https://github.com/carmelbd/ha-home-3d`, choose type **Dashboard**, and click **Add**. Then search HACS for **Home 3D** and click **Download**.
 
-To check it worked, open `http://<your-ha-address>:8123/local/floor-designer.html` in a browser. You should see the designer.
+HACS adds the card to your dashboards automatically. If it asks you to reload the page, do it.
 
-### 2. Add the dashboard
+### 2. Add the Home 3D dashboard
 
-1. In Home Assistant go to **Settings → Dashboards → + Add dashboard → New dashboard from scratch**. Name it **Home 3D** and pick an icon (`mdi:home-floor-3` looks nice).
+1. Go to **Settings → Dashboards → + Add dashboard → New dashboard from scratch**. Name it **Home 3D** and pick an icon (`mdi:home-floor-3` looks nice).
 2. Open the new dashboard, click ✏️ (top right) → ⋮ → **Raw configuration editor**, replace everything with this, and save:
 
 ```yaml
@@ -69,11 +68,26 @@ views:
     path: home
     type: panel
     cards:
+      - type: custom:home-3d-card
+```
+
+3. Open **Home 3D** in the sidebar. That's it.
+
+The card is also in the normal **Add card** list, under the name **Home 3D**. It works best in a view of type **Panel (single card)**, which gives it the whole screen. In other views you can set its height, for example `height: 700px`.
+
+<details>
+<summary><b>Without HACS (manual install)</b></summary>
+
+1. Download [`floor-designer.html`](floor-designer.html) and put it in the **`www`** folder inside your Home Assistant config folder (the folder with `configuration.yaml`). If there's no `www` folder, create it and restart Home Assistant once. You can use the *File editor* or *Samba* add-on, or Finder, Explorer or Cyberduck on a NAS.
+2. Make the dashboard as in step 2 above, but use this card instead:
+
+```yaml
       - type: iframe
         url: /local/floor-designer.html?v=1
 ```
 
-3. Open **Home 3D** in the sidebar. That's it.
+To update later, replace the file and raise `?v=1` to `?v=2` so browsers and the phone app load the new copy.
+</details>
 
 ### 3. Design your home
 
@@ -86,17 +100,15 @@ views:
 - **Saving needs an admin user.** Changes are saved into the dashboard itself, and Home Assistant only lets admins change dashboards. Other users can still view and control.
 - **Backup or share a design:** ⋯ → **Save design file** / **Open design file**.
 - **It needs internet** the first time it loads, because the 3D engine (three.js) comes from a CDN.
-- You can also open the file on its own, outside Home Assistant, to play with a design. Devices are then simulated and the design is saved in that browser only.
+- You can also open `floor-designer.html` on its own, outside Home Assistant, to play with a design. Devices are then simulated and the design is saved in that browser only.
 
 ## Updating to a new version
 
-Your design is stored in Home Assistant, not in the file, so updating never touches it.
+Your design is stored in Home Assistant, not in the plugin, so updating never touches it.
 
-1. Download the new [`floor-designer.html`](floor-designer.html) and replace the old one in your `www` folder.
-2. In Home Assistant, open the **Home 3D** dashboard → ✏️ → ⋮ → **Raw configuration editor**. Raise the number at the end of the URL by one, for example `/local/floor-designer.html?v=1` → `?v=2`, then save. Leave everything else in that editor as it is. This makes browsers and the phone app load the new version instead of an old saved copy.
-3. Reload the page. On a phone, close and reopen the Home Assistant app.
-
-If something looks off after updating, clear the browser cache or bump the number once more.
+- **HACS:** when a new version is out, HACS shows an update under **Settings → Updates** (or in HACS). Click **Update**, then reload the page. On a phone, close and reopen the Home Assistant app.
+- **Manual install:** see "Without HACS" above.
+- **Moving from the manual install to HACS:** install with HACS, then in your existing Home 3D dashboard's raw configuration editor replace the `type: iframe` card (and its `url:` line) with `type: custom:home-3d-card`. Keep everything else, including the `floor_designer:` part, which is your design. You can then delete `floor-designer.html` from `www`.
 
 ## License
 

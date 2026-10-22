@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.0 (2026-10-22): Install with HACS
+
+- **HACS support.** Add the repository to HACS as a **Dashboard** plugin, download it, and use the `custom:home-3d-card` card. There are no files to copy, and updates arrive through HACS.
+- The card also appears in the **Add card** picker as **Home 3D**, with an optional `height` setting.
+- It works on the default dashboard too, not only on dashboards with their own URL.
+
 ## 2026-10-22: Stairs that connect, and stair LEDs
 
 - **Automatic opening in the floor above.** Straight and U-shaped stairs cut a matching hole in the floor above, with a glass railing on the open sides (the arrival side stays open). In 2D the upper floor shows it as "↓ stairs", and in 3D you can look down through it. Turn it off per stair with *Opening in the floor above → No*. Stairs that already sit inside an "Open to the floor below" stairwell don't get a second railing.

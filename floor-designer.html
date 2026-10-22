@@ -786,7 +786,7 @@ function haLive(){clearTimeout(ha.liveT);ha.liveT=setTimeout(()=>{haSync();rende
   const s=ui.sel&&findObj(ui.sel),el=$('#liveSt');if(el&&s&&s.t==='devices')el.textContent=haLabel(s.o)},400)}
 async function haInit(){
   const h=hass(),conn=h.connection;
-  ha.dash=window.parent.location.pathname.split('/')[1];
+  ha.dash=window.parent.location.pathname.split('/')[1];if(ha.dash==='lovelace')ha.dash=null; // the default dashboard has no url_path
   try{ha.cfg=await conn.sendMessagePromise({type:'lovelace/config',url_path:ha.dash})}catch(e){ha.cfg={}}
   const d=ha.cfg.floor_designer;
   if(d&&Array.isArray(d.floors)&&d.floors.length){doc=normalize(d);undoS=[];redoS=[];ui.floor=clamp(ui.floor,0,doc.floors.length-1);fixSel()}
