@@ -3,6 +3,7 @@
 ## 2026-10-22: Stairs that connect, and stair LEDs
 
 - **Automatic opening in the floor above.** Straight and U-shaped stairs cut a matching hole in the floor above, with a glass railing on the open sides (the arrival side stays open). In 2D the upper floor shows it as "↓ stairs", and in 3D you can look down through it. Turn it off per stair with *Opening in the floor above → No*. Stairs that already sit inside an "Open to the floor below" stairwell don't get a second railing.
+- **Stairs going down.** New *Direction* option on stairs: *Down to the floor below*. The stairs start on the current floor, cut an opening in it with a railing, and land exactly on the floor below. The lower floor shows them faded in 2D and fully in 3D.
 - **Stair LEDs.** *Under each step*, *Along the bottom* or *Both*, with a color picker. They glow and add a soft light, stronger in night mode.
 
 ## 2026-10-22: Search, zoom and new products

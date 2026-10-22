@@ -9,6 +9,7 @@ Draw your home, walk around it in 3D, and control your real devices from the pla
 **Already installed?** Jump to [Updating](#updating-to-a-new-version). It takes a minute and your design is kept.
 
 - **🪜 Stairs that connect to the floor above.** Stairs now cut a matching opening in the floor above automatically, with a glass railing around it, so they go up *through* the floor and look right in 3D. On the upper floor's 2D plan the opening shows as "↓ stairs". Don't want it? Set **Opening in the floor above → No**.
+- **⬇️ Stairs going down.** Set a stair's **Direction → Down to the floor below** and it starts on the floor you're on, sinks through it and lands on the floor below (great for a basement). The floor gets the opening and railing automatically, and the floor below shows where the stairs land. In "Whole house" 3D it's one continuous staircase.
 - **💡 LED lights on stairs.** Choose **Under each step**, **Along the bottom** or **Both**, in any color. They glow, especially in 🌙 night mode.
 - **Zoom in 2D.** Scroll or pinch on the plan to zoom in on a room, and drag empty space to move around. There are also **− / + / Fit** buttons in the corner. Phones and tablets support two-finger pinch. Each floor remembers its own zoom.
 - **🔍 Search products.** A search box sits above the catalog. Type `light`, `sofa`, `trash`… and only the matches show. **Enter** adds the first one, **Esc** clears.
@@ -16,9 +17,9 @@ Draw your home, walk around it in 3D, and control your real devices from the pla
 - **🗑️ Sensor trash can** (Kitchen & bath). It comes rectangular, round or as a double recycling bin, in 12 / 30 / 50 L, in steel, black or white, with a glowing blue sensor light.
 - **Safer saving.** If the dashboard is edited while Home 3D is open, saving no longer overwrites that edit.
 
-| Stairs through the floor | Stair LEDs at night |
-|---|---|
-| ![Stairs opening with railing](screenshots/stairs-opening.png) | ![Stair LEDs glowing at night](screenshots/stairs-led-night.png) |
+| Stairs through the floor | Stairs going down | Stair LEDs at night |
+|---|---|---|
+| ![Stairs opening with railing](screenshots/stairs-opening.png) | ![Stairs going down to the basement](screenshots/stairs-down.png) | ![Stair LEDs glowing at night](screenshots/stairs-led-night.png) |
 
 | Zoom + search | Vanity and trash can | …at night |
 |---|---|---|
