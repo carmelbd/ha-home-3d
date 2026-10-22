@@ -57,6 +57,9 @@ h4:first-child{margin-top:2px}
 #v3err{position:absolute;inset:0;display:grid;place-items:center;color:var(--muted);padding:24px;text-align:center}
 .v3bar{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:4px;background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:4px;z-index:2;flex-wrap:wrap;justify-content:center;width:max-content;max-width:calc(100% - 24px)}
 .v3bar button{border-color:transparent;background:transparent;font-size:12.5px}
+.zbar{position:absolute;bottom:12px;right:12px;display:flex;gap:2px;background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:4px;z-index:2}
+.zbar button{border-color:transparent;background:transparent;min-width:34px;font-size:15px;padding:4px 8px}
+.zbar button[data-z="fit"]{font-size:12.5px}
 #saved{font-size:12px;color:var(--muted);min-width:48px}
 .ph{display:flex;align-items:center;gap:8px;margin-bottom:10px}
 .ph h3{margin:0;font-size:15px}
@@ -133,7 +136,7 @@ ol.steps li{margin-bottom:6px}
 </header>
 <main>
   <aside id="palette"></aside>
-  <section id="stage"><div id="hint"></div><svg id="plan" xmlns="http://www.w3.org/2000/svg"></svg>
+  <section id="stage"><div id="hint"></div><svg id="plan" xmlns="http://www.w3.org/2000/svg"></svg><div class="zbar" id="zbar"><button data-z="out" title="Zoom out">−</button><button data-z="in" title="Zoom in">+</button><button data-z="fit" title="Show the whole floor">Fit</button></div>
     <div id="v3" hidden><div id="v3err" hidden>The 3D engine could not load. Check your internet connection and reload the page.</div>
       <div class="v3bar" id="v3bar"><button data-v3="floor">This floor</button><button data-v3="all">Whole house</button><button data-v3="full">Full-height walls</button><button data-v3="explode">↕ Explode</button><button data-v3="night">🌙 Night</button><button data-v3="lights">💡 All lights</button><button data-v3="reset">Reset view</button></div></div>
   </section>
@@ -893,10 +896,10 @@ function renderInner(fl,P,o={}){
 const svg=$('#plan');
 function renderPlan(){
   const fl=cur();
-  svg.setAttribute('viewBox',`0 0 ${fl.w*K} ${fl.h*K}`);
+  const v=vb();svg.setAttribute('viewBox',`${n(v.x)} ${n(v.y)} ${n(v.w)} ${n(v.h)}`);
   svg.innerHTML=renderInner(fl,curP(),{grid:!ui.preview,devices:true,interactive:!ui.preview,preview:ui.preview,sel:ui.preview?null:ui.sel,draft:ui.draft,idp:'d'});
   svg.classList.toggle('drawing',ui.tool==='draw');
-  const is3=ui.view==='3d';svg.style.display=is3?'none':'';$('#v3').hidden=!is3;
+  const is3=ui.view==='3d';svg.style.display=is3?'none':'';$('#zbar').style.display=is3?'none':'';$('#v3').hidden=!is3;
   let h;
   if(hintMsg)h=hintMsg;
   else if(is3)h='Drag to rotate · right-drag to pan · scroll to zoom · click a light to switch it';
@@ -904,7 +907,7 @@ function renderPlan(){
   else if(ui.tool==='draw'&&ui.extend)h=`Drag a rectangle touching “${(cur().rooms.find(x=>x.id===ui.extend)||{}).name}” to add a section · Esc to cancel`;
   else if(ui.tool==='draw')h=`Drag on the plan to draw: ${ROOM_LABEL[ui.drawType]} · Esc to cancel`;
   else if(ui.sel)h='Drag to move · Del removes · R rotates · Ctrl/⌘+D duplicates';
-  else h='Pick a room type on the left, then drag on the plan to draw it';
+  else h='Pick a room type on the left, then drag on the plan to draw it · scroll to zoom · drag empty space to move around';
   $('#hint').textContent=h;
 }
 function refreshViews(){renderPlan();if(ui.view==='3d')render3DView()}
@@ -1024,9 +1027,10 @@ function toWorld(e){const pt=svg.createSVGPoint();pt.x=e.clientX;pt.y=e.clientY;
 function flash(msg){hintMsg=msg;clearTimeout(hintTimer);hintTimer=setTimeout(()=>{hintMsg=null;renderPlan()},2200);renderPlan()}
 function toggleDev(d){if(ha.on)return haToggle(d);const k=DEV[d.kind];if(k.tap!=='toggle'){flash(`${d.name}: ${k.asLabel?'shows its live value':'opens its details panel'} in Home Assistant`);return}ON.has(d.id)?ON.delete(d.id):ON.add(d.id);flash(`${d.name}: ${ON.has(d.id)?'on':'off'}`)}
 svg.addEventListener('pointerdown',e=>{
+  if(e.button===1||e.button===2){drag={k:'pan',sx:e.clientX,sy:e.clientY};svg.setPointerCapture(e.pointerId);return}
   if(e.button!==0)return;
   const fl=cur(),p=toWorld(e);
-  if(ui.preview){const g=e.target.closest('[data-t="dev"]');if(g)toggleDev(fl.devices.find(x=>x.id===g.dataset.id));return}
+  if(ui.preview){const g=e.target.closest('[data-t="dev"]');if(g)toggleDev(fl.devices.find(x=>x.id===g.dataset.id));else{drag={k:'pan',sx:e.clientX,sy:e.clientY};svg.setPointerCapture(e.pointerId)}return}
   if(ui.tool==='draw'){const x=snapTo(clamp(p.x,0,fl.w),.25),y=snapTo(clamp(p.y,0,fl.h),.25);ui.draft={x0:x,y0:y,x,y,w:0,h:0};drag={k:'draw'};svg.setPointerCapture(e.pointerId);renderPlan();return}
   const hd=e.target.closest('[data-h]'),s=ui.sel&&findObj(ui.sel);
   if(hd&&s){drag={k:'resize',c:hd.dataset.h,o:s.o,orig:{...s.o},start:p,step:s.t==='rooms'?.25:.05,before:snap0()};svg.setPointerCapture(e.pointerId);return}
@@ -1034,11 +1038,13 @@ svg.addEventListener('pointerdown',e=>{
   if(g){ui.sel=g.dataset.id;const f=findObj(ui.sel);
     drag={k:'move',o:f.o,orig:{x:f.o.x,y:f.o.y},start:p,step:f.t==='rooms'?.25:.05,kids:f.t==='rooms'?groupOf(fl,f.o).flatMap(r=>r===f.o?kidsOf(fl,r):[r,...kidsOf(fl,r)]).map(o=>({o,x:o.x,y:o.y})):[],before:snap0()};
     svg.setPointerCapture(e.pointerId)}
-  else ui.sel=null;
+  else{ui.sel=null;drag={k:'pan',sx:e.clientX,sy:e.clientY};svg.setPointerCapture(e.pointerId)}
   renderAll();
 });
 svg.addEventListener('pointermove',e=>{
-  if(!drag)return;const p=toWorld(e),fl=cur();
+  if(!drag)return;
+  if(drag.k==='pan'){panBy(e.clientX-drag.sx,e.clientY-drag.sy);drag.sx=e.clientX;drag.sy=e.clientY;return}
+  const p=toWorld(e),fl=cur();
   if(drag.k==='draw'){const d=ui.draft,x=snapTo(clamp(p.x,0,fl.w),.25),y=snapTo(clamp(p.y,0,fl.h),.25);d.x=Math.min(d.x0,x);d.y=Math.min(d.y0,y);d.w=Math.abs(x-d.x0);d.h=Math.abs(y-d.y0);renderPlan();return}
   const dx=p.x-drag.start.x,dy=p.y-drag.start.y,st=drag.step;
   if(drag.k==='move'){const o=drag.o,nx=n(snapTo(drag.orig.x+dx,st)),ny=n(snapTo(drag.orig.y+dy,st));o.x=nx;o.y=ny;for(const k of drag.kids){k.o.x=n(k.x+nx-drag.orig.x);k.o.y=n(k.y+ny-drag.orig.y)}renderPlan();return}
@@ -1049,6 +1055,7 @@ svg.addEventListener('pointermove',e=>{
 });
 function endDrag(){
   if(!drag)return;const d=drag;drag=null;
+  if(d.k==='pan')return;
   if(d.k==='draw'){const r=ui.draft;ui.draft=null;
     const base=ui.extend&&cur().rooms.find(x=>x.id===ui.extend);ui.extend=null;
     if(r&&r.w>=.5&&r.h>=.5)mutate(()=>{const room={id:uid(),name:uniqueName(ROOM_LABEL[ui.drawType]),type:ui.drawType,x:n(r.x),y:n(r.y),w:n(r.w),h:n(r.h)};if(ui.drawType==='stairs'&&ui.floor>0)room.open=true;
@@ -1058,6 +1065,30 @@ function endDrag(){
   commit(d.before);renderAll();
 }
 svg.addEventListener('pointerup',endDrag);svg.addEventListener('pointercancel',endDrag);
+
+/* ---------- 2D zoom & pan ---------- */
+const ZV={};
+function vb(){const fl=cur();return ZV[fl.id]||{x:0,y:0,w:fl.w*K,h:fl.h*K}}
+function setVB(v){ZV[cur().id]=v;svg.setAttribute('viewBox',`${n(v.x)} ${n(v.y)} ${n(v.w)} ${n(v.h)}`)}
+function zoomAt(cx,cy,f){const fl=cur(),v=vb(),bw=fl.w*K;f=clamp(f,v.w/(bw*1.5),v.w/(bw/12));
+  const pt=svg.createSVGPoint();pt.x=cx;pt.y=cy;const p=pt.matrixTransform(svg.getScreenCTM().inverse());
+  setVB({x:p.x-(p.x-v.x)/f,y:p.y-(p.y-v.y)/f,w:v.w/f,h:v.h/f})}
+function zoomMid(f){const b=svg.getBoundingClientRect();zoomAt(b.left+b.width/2,b.top+b.height/2,f)}
+function panBy(dx,dy){const v=vb(),s=svg.getScreenCTM().a;setVB({...v,x:v.x-dx/s,y:v.y-dy/s})}
+function cancelDrag(){if(!drag)return;const d=drag;drag=null;
+  if(d.k==='move'){d.o.x=d.orig.x;d.o.y=d.orig.y;for(const k of d.kids){k.o.x=k.x;k.o.y=k.y}}
+  else if(d.k==='resize')Object.assign(d.o,d.orig);else if(d.k==='draw')ui.draft=null;renderPlan()}
+svg.addEventListener('wheel',e=>{e.preventDefault();const dy=e.deltaY*(e.deltaMode===1?16:1);zoomAt(e.clientX,e.clientY,Math.exp(-dy*(e.ctrlKey?.01:.0015)))},{passive:false});
+svg.addEventListener('contextmenu',e=>e.preventDefault());
+const touches=new Map();let pinch=null;
+const tmid=()=>{const [a,b]=[...touches.values()];return{x:(a.x+b.x)/2,y:(a.y+b.y)/2,d:Math.hypot(a.x-b.x,a.y-b.y)}};
+svg.addEventListener('pointerdown',e=>{if(e.pointerType!=='touch')return;touches.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if(touches.size===2){cancelDrag();pinch=tmid();e.stopImmediatePropagation()}else if(touches.size>2)e.stopImmediatePropagation()},true);
+svg.addEventListener('pointermove',e=>{if(!touches.has(e.pointerId))return;touches.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if(pinch&&touches.size===2){const m=tmid();panBy(m.x-pinch.x,m.y-pinch.y);if(pinch.d>0)zoomAt(m.x,m.y,m.d/pinch.d);pinch=m;e.stopImmediatePropagation()}},true);
+for(const t of['pointerup','pointercancel'])svg.addEventListener(t,e=>{touches.delete(e.pointerId);if(touches.size<2)pinch=null},true);
+$('#zbar').addEventListener('click',e=>{const b=e.target.closest('[data-z]');if(!b)return;const z=b.dataset.z;
+  if(z==='fit'){delete ZV[cur().id];renderPlan()}else zoomMid(z==='in'?1.4:1/1.4)});
 
 /* ---------- panels & header events ---------- */
 $('#palette').addEventListener('click',e=>{
