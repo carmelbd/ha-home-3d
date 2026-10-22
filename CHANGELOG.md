@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-10-22: Stairs that connect, and stair LEDs
+
+- **Automatic opening in the floor above.** Straight and U-shaped stairs cut a matching hole in the floor above, with a glass railing on the open sides (the arrival side stays open). In 2D the upper floor shows it as "↓ stairs", and in 3D you can look down through it. Turn it off per stair with *Opening in the floor above → No*. Stairs that already sit inside an "Open to the floor below" stairwell don't get a second railing.
+- **Stair LEDs.** *Under each step*, *Along the bottom* or *Both*, with a color picker. They glow and add a soft light, stronger in night mode.
+
 ## 2026-10-22: Search, zoom and new products
 
 - **2D zoom and pan.** Mouse wheel or trackpad pinch zooms toward the cursor. Drag empty space (or right/middle-drag anywhere) to pan. Two-finger pinch works on touch screens. − / + / Fit buttons sit in the corner, and each floor keeps its own zoom.
