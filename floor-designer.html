@@ -37,7 +37,10 @@ details.menu>div button{text-align:left;border-color:transparent;background:tran
 details.menu>div button:hover{background:var(--panel2)}
 main{flex:1;min-height:0;display:grid;grid-template-columns:240px minmax(0,1fr) 300px}
 aside{overflow:auto;padding:12px;background:var(--panel)}
-#palette{border-right:1px solid var(--border)}
+#palette{border-right:1px solid var(--border);padding-top:0}
+.psearch{position:sticky;top:0;z-index:3;background:var(--panel);padding:12px 0 6px;margin-bottom:-6px}
+.psearch input{width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border);border-radius:8px;background:var(--panel2);color:var(--text);font:inherit}
+.psearch input:focus{outline:2px solid var(--accent);outline-offset:-1px}
 #props{border-left:1px solid var(--border)}
 h4{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:14px 0 6px}
 h4:first-child{margin-top:2px}
@@ -135,7 +138,7 @@ ol.steps li{margin-bottom:6px}
   </div>
 </header>
 <main>
-  <aside id="palette"></aside>
+  <aside id="palette"><div class="psearch"><input id="pq" type="search" placeholder="🔍 Search products…" autocomplete="off" spellcheck="false"></div><div id="pal"></div><p id="pnone" class="muted" hidden>Nothing matches. Try another word.</p></aside>
   <section id="stage"><div id="hint"></div><svg id="plan" xmlns="http://www.w3.org/2000/svg"></svg><div class="zbar" id="zbar"><button data-z="out" title="Zoom out">−</button><button data-z="in" title="Zoom in">+</button><button data-z="fit" title="Show the whole floor">Fit</button></div>
     <div id="v3" hidden><div id="v3err" hidden>The 3D engine could not load. Check your internet connection and reload the page.</div>
       <div class="v3bar" id="v3bar"><button data-v3="floor">This floor</button><button data-v3="all">Whole house</button><button data-v3="full">Full-height walls</button><button data-v3="explode">↕ Explode</button><button data-v3="night">🌙 Night</button><button data-v3="lights">💡 All lights</button><button data-v3="reset">Reset view</button></div></div>
@@ -452,7 +455,7 @@ Object.assign(FURN,{
         if(o.style==='corner'){b.glass(w-.03,0,.012,d,.07,gh-.04,o.glass);b.box(w-.036,0,.024,d,gh+.03,.025,CH_,CHROME);b.box(w-.036,0,.024,.025,.05,gh,CH_,CHROME);b.box(w*.52+.04,d-.1,.02,.03,.85,.4,CH_,CHROME)}
         else b.box(w*.35+w*.65-.02,d-.03,.02,.02,gh,.02,CH_,CHROME)}}},
   nightstand:{label:'Nightstand',group:'bed',w:.45,h:.4,opts:[O.sel('drawers','Drawers',[['0','Open shelf'],['1','1 drawer'],['2','2 drawers'],['3','3 drawers']],'1'),O.sel('lamp','Lamp',[['yes','Yes'],['no','No']],'yes'),O.color('#d9c7ad')],draw:bedside2D,d3:bedside3,surf:bedsideH},
-  vanity:{label:'Makeup vanity',group:'bed',w:1,h:.8,opts:[O.sel('light','Mirror light',[['bulbs','Hollywood bulbs'],['led','LED frame'],['none','No light']],'bulbs'),O.sel('stool','Stool',[['yes','Yes'],['no','No']],'yes'),O.sel('drawers','Drawers',[['yes','Yes'],['no','No']],'yes'),O.color('#f4efe9')],
+  vanity:{label:'Makeup vanity',group:'bed',kw:'dressing table mirror makeup cosmetics hollywood light',w:1,h:.8,opts:[O.sel('light','Mirror light',[['bulbs','Hollywood bulbs'],['led','LED frame'],['none','No light']],'bulbs'),O.sel('stool','Stool',[['yes','Yes'],['no','No']],'yes'),O.sel('drawers','Drawers',[['yes','Yes'],['no','No']],'yes'),O.color('#f4efe9')],
     draw:(w,h,P,o)=>{const t=Math.min(.45,h);let s=R(0,0,w,t,P,{rx:.02,fill:o.color})+L(w*.12,.035,w*.88,.035,P,{stroke:P.glassS,sw:.03});
       if(o.light==='bulbs')for(let i=0;i<5;i++)s+=C(w*.12+i*w*.19,.035,.025,P,{fill:'#ffe9a8',sw:.01});else if(o.light==='led')s+=L(w*.1,.035,w*.9,.035,P,{stroke:'#ffd36b',sw:.04});
       if(o.drawers==='yes')s+=L(w*.36,0,w*.36,t,P,{sw:.015});
@@ -469,6 +472,13 @@ Object.assign(FURN,{
         for(let i=0;i<ny;i++){const y=my+mh*(i+.5)/ny;b.sph(mx-.015,.045,y,.028,'#fff6dc',lit);b.sph(mx+mw+.015,.045,y,.028,'#fff6dc',lit)}}
       if(o.stool==='yes'&&d>t+.15){const z=t+(d-t)/2,r=Math.min(.17,(d-t)/2);b.cyl(w/2,z,.025,0,.42,C3.steel,CHROME);b.cyl(w/2,z,r*.8,0,.02,C3.steel,CHROME);b.cyl(w/2,z,r,.42,.07,'#f2d6dc')}},
     surf:()=>.77},
+  trash_sensor:{label:'Sensor trash can',group:'wet',w:.42,h:.32,kw:'garbage bin trash can waste rubbish electric automatic touchless motion',
+    opts:[O.sel('shape','Shape',[['rect','Rectangular'],['round','Round'],['dual','Double (recycling)']],'rect'),O.sel('size','Size',[['.6','30 L'],['.7','50 L'],['.45','12 L']],'.6'),O.sel('finish','Finish',[['#c3c8cf','Steel'],['#2a2e35','Black'],['#f3f4f6','White']],'#c3c8cf')],
+    draw:(w,h,P,o)=>{if(o.shape==='round'){const r=Math.min(w,h)/2;return C(w/2,h/2,r,P,{fill:P.fur2})+C(w/2,h/2+r*.7,.02,P,{fill:'#4aa3ff',sw:.005})}
+      let s=R(0,0,w,h,P,{rx:.04,fill:P.fur2});if(o.shape==='dual')s+=L(w/2,0,w/2,h,P,{sw:.015});return s+R(w*.35,h-.05,w*.3,.025,P,{rx:.01,fill:'#4aa3ff',sw:.005})},
+    d3:(b,w,d,H,o)=>{const ht=+o.size,c=o.finish,lid=shade(c,-.15),g={metal:c==='#c3c8cf'?.25:.05,rough:.35},led={emis:'#4aa3ff',ei:1.4};
+      if(o.shape==='round'){const r=Math.min(w,d)/2;b.cyl(w/2,d/2,r,0,ht-.05,c,g);b.cyl(w/2,d/2,r*1.01,ht-.05,.05,lid,g);b.box(w/2-.03,d/2+r-.004,.06,.01,ht-.035,.015,'#4aa3ff',led)}
+      else{const k=o.shape==='dual'?2:1,cw=w/k;for(let i=0;i<k;i++){const x=i*cw;b.box(x+.005,0,cw-.01,d,0,ht-.05,c,g);b.box(x+.005,0,cw-.01,d,ht-.05,.05,lid,g);b.box(x+cw/2-.04,d,.08,.008,ht-.035,.015,'#4aa3ff',led)}}}},
   bedside:{label:'Bedside drawers',group:'bed',w:.42,h:.38,opts:[O.sel('drawers','Drawers',[['0','Open shelf'],['1','1 drawer'],['2','2 drawers'],['3','3 drawers']],'3'),O.sel('lamp','Lamp',[['yes','Yes'],['no','No']],'no'),O.color('#f2efe9')],draw:bedside2D,d3:bedside3,surf:bedsideH},
   plastic_wardrobe:{label:'Plastic closet',group:'bed',w:.9,h:.45,opts:[O.sel('tint','Cover',[['#f4f6f8','Clear'],['#ffffff','White'],['#f7c6d4','Pink'],['#bfe8d6','Mint'],['#c9d6f2','Blue'],['#3a3f46','Black']],'#f4f6f8'),O.sel('tall','Height',[['1.6','1.6 m'],['1.75','1.75 m'],['1.2','1.2 m']],'1.6')],
     draw:(w,h,P)=>{let s=R(0,0,w,h,P,{fill:P.glass,stroke:P.glassS,rx:.02});s+=L(.04,h/2,w-.04,h/2,P,{sw:.02});for(let x=.08;x<w-.04;x+=.09)s+=L(x,h/2-.13,x,h/2+.13,P,{sw:.015});return s},
@@ -528,8 +538,8 @@ Object.assign(FURN,{
     draw:(w,h,P,o)=>R(0,0,w,h,P,{fill:o.color})+L(.04,h*.55,w-.04,h*.55,P,{sw:.012,dash:'0.05 0.04'}),
     d3:(b,w,d,H,o)=>{for(let i=0;i<+o.shelves;i++){const y=i*.3;b.box(0,0,w,d,y,.03,o.color);b.box(.06,0,.02,d*.8,y-.08,.08,C3.frame);b.box(w-.08,0,.02,d*.8,y-.08,.08,C3.frame);
       if(o.decor==='yes'){let j=i*3;if(i%2===0)for(let x=.05;x<w*.45;x+=.034,j++)b.box(x,.03,.028,d-.07,y+.03,.15+((j*13)%5)/60,CLOTHES[j%CLOTHES.length]);const pc=i%2?w*.25:w*.75;b.cyl(pc,d/2,.045,y+.03,.08,'#e8e4dc');b.sph(pc,d/2,y+.16,.07,C3.plant)}}}},
-  table_lamp:{label:'Table lamp',group:'fun',w:.25,h:.25,small:true,draw:(w,h,P)=>C(w/2,h/2,Math.min(w,h)*.45,P,{fill:'#fff4dc'}),d3:(b,w,d)=>{b.cyl(w/2,d/2,.07,0,.025,C3.dark);b.cyl(w/2,d/2,.01,.025,.25,C3.dark);b.cyl(w/2,d/2,.11,.25,.14,'#fff4dc',{emis:'#ffd9a0',ei:.4})}},
-  floor_lamp:{label:'Floor lamp',group:'living',w:.4,h:.4,draw:(w,h,P)=>C(w/2,h/2,Math.min(w,h)*.45,P,{fill:'#fff4dc'})+C(w/2,h/2,.04,P,{fill:P.furS}),d3:(b,w,d)=>{b.cyl(w/2,d/2,.15,0,.03,C3.dark);b.cyl(w/2,d/2,.014,.03,1.45,C3.dark);b.cyl(w/2,d/2,.19,1.45,.28,'#fff4dc',{emis:'#ffd9a0',ei:.4})}},
+  table_lamp:{label:'Table lamp',kw:'light',group:'fun',w:.25,h:.25,small:true,draw:(w,h,P)=>C(w/2,h/2,Math.min(w,h)*.45,P,{fill:'#fff4dc'}),d3:(b,w,d)=>{b.cyl(w/2,d/2,.07,0,.025,C3.dark);b.cyl(w/2,d/2,.01,.025,.25,C3.dark);b.cyl(w/2,d/2,.11,.25,.14,'#fff4dc',{emis:'#ffd9a0',ei:.4})}},
+  floor_lamp:{label:'Floor lamp',kw:'light',group:'living',w:.4,h:.4,draw:(w,h,P)=>C(w/2,h/2,Math.min(w,h)*.45,P,{fill:'#fff4dc'})+C(w/2,h/2,.04,P,{fill:P.furS}),d3:(b,w,d)=>{b.cyl(w/2,d/2,.15,0,.03,C3.dark);b.cyl(w/2,d/2,.014,.03,1.45,C3.dark);b.cyl(w/2,d/2,.19,1.45,.28,'#fff4dc',{emis:'#ffd9a0',ei:.4})}},
   tv_wall:{label:'Wall TV',group:'living',w:1.4,h:.08,z:1,draw:(w,h,P)=>R(0,0,w,h,P,{fill:P.wall}),d3:(b,w,d)=>{b.box(0,0,w,.05,0,w*.57,C3.dark,{rough:.3});b.box(.02,.051,w-.04,.002,.02,w*.57-.04,'#0e1116',{rough:.12})}}
 });
 const BREEDS={white:{label:'White',fur:'#f6f4f0',light:'#ffffff'},grey:{label:'Grey',fur:'#9a9894',light:'#d6d3cd'},brown:{label:'Brown',fur:'#9b6b43',light:'#dcbc95'},black:{label:'Black',fur:'#2f2c2b',light:'#55504d'},
@@ -939,13 +949,21 @@ function renderTabs(){
 }
 function miniSVG(f,P,opts){const p=.1;return`<svg width="24" height="18" viewBox="${-p} ${-p} ${n(f.w+2*p)} ${n(Math.max(f.h,.12)+2*p)}">${f.draw(f.w,f.h,P,opts||optv({kind:Object.keys(FURN).find(k=>FURN[k]===f)}))}</svg>`}
 function renderPalette(){
-  const P=curP();let h=`<h4>Rooms</h4><p class="muted">Click a type, then drag on the plan</p><div class="pgrid">`;
-  for(const[k,l]of ROOM_TYPES)h+=`<button class="pbtn ${ui.tool==='draw'&&ui.drawType===k?'on':''}" data-room="${k}"><span class="sw" style="background:${P.rooms[k]}"></span>${l}</button>`;
-  h+='</div>';
-  for(const[g,gl]of FURN_GROUPS){h+=`<h4>${gl}</h4>${g==='fun'?'<p class="muted">Select a table, TV unit or shelf first and small things land on top of it.</p>':''}<div class="pgrid">`;for(const[k,f]of Object.entries(FURN))if(f.group===g)h+=`<button class="pbtn" data-item="${k}">${miniSVG(f,P,optv({kind:k}))}${f.label}</button>`;h+='</div>'}
-  for(const[g,gl]of DEV_GROUPS){h+=`<h4>${gl}</h4><div class="pgrid">`;for(const[k,d]of Object.entries(DEV))if(d.g===g)h+=`<button class="pbtn" data-dev="${k}"><span class="em">${d.emoji}</span>${d.label}</button>`;h+='</div>'}
-  $('#palette').innerHTML=h;
+  const P=curP(),kw=s=>esc(s.replace(/_/g,' '));let h=`<div class="pgrp"><h4>Rooms</h4><p class="muted">Click a type, then drag on the plan</p><div class="pgrid">`;
+  for(const[k,l]of ROOM_TYPES)h+=`<button class="pbtn ${ui.tool==='draw'&&ui.drawType===k?'on':''}" data-room="${k}" data-kw="room ${kw(k)}"><span class="sw" style="background:${P.rooms[k]}"></span>${l}</button>`;
+  h+='</div></div>';
+  for(const[g,gl]of FURN_GROUPS){h+=`<div class="pgrp"><h4>${gl}</h4>${g==='fun'?'<p class="muted">Select a table, TV unit or shelf first and small things land on top of it.</p>':''}<div class="pgrid">`;for(const[k,f]of Object.entries(FURN))if(f.group===g)h+=`<button class="pbtn" data-item="${k}" data-kw="${kw(k+' '+gl+' '+(f.kw||''))}">${miniSVG(f,P,optv({kind:k}))}${f.label}</button>`;h+='</div></div>'}
+  for(const[g,gl]of DEV_GROUPS){h+=`<div class="pgrp"><h4>${gl}</h4><div class="pgrid">`;for(const[k,d]of Object.entries(DEV))if(d.g===g)h+=`<button class="pbtn" data-dev="${k}" data-kw="${kw(k+' '+gl+' device smart '+d.domain)}"><span class="em">${d.emoji}</span>${d.label}</button>`;h+='</div></div>'}
+  $('#pal').innerHTML=h;filterPalette();
 }
+function filterPalette(){const q=$('#pq').value.trim().toLowerCase(),words=q.split(/\s+/).filter(Boolean);let any=false;
+  for(const grp of $('#pal').querySelectorAll('.pgrp')){let vis=0;
+    for(const b of grp.querySelectorAll('.pbtn')){const ok=words.every(w=>(b.textContent+' '+b.dataset.kw).toLowerCase().includes(w));b.style.display=ok?'':'none';if(ok)vis++}
+    grp.style.display=vis?'':'none';for(const m of grp.querySelectorAll('p.muted'))m.style.display=q?'none':'';if(vis)any=true}
+  $('#pnone').hidden=any}
+$('#pq').addEventListener('input',filterPalette);
+$('#pq').addEventListener('keydown',e=>{if(e.key==='Escape'){e.target.value='';filterPalette()}
+  else if(e.key==='Enter'){const b=[...$('#pal').querySelectorAll('.pbtn')].find(x=>x.style.display!=='none');if(b)b.click()}});
 const num=(f,label,v,step)=>`<label class="f"><span>${label}</span><input type="number" step="${step}" data-f="${f}" value="${n(v)}"></label>`;
 const txt=(f,label,v,extra='')=>`<label class="f"><span>${label}</span><input data-f="${f}" value="${esc(v)}" ${extra}></label>`;
 const sel=(attr,label,choices,v)=>`<label class="f"><span>${label}</span><select ${attr}>${choices.map(([k,l])=>`<option value="${k}"${String(k)===String(v)?' selected':''}>${l}</option>`).join('')}</select></label>`;
