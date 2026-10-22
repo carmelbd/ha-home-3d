@@ -452,6 +452,23 @@ Object.assign(FURN,{
         if(o.style==='corner'){b.glass(w-.03,0,.012,d,.07,gh-.04,o.glass);b.box(w-.036,0,.024,d,gh+.03,.025,CH_,CHROME);b.box(w-.036,0,.024,.025,.05,gh,CH_,CHROME);b.box(w*.52+.04,d-.1,.02,.03,.85,.4,CH_,CHROME)}
         else b.box(w*.35+w*.65-.02,d-.03,.02,.02,gh,.02,CH_,CHROME)}}},
   nightstand:{label:'Nightstand',group:'bed',w:.45,h:.4,opts:[O.sel('drawers','Drawers',[['0','Open shelf'],['1','1 drawer'],['2','2 drawers'],['3','3 drawers']],'1'),O.sel('lamp','Lamp',[['yes','Yes'],['no','No']],'yes'),O.color('#d9c7ad')],draw:bedside2D,d3:bedside3,surf:bedsideH},
+  vanity:{label:'Makeup vanity',group:'bed',w:1,h:.8,opts:[O.sel('light','Mirror light',[['bulbs','Hollywood bulbs'],['led','LED frame'],['none','No light']],'bulbs'),O.sel('stool','Stool',[['yes','Yes'],['no','No']],'yes'),O.sel('drawers','Drawers',[['yes','Yes'],['no','No']],'yes'),O.color('#f4efe9')],
+    draw:(w,h,P,o)=>{const t=Math.min(.45,h);let s=R(0,0,w,t,P,{rx:.02,fill:o.color})+L(w*.12,.035,w*.88,.035,P,{stroke:P.glassS,sw:.03});
+      if(o.light==='bulbs')for(let i=0;i<5;i++)s+=C(w*.12+i*w*.19,.035,.025,P,{fill:'#ffe9a8',sw:.01});else if(o.light==='led')s+=L(w*.1,.035,w*.9,.035,P,{stroke:'#ffd36b',sw:.04});
+      if(o.drawers==='yes')s+=L(w*.36,0,w*.36,t,P,{sw:.015});
+      return s+(o.stool==='yes'&&h>t+.15?C(w/2,t+(h-t)/2,Math.min(.17,(h-t)/2),P,{fill:P.fur2}):'')},
+    d3:(b,w,d,H,o)=>{const t=Math.min(.45,d),c=o.color,top=.74,mw=w*.72,mx=(w-mw)/2,my=top+.06,mh=Math.min(.75,H-my-.15),lit={emis:'#ffe2a8',ei:1.2};
+      b.box(0,0,w,t,top,.03,c);
+      if(o.drawers==='yes'){b.box(0,0,w*.36,t,0,top,c);for(let i=0;i<3;i++){const y=.04+i*.235;b.box(.02,t,w*.36-.04,.012,y,.215,shade(c,-.06));b.box(w*.18-.04,t+.012,.08,.012,y+.1,.015,C3.steel,CHROME)}}
+      else for(const[x,z]of[[.02,.02],[.02,t-.06]])b.box(x,z,.04,.04,0,top,c);
+      for(const[x,z]of[[w-.06,.02],[w-.06,t-.06]])b.box(x,z,.04,.04,0,top,c);
+      b.box(mx-.03,0,mw+.06,.025,my-.03,mh+.06,shade(c,-.1));b.box(mx,.025,mw,.008,my,mh,C3.mirror,{rough:.06,metal:.35});
+      if(o.light==='led')b.box(mx-.035,.02,mw+.07,.01,my-.035,mh+.07,'#fff3d6',lit);
+      else if(o.light==='bulbs'){const nx=Math.max(3,Math.round(mw/.16)),ny=Math.max(3,Math.round(mh/.17));
+        for(let i=0;i<nx;i++)b.sph(mx+mw*(i+.5)/nx,.045,my+mh+.01,.028,'#fff6dc',lit);
+        for(let i=0;i<ny;i++){const y=my+mh*(i+.5)/ny;b.sph(mx-.015,.045,y,.028,'#fff6dc',lit);b.sph(mx+mw+.015,.045,y,.028,'#fff6dc',lit)}}
+      if(o.stool==='yes'&&d>t+.15){const z=t+(d-t)/2,r=Math.min(.17,(d-t)/2);b.cyl(w/2,z,.025,0,.42,C3.steel,CHROME);b.cyl(w/2,z,r*.8,0,.02,C3.steel,CHROME);b.cyl(w/2,z,r,.42,.07,'#f2d6dc')}},
+    surf:()=>.77},
   bedside:{label:'Bedside drawers',group:'bed',w:.42,h:.38,opts:[O.sel('drawers','Drawers',[['0','Open shelf'],['1','1 drawer'],['2','2 drawers'],['3','3 drawers']],'3'),O.sel('lamp','Lamp',[['yes','Yes'],['no','No']],'no'),O.color('#f2efe9')],draw:bedside2D,d3:bedside3,surf:bedsideH},
   plastic_wardrobe:{label:'Plastic closet',group:'bed',w:.9,h:.45,opts:[O.sel('tint','Cover',[['#f4f6f8','Clear'],['#ffffff','White'],['#f7c6d4','Pink'],['#bfe8d6','Mint'],['#c9d6f2','Blue'],['#3a3f46','Black']],'#f4f6f8'),O.sel('tall','Height',[['1.6','1.6 m'],['1.75','1.75 m'],['1.2','1.2 m']],'1.6')],
     draw:(w,h,P)=>{let s=R(0,0,w,h,P,{fill:P.glass,stroke:P.glassS,rx:.02});s+=L(.04,h/2,w-.04,h/2,P,{sw:.02});for(let x=.08;x<w-.04;x+=.09)s+=L(x,h/2-.13,x,h/2+.13,P,{sw:.015});return s},
@@ -1197,7 +1214,7 @@ function builder(g,w,d){const off=(x,z)=>[x-w/2,z-d/2];return{
   box(x,z,sw,sd,y0,ht,col,o={}){const m=mesh(new THREE.BoxGeometry(Math.max(sw,.005),Math.max(ht,.005),Math.max(sd,.005)),mat(col,o),!((o.opacity??1)<1));const[px,pz]=off(x+sw/2,z+sd/2);m.position.set(px,y0+ht/2,pz);g.add(m);return m},
   cyl(cx,cz,r,y0,ht,col,o={}){const m=mesh(new THREE.CylinderGeometry(r,r,ht,28),mat(col,o));const[px,pz]=off(cx,cz);m.position.set(px,y0+ht/2,pz);g.add(m);return m},
   glass(x,z,sw,sd,y0,ht,kind){const geo=new THREE.BoxGeometry(Math.max(sw,.005),Math.max(ht,.005),Math.max(sd,.005)),m=new THREE.Mesh(geo,glassMat(kind));m.renderOrder=2;const[px,pz]=off(x+sw/2,z+sd/2);m.position.set(px,y0+ht/2,pz);g.add(m);const e=new THREE.LineSegments(new THREE.EdgesGeometry(geo),edgeMat());e.position.copy(m.position);g.add(e);return m},
-  sph(cx,cz,y,r,col){const m=mesh(new THREE.SphereGeometry(r,18,14),mat(col));const[px,pz]=off(cx,cz);m.position.set(px,y,pz);g.add(m);return m},
+  sph(cx,cz,y,r,col,o={}){const m=mesh(new THREE.SphereGeometry(r,18,14),mat(col,o));const[px,pz]=off(cx,cz);m.position.set(px,y,pz);g.add(m);return m},
   add(m,cx,cz,y){const[px,pz]=off(cx,cz);m.position.set(px,y,pz);g.add(m);return m}}}
 function canvasTex(c){const t=new THREE.CanvasTexture(c);t.anisotropy=4;return t}
 function labelMesh(text,sub,fs,P){
