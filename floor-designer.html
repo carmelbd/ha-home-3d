@@ -724,7 +724,8 @@ function haToggle(d){
 function haLights(ls,turnOn){const ids=[...new Set(ls.filter(validEntity).map(d=>d.entity))];if(!ids.length)return;
   hass().callService('homeassistant',turnOn?'turn_on':'turn_off',{entity_id:ids});for(const d of ls)turnOn?ON.add(d.id):ON.delete(d.id)}
 function haSave(){$('#saved').textContent='Saving…';clearTimeout(ha.saveT);ha.saveT=setTimeout(async()=>{
-  try{ha.cfg=Object.assign({},ha.cfg,{floor_designer:Object.assign({},doc,{entities:[]})});
+  try{const conn=hass().connection;try{ha.cfg=await conn.sendMessagePromise({type:'lovelace/config',url_path:ha.dash})}catch(e){}
+    ha.cfg=Object.assign({},ha.cfg,{floor_designer:Object.assign({},doc,{entities:[]})});
     await hass().connection.sendMessagePromise({type:'lovelace/config/save',url_path:ha.dash,config:ha.cfg});
     $('#saved').textContent='Saved to HA ✓';clearTimeout(saveTimer);saveTimer=setTimeout(()=>$('#saved').textContent='',1500)}
   catch(e){$('#saved').textContent='Not saved: '+(e.message||'HA error')}},600)}
