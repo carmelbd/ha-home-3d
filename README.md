@@ -4,9 +4,26 @@ Draw your home, walk around it in 3D, and control your real devices from the pla
 
 ![Whole house, exploded 3D view](screenshots/3d-explode.png)
 
+## 🆕 What's new
+
+**Already installed?** Jump to [Updating](#updating-to-a-new-version). It takes a minute and your design is kept.
+
+- **Zoom in 2D.** Scroll or pinch on the plan to zoom in on a room, and drag empty space to move around. There are also **− / + / Fit** buttons in the corner. Phones and tablets support two-finger pinch. Each floor remembers its own zoom.
+- **🔍 Search products.** A search box sits above the catalog. Type `light`, `sofa`, `trash`… and only the matches show. **Enter** adds the first one, **Esc** clears.
+- **💄 Makeup vanity** (Bedroom, closet & office). It has a mirror with Hollywood bulbs or an LED frame that glow in night mode, plus optional stool and drawers, in any color.
+- **🗑️ Sensor trash can** (Kitchen & bath). It comes rectangular, round or as a double recycling bin, in 12 / 30 / 50 L, in steel, black or white, with a glowing blue sensor light.
+- **Safer saving.** If the dashboard is edited while Home 3D is open, saving no longer overwrites that edit.
+
+| Zoom + search | Vanity and trash can | …at night |
+|---|---|---|
+| ![Zoom and search](screenshots/2d-zoom-search.png) | ![Makeup vanity and sensor trash can](screenshots/3d-vanity-trash.png) | ![Vanity bulbs glowing at night](screenshots/3d-vanity-night.png) |
+
+The full list of changes is in [CHANGELOG.md](CHANGELOG.md).
+
 ## What it does
 
-- **Design your home.** Draw rooms, walls, doors, windows and stairs. Add any number of floors (and a basement), then furnish it from a catalog of sofas, beds, kitchens, plants and more.
+- **Design your home.** Draw rooms, walls, doors, windows and stairs. Add any number of floors (and a basement), then furnish it from a catalog of sofas, beds, kitchens, plants, a makeup vanity, a sensor trash can and more. Use 🔍 search to find things fast.
+- **Zoom in 2D.** Scroll or pinch to zoom, drag to move around, or use the − / + / Fit buttons.
 - **Look around in 3D.** Drag to rotate, right-drag to pan and scroll to zoom. You can show one floor or the whole house, use full-height walls, or "explode" the floors apart.
 - **Day or night.** 🌙 Night mode darkens the house so you can see which lights are on.
 - **Control your devices.** Place lights, switches, ACs, shutters, TVs, sensors, cameras and more, and link each one to a Home Assistant entity.
@@ -58,10 +75,19 @@ views:
 ## Good to know
 
 - **Saving needs an admin user.** Changes are saved into the dashboard itself, and Home Assistant only lets admins change dashboards. Other users can still view and control.
-- **Updating to a new version:** replace `floor-designer.html` in `www`. Then change `?v=1` to `?v=2` in the dashboard so phones don't keep the old copy. Your design isn't touched.
 - **Backup or share a design:** ⋯ → **Save design file** / **Open design file**.
 - **It needs internet** the first time it loads, because the 3D engine (three.js) comes from a CDN.
 - You can also open the file on its own, outside Home Assistant, to play with a design. Devices are then simulated and the design is saved in that browser only.
+
+## Updating to a new version
+
+Your design is stored in Home Assistant, not in the file, so updating never touches it.
+
+1. Download the new [`floor-designer.html`](floor-designer.html) and replace the old one in your `www` folder.
+2. In Home Assistant, open the **Home 3D** dashboard → ✏️ → ⋮ → **Raw configuration editor**. Raise the number at the end of the URL by one, for example `/local/floor-designer.html?v=1` → `?v=2`, then save. Leave everything else in that editor as it is. This makes browsers and the phone app load the new version instead of an old saved copy.
+3. Reload the page. On a phone, close and reopen the Home Assistant app.
+
+If something looks off after updating, clear the browser cache or bump the number once more.
 
 ## License
 
