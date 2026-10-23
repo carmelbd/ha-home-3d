@@ -1032,11 +1032,11 @@ const groupOf=(fl,r)=>r.link?fl.rooms.filter(x=>x.link===r.link):[r];
 const mainOf=(fl,r)=>groupOf(fl,r).reduce((a,b)=>b.w*b.h>a.w*a.h?b:a);
 const groupArea=(fl,r)=>groupOf(fl,r).reduce((a,x)=>a+x.w*x.h,0);
 const touching=(a,b)=>a.x<=b.x+b.w+.01&&b.x<=a.x+a.w+.01&&a.y<=b.y+b.h+.01&&b.y<=a.y+a.h+.01&&(Math.min(a.x+a.w,b.x+b.w)-Math.max(a.x,b.x)>.05||Math.min(a.y+a.h,b.y+b.h)-Math.max(a.y,b.y)>.05);
-function syncGroup(fl,r){for(const x of groupOf(fl,r))if(x!==r){x.name=r.name;x.type=r.type;x.floor=r.floor;x.fdir=r.fdir;x.open=r.open}}
+function syncGroup(fl,r){for(const x of groupOf(fl,r))if(x!==r){x.name=r.name;x.type=r.type;x.floor=r.floor;x.fdir=r.fdir;x.open=r.open;x.walls=r.walls}}
 function wallEdges(fl){
   const E=[],hid=[];
-  for(const r of fl.rooms){if(OUTDOOR.has(r.type))continue;const rail=r.type==='balcony'||!!r.open,hd=r.hide||{};
-    for(const[sd,ax,c,a,b]of sidesOf(r))(hd[sd]?hid:E).push({ax,c,a,b,rail,room:r})}
+  for(const r of fl.rooms){if(OUTDOOR.has(r.type)&&!['yes','low','rail'].includes(r.walls))continue;const rail=r.type==='balcony'||!!r.open||r.walls==='rail',low=r.walls==='low',hd=r.hide||{};
+    for(const[sd,ax,c,a,b]of sidesOf(r))(hd[sd]?hid:E).push({ax,c,a,b,rail,low,room:r})}
   for(const e of E){let p=[[e.a,e.b]];for(const h of hid)if(h.ax===e.ax&&Math.abs(h.c-e.c)<.06)p=subI(p,h.a,h.b);
     if(e.room.link)for(const r2 of fl.rooms)if(r2!==e.room&&r2.link===e.room.link)for(const[,ax,c,a,b]of sidesOf(r2))if(ax===e.ax&&Math.abs(c-e.c)<.06)p=subI(p,a,b);
     e.pcs=p.filter(([a,b])=>b-a>.01)}
@@ -1247,7 +1247,7 @@ function renderProps(){
         `<div class="card"><h4>Shape</h4><p class="tip" style="margin-top:0">Make an L, T or U shape by adding rectangles to this room. The walls between sections disappear.</p>`+
         `<div class="btns" style="margin-bottom:${others.length?6:0}px"><button data-act="addSection" class="primary">＋ Add section</button>${grp.length>1?'<button data-act="detach">Detach this section</button>':''}</div>`+
         (others.length?sel('data-f="joinWith"','Or join with a neighbouring room',[['','Choose a room…'],...others.map(x=>[x.id,`${x.name}`])],''):'')+`</div>`})()+
-      `<h4>Walls</h4><div class="cks">${ck('data-f="wall_n"','Top',!hd.n)}${ck('data-f="wall_e"','Right',!hd.e)}${ck('data-f="wall_s"','Bottom',!hd.s)}${ck('data-f="wall_w"','Left',!hd.w)}</div>`+
+      `<h4>Walls</h4>${OUTDOOR.has(r.type)?sel('data-f="walls"','Walls around this area',[['none','None (open)'],['yes','Walls (full height)'],['low','Low wall (1.2 m)'],['rail','Railing']],r.walls||'none'):''}<div class="cks">${ck('data-f="wall_n"','Top',!hd.n)}${ck('data-f="wall_e"','Right',!hd.e)}${ck('data-f="wall_s"','Bottom',!hd.s)}${ck('data-f="wall_w"','Left',!hd.w)}</div>`+
       `<p class="tip" style="margin-top:-6px">Untick a side to remove that wall, for example to make an open kitchen. It also removes the neighbour's matching wall.</p>`+
       (fi>0?`<div class="cks">${ck('data-f="open"','Open to the floor below (stairwell)',r.open)}</div>`:'')+
       `<div class="btns"><button data-act="dup">Duplicate</button><button data-act="del" class="danger">Delete</button></div>`+
@@ -1404,6 +1404,7 @@ $('#props').addEventListener('input',e=>{
     if(s.t==='rooms'&&(f==='x'||f==='y'))for(const k of kidsOf(fl,o))k[f]=n(k[f]+x-o[f]);o[f]=x;refreshViews();return}
   if(f==='type'){if(o.name===ROOM_LABEL[o.type]||!o.name)o.name=uniqueName(ROOM_LABEL[v]);o.type=v;syncGroup(fl,o);finishField();renderAll();return}
   if(f==='floor'){o.floor=v;syncGroup(fl,o);finishField();renderAll();return}
+  if(f==='walls'){o.walls=v;syncGroup(fl,o);finishField();renderAll();return}
   if(f==='fdir'){o.fdir=+v;syncGroup(fl,o);finishField();refreshViews();return}
   if(f==='z'){const x=parseFloat(v);if(x>=0&&x<=4){o.z=x;refreshViews()}return}
   if(f==='kind'){const old=DEV[o.kind],nk=DEV[v];if(o.entity&&o.entity.startsWith(old.domain+'.'))o.entity=nk.domain+o.entity.slice(old.domain.length);o.kind=v;finishField();renderAll();return}
@@ -1569,7 +1570,7 @@ function buildFloor(fl,P,o){
     const gl=mesh(new THREE.BoxGeometry(len,.96,.02),glassM,false);gl.position.set(mx,.48,mz);gl.rotation.y=ang;g.add(gl);
     const bar=mesh(new THREE.BoxGeometry(len+.04,.04,.05),railM);bar.position.set(mx,.98,mz);bar.rotation.y=ang;g.add(bar)}
   for(const e of wallEdges(fl)){
-    const hgt=e.rail?1:H,t=e.rail?.05:.12;
+    const hgt=e.rail?1:e.low?Math.min(H,1.2):H,t=e.rail?.05:.12;
     const seg=(a,b,y0,y1,m,ext=true)=>{let a2=a,b2=b;if(ext){if(Math.abs(a-e.a)<1e-6)a2-=t/2;if(Math.abs(b-e.b)<1e-6)b2+=t/2}
       const len=b2-a2,hh=y1-y0;if(len<.01||hh<.01)return;const w=mesh(e.ax==='h'?wallUV(new THREE.BoxGeometry(len,hh,t),len,hh,t):wallUV(new THREE.BoxGeometry(t,hh,len),t,hh,len),m,m!==glassM);
       const mid=(a2+b2)/2;if(e.ax==='h')w.position.set(mid,y0+hh/2,e.c);else w.position.set(e.c,y0+hh/2,mid);g.add(w);

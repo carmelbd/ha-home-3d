@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.6.1 (2026-10-23): Walls around outdoor areas
+
+- Outdoor rooms (Garden / lawn, Outdoor paving, Gravel yard, Parking) get a **Walls around this area** option: None (open, the default), Walls (full height), Low wall (1.2 m) or Railing. The Top / Right / Bottom / Left ticks still remove single sides, for example where two yards meet.
+
 ## 1.6.0 (2026-10-23): Pool, pergola & yard
 
 - **New catalog group "Pool, pergola & yard":** louvered pergola, outdoor kitchen (gas or charcoal grill, sink, mini fridge), outdoor LED screen, garden / boundary wall with lights, outdoor steps, car, and a corner L-shaped sofa (in Living & media).
