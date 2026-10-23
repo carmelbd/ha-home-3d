@@ -4,6 +4,7 @@
 
 - **Camera arrows:** tap a camera in the wall display to see it big. Pan-and-tilt cameras from **Eufy Security** or **ONVIF** now show ◀ ▲ ▼ ▶ arrows to turn them, and ⟳ for a full turn (Eufy).
 - **Eufy cameras wake up by themselves:** when an Eufy camera has no picture yet, the card starts its live stream so a picture appears.
+- **New guide:** [Cameras, including Eufy](README.md#cameras-including-eufy). It covers showing cameras on the wall, the arrows, and adding Eufy cameras to Home Assistant step by step (HACS, eufy-security-ws, go2rtc, a second Eufy account), with troubleshooting.
 
 ## 1.7.2 (2026-10-23): A better-looking weather card
 

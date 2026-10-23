@@ -8,6 +8,12 @@ Draw your home, walk around it in 3D, and control your real devices from the pla
 
 **Now on HACS!** [Install with HACS](#install-with-hacs-about-2-minutes) and future updates arrive as one click. **Already installed by hand?** See [Updating](#updating-to-a-new-version). Your design is kept.
 
+- **📷 Cameras you can turn (1.7.3).** Tap a camera on the wall display to see it big. Pan-and-tilt cameras (Eufy Security or ONVIF) get ◀ ▲ ▼ ▶ arrows to turn them and ⟳ for a full turn. Eufy cameras with no picture yet start their live stream by themselves. New guide: [Cameras, including Eufy](#cameras-including-eufy).
+
+![Wall display with two cameras next to the clock and weather](screenshots/wall-cameras.png)
+
+![A camera opened big, with arrows to turn it](screenshots/camera-arrows.png)
+
 - **⛶ Wall display (1.7.0).** For a tablet on the wall: **⛶ Wall** fills the whole screen with just your house, covering Home Assistant's sidebar and top bar. Add a clock (digital, analog or small), weather with a 5-day forecast for where the tablet or phone is, scene buttons, live camera pictures and any sensor values, and put each one where you like. Buttons hide by themselves, and there's a screensaver and an automatic night look. **🧹 House only** hides everything except the house. [More below](#wall-display-tablet-on-the-wall).
 
 ![Wall display with clock, weather and scene buttons](screenshots/wall.png)
@@ -144,7 +150,114 @@ type: custom:home-3d-card
 wall: true
 ```
 
-**Tips for a wall tablet:** use the Home Assistant app and turn on its full-screen option, and set the tablet's Auto-Lock to **Never** (or use Guided Access on an iPad) so the screen stays on. Camera pictures are snapshots that refresh, not live video.
+**Tips for a wall tablet:** use the Home Assistant app and turn on its full-screen option, and set the tablet's Auto-Lock to **Never** (or use Guided Access on an iPad) so the screen stays on. Camera pictures are snapshots that refresh, not smooth video. See [Cameras, including Eufy](#cameras-including-eufy).
+
+## Cameras, including Eufy
+
+### Show cameras on the wall display
+
+1. Tap **⛶ Wall**, tap the screen 3 times, then **⚙ Wall settings → Cameras**.
+2. Tap **＋ Add all my cameras**, or write one per line as `entity | label`:
+   ```
+   camera.balcony | Balcony
+   camera.entryway | Entryway
+   ```
+3. Choose **Cameras position** (for example the same corner as the clock or weather; they stack), **Camera size** (Small, Medium, Large, Huge) and **Refresh picture every** (2, 5, 10 or 30 seconds).
+
+Tap a camera to see it big. The big picture refreshes every second.
+
+### Turn the camera (pan and tilt)
+
+When a camera can turn, the big view shows arrows in the corner:
+
+| Button | What it does |
+|---|---|
+| ◀ ▶ | Turn left or right, one step per tap |
+| ▲ ▼ | Tilt up or down, one step per tap |
+| ⟳ | Full 360° turn (Eufy only) |
+
+The card finds out by itself which cameras can turn (from Home Assistant's entity list):
+
+- **Eufy Security** cameras use `eufy_security.ptz_left`, `ptz_right`, `ptz_up`, `ptz_down` and `ptz_360`.
+- **ONVIF** cameras use `onvif.ptz` with a short move.
+
+Other cameras show no arrows.
+
+You can do the same from Home Assistant itself: **Developer tools → Actions → Eufy Security: PTZ left**, target `camera.your_camera`. The Eufy app can also save preset positions, and **Eufy Security: Preset position** jumps to them.
+
+### Add Eufy cameras to Home Assistant
+
+Eufy cameras that are in Apple Home can't simply be shared to Home Assistant. A HomeKit camera can only be paired to one hub, and Home Assistant's HomeKit integration gives still pictures only. Use the **Eufy Security** integration instead. Your cameras stay in Apple Home and the Eufy app too.
+
+You need three parts:
+
+| Part | What it is | Where it runs |
+|---|---|---|
+| **Eufy Security** integration | Makes `camera.*`, motion sensors, switches and pan/tilt actions in Home Assistant | Home Assistant (from HACS) |
+| **eufy-security-ws** | Logs in to your Eufy account and talks to the cameras | Add-on, or a Docker container |
+| **go2rtc** | Relays the live video so Home Assistant can show it | Add-on, or a Docker container |
+
+**1. Make a second Eufy account (recommended).** Eufy doesn't like one account logged in from two places, so your phone or Home Assistant can get logged out at random.
+1. In the Eufy app, sign up a new account with another email. A Gmail `+` address works, like `you+eufy@gmail.com`.
+2. In your main account, open **Me → Family & Guests** (or **Home Sharing**) **→ Add** and invite the new email.
+3. Choose your cameras and give **Admin** rights. With guest rights, Home Assistant can watch but can't turn the camera.
+4. Log in to the new account once and accept the invite.
+
+**2. Install the integration.**
+1. In **HACS**, search **Eufy Security** (by fuatakgun) and tap **Download**.
+2. Restart Home Assistant: **Settings → System → ⏻ → Restart**.
+
+> **"You can add this integration by adding it to your configuration.yaml"?** You picked the built-in **Eufy** integration, which is for old Eufy bulbs and plugs. The camera one is **Eufy Security**, and it only shows up after the HACS download and a restart.
+
+**3. Start eufy-security-ws and go2rtc.**
+
+- **With Home Assistant OS (you have Settings → Add-ons):**
+  1. Add the repository `https://github.com/bropat/hassio-eufy-security-ws` and install **eufy-security-ws**.
+  2. Enter the second account's email, password and country.
+  3. Also install **go2rtc** (or the WebRTC add-on).
+- **Without add-ons (Home Assistant Container):** run them with Docker on any computer that stays on. It can be the Home Assistant machine itself:
+
+  ```sh
+  docker run -d --name eufy-security-ws --restart unless-stopped \
+    -p 3000:3000 -v ~/eufy-security-ws-data:/data \
+    -e USERNAME="second-account-email" -e PASSWORD="second-account-password" \
+    -e COUNTRY="IL" bropat/eufy-security-ws:latest
+
+  docker run -d --name go2rtc --restart unless-stopped \
+    -p 8554:8554 -p 1984:1984 -p 8555:8555/tcp -p 8555:8555/udp \
+    -v ~/go2rtc-config:/config alexxit/go2rtc:latest
+  ```
+
+  - Use your own country code.
+  - On a Mac, use `-p` like above, not `--network host`. Docker on a Mac doesn't open host-network ports to the rest of your network.
+  - If port 3000 is already taken, use `-p 3001:3000` and port `3001` below.
+  - The `/data` folder keeps the Eufy login across restarts.
+  - Check it worked with `docker logs eufy-security-ws`. You should see `Connected to station …` for each camera.
+
+**4. Connect it.**
+1. Open **Settings → Devices & Services → Add Integration → Eufy Security**.
+2. **Host:** the address of the computer running eufy-security-ws. Use `127.0.0.1` only if it's the Home Assistant machine itself. **Port:** `3000` (or the one you chose).
+3. For live video, open **Eufy Security → Configure** and set **RTSP server address** to the address of the computer running go2rtc.
+
+Each camera now has:
+- a `camera.*` entity
+- motion, person, pet and sound sensors
+- switches (camera on, status light, night vision, RTSP)
+- the pan/tilt actions
+
+**Troubleshooting**
+
+| You see | Fix |
+|---|---|
+| Integration setup says **auth** or "Connection to add-on was broken" | Home Assistant can't reach eufy-security-ws. Check the host and port, that the container is running, and (on a Mac) that you used `-p`, not host network. |
+| Camera shows no picture / `camera_proxy` gives an error | The camera has no picture until motion or a live stream. The card starts the stream for you. By hand: **Eufy Security: Start P2P livestream**. If the log says `Connection refused, rtsp://…:8554`, go2rtc isn't reachable: set **RTSP server address** (step 4). |
+| Arrows don't move the camera | The Eufy account needs **Admin** rights on that camera (step 1). |
+| Your phone gets logged out of Eufy | Use the second account (step 1). |
+
+### Other cameras
+
+- **RTSP cameras:** many cameras have an RTSP option in their app. In the Eufy app this is **NAS (RTSP)** on supported models. Add them with **Add Integration → Generic Camera** and a URL like `rtsp://user:password@camera-ip/live0`.
+- **ONVIF cameras:** add them with the **ONVIF** integration. If they can turn, they get the arrows too.
 
 ## Good to know
 
