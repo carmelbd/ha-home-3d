@@ -23,7 +23,7 @@ class Home3DCard extends HTMLElement {{
       :host {{ display: block; }}
       ha-card {{ overflow: hidden; }}
       iframe {{ display: block; width: 100%; border: 0; }}
-    </style><ha-card><iframe title="Home 3D" allow="fullscreen"></iframe></ha-card>`;
+    </style><ha-card><iframe title="Home 3D" allow="fullscreen; geolocation"></iframe></ha-card>`;
     this._frame = root.querySelector("iframe");
     this._size();
     // srcdoc keeps the page on Home Assistant's origin, so it can use the live connection.

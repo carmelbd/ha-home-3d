@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.7.1 (2026-10-23): Weather where you are
+
+- **Weather for** setting in the wall display: **Where this tablet / phone is** (the new default), **Home**, **A person or phone in Home Assistant**, or **A Home Assistant weather entity** (as before).
+- Location weather comes from [Open-Meteo](https://open-meteo.com) (free, no account): now, humidity, wind and the next days, plus the town name. It refreshes every 15 minutes.
+- "Where this tablet / phone is" uses the device's GPS when the browser allows it (Home Assistant opened over **https**, for example with Nabu Casa). Otherwise it uses the location the Home Assistant app reports for the logged-in person, and falls back to your home.
+- Only a rounded location (about 1 km) is sent to the weather service.
+
 ## 1.7.0 (2026-10-23): Wall display
 
 - **⛶ Wall** button: the house fills the whole screen for a tablet on the wall, covering Home Assistant's sidebar and top bar. Tap three times to show the buttons (2D / 3D, Whole house, Night, All lights, Reset view, Wall settings, Exit).

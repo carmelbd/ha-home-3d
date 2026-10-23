@@ -1861,7 +1861,7 @@ $('#mdiList').innerHTML=MDI.map(m=>`<option value="mdi:${m}">`).join('');
 try{const s=JSON.parse(localStorage.getItem(KEY+'-3d')||'{}');ui.v3all=!!s.all;ui.v3full=!!s.full;ui.night=!!s.night;ui.explode=!!s.explode}catch(e){}
 /* ---------- wall display ---------- */
 const WALL_DEF={view:'3d',all:true,full:false,clock:'digital',pos:'tl',size:'l',date:true,h24:true,secs:false,color:'auto',card:true,
-  info:'tr',weather:'',weatherStyle:'forecast',weatherPos:'tr',sensors:'',lights:true,
+  info:'tr',weather:'',weatherStyle:'forecast',weatherPos:'tr',weatherSrc:'device',weatherTracker:'',sensors:'',lights:true,
   scenes:'',scenesPos:'bl',cams:'',camPos:'br',camSize:'m',camRefresh:5,
   buttons:'tap',labels:false,area:false,devices:true,control:true,
   rotate:'off',night:'auto',saver:0,saverStyle:'clock',wake:true};
@@ -1878,6 +1878,38 @@ function analog(d,px,col){const a=(v,max)=>v/max*Math.PI*2,hand=(ang,len,w)=>`<l
 const WEATHER_EM={sunny:'☀️','clear-night':'🌙',partlycloudy:'⛅',cloudy:'☁️',rainy:'🌧️',pouring:'🌧️',lightning:'🌩️','lightning-rainy':'⛈️',snowy:'🌨️',fog:'🌫️',windy:'💨','windy-variant':'💨',hail:'🌨️',exceptional:'⚠️'};
 const wText=c=>({partlycloudy:'partly cloudy','clear-night':'clear','lightning-rainy':'thunderstorm','windy-variant':'windy',exceptional:'warning'}[c]||(c||'').replace(/-/g,' ')).replace(/^./,x=>x.toUpperCase());
 function stOf(id){const h=ha.on&&hass();return h&&h.states[id]}
+const wHass=()=>ha.on&&hass();
+function wxData(){const w=W();
+  if(w.weatherSrc==='entity'){const id=weatherId();if(!id)return null;const s=stOf(id);if(!s)return{none:true};const a=s.attributes||{};
+    return{cond:s.state,temp:a.temperature,hum:a.humidity,wind:a.wind_speed,wu:a.wind_speed_unit||'',fc:WALL.fc}}
+  return WALL.wx||{none:true,msg:WALL.wxMsg||'Finding the location…'}}
+/* where to show the weather for: this device's GPS (needs https), the logged-in person's phone in HA, a chosen person/phone, or home */
+function geoBrowser(){return new Promise(ok=>{if(!window.isSecureContext||!navigator.geolocation)return ok(null);
+  navigator.geolocation.getCurrentPosition(p=>ok({lat:p.coords.latitude,lon:p.coords.longitude,src:''}),()=>ok(null),{timeout:10000,maximumAge:600000})})}
+function geoHA(){const w=W(),h=wHass();if(!h)return null;const ll=s=>s&&s.attributes&&s.attributes.latitude!=null?{lat:+s.attributes.latitude,lon:+s.attributes.longitude,src:s.entity_id.startsWith('zone.')?s.attributes.friendly_name||'Home':''}:null;
+  if(w.weatherSrc==='tracker'&&w.weatherTracker){const p=ll(h.states[w.weatherTracker]);if(p)return p}
+  if(w.weatherSrc==='device'){const uid=h.user&&h.user.id,me=uid&&Object.values(h.states).find(s=>s.entity_id.startsWith('person.')&&s.attributes.user_id===uid);const p=ll(me);if(p)return p}
+  return ll(h.states['zone.home'])}
+const WMO=c=>c===0?'sunny':c<=2?'partlycloudy':c===3?'cloudy':c<=48?'fog':c===65||c===82?'pouring':c<=67||c===80||c===81?'rainy':c<=77||c===85||c===86?'snowy':c===95?'lightning-rainy':c>=96?'hail':'cloudy';
+async function wallGeoWeather(){WALL.wxT=Date.now();const w=W();if(w.weatherStyle==='off'||w.weatherSrc==='entity')return;
+  // show Home Assistant's location right away; this device's GPS (if the browser allows it) replaces it when it arrives
+  const gps=w.weatherSrc==='device'?geoBrowser():null,at=geoHA();
+  if(at)await wxFetch(at);
+  const g=gps&&await gps;if(g&&(!WALL.wx||WALL.wx.key!==g.lat.toFixed(2)+','+g.lon.toFixed(2)))await wxFetch(g);
+  if(!at&&!g){WALL.wx=null;WALL.wxMsg=w.weatherSrc==='tracker'?'That person or phone has no location':'No location yet';wallRender()}}
+async function wxFetch(at){
+  const lat=at.lat.toFixed(2),lon=at.lon.toFixed(2),key=lat+','+lon;  // rounded to about 1 km
+  try{const h=wHass(),f=!!(h&&h.config&&h.config.unit_system&&h.config.unit_system.temperature==='°F');
+    const to=()=>(AbortSignal.timeout?{signal:AbortSignal.timeout(10000)}:{});
+    const j=await(await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code,is_day&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=auto&forecast_days=6${f?'&temperature_unit=fahrenheit&wind_speed_unit=mph':''}`,to())).json(),c=j.current;
+    let cond=WMO(c.weather_code);if(cond==='sunny'&&!c.is_day)cond='clear-night';
+    const place=WALL.wx&&WALL.wx.key===key?WALL.wx.place:'';
+    WALL.wx={key,cond,temp:c.temperature_2m,hum:c.relative_humidity_2m,wind:c.wind_speed_10m,wu:f?'mph':'km/h',place:place||at.src,
+      fc:{type:'daily',list:j.daily.time.map((t,i)=>({datetime:t+'T12:00',condition:WMO(j.daily.weather_code[i]),temperature:j.daily.temperature_2m_max[i],templow:j.daily.temperature_2m_min[i]}))}};WALL.wxMsg='';
+    if(!place){wallRender();let g={};try{g=await(await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=${encodeURIComponent((navigator.language||'en').slice(0,2))}`,to())).json()}catch(e){}
+      const nm=g.city||g.locality||g.principalSubdivision;if(nm&&WALL.wx&&WALL.wx.key===key)WALL.wx.place=nm}}
+  catch(e){WALL.wxMsg='Weather service not reachable'}
+  wallRender()}
 const wlines=t=>(t||'').split('\n').map(l=>l.split('|').map(x=>x.trim())).filter(a=>a[0]);
 function weatherId(){const w=W();return w.weather||(ha.on&&Object.keys(hass().states).find(k=>k.startsWith('weather.')))||''}
 function camSrc(id){const s=stOf(id),pic=s&&s.attributes&&s.attributes.entity_picture;if(!pic)return'';const base='';return base+pic+(pic.includes('?')?'&':'?')+'t='+Date.now()}
@@ -1898,11 +1930,11 @@ function wallRender(){if(!WALL.on)return;const w=W(),d=new Date(),col=wallColor(
     if(w.clock==='analog')c=`<div class="${cls}" style="text-align:center">${analog(d,fs*1.6,col)}${w.date?`<div class="wdate" style="font-size:${Math.max(14,fs*.2)}px">${esc(fmtDate(d))}</div>`:''}</div>`;
     else{const sz=w.clock==='minimal'?fs*.55:fs;c=`<div class="${cls}"><div class="wtime" style="font-size:${sz}px">${fmtTime(d,w)}</div>${w.date?`<div class="wdate" style="font-size:${Math.max(14,sz*.2)}px">${esc(fmtDate(d))}</div>`:''}</div>`}
     add(w.pos,'clock',c)}
-  const wid=weatherId();
-  if(w.weatherStyle!=='off'&&wid){const s=stOf(wid),a=s?s.attributes||{}:{},u=a.temperature_unit||'°',deg=v=>v==null?'—':Math.round(v)+'°';
-    let h=`<div class="now"><span class="em">${s?WEATHER_EM[s.state]||'🌡️':'⛅'}</span><b>${s?deg(a.temperature):'—°'}</b><div><div>${s?esc(wText(s.state)):'Weather'}</div><div class="sub">${s?[a.humidity!=null?`💧 ${Math.round(a.humidity)}%`:'',a.wind_speed!=null?`💨 ${Math.round(a.wind_speed)} ${esc(a.wind_speed_unit||'')}`:''].filter(Boolean).join(' · '):'Connect to Home Assistant'}</div></div></div>`;
-    if(w.weatherStyle==='forecast'&&WALL.fc&&WALL.fc.list.length){const hourly=WALL.fc.type==='hourly',seen=new Set(),days=[];
-      for(const f of WALL.fc.list){const t=new Date(f.datetime),key=hourly?t.getHours():t.toDateString();if(t<d&&!hourly&&t.toDateString()!==d.toDateString())continue;if(seen.has(key)||(WALL.fc.type==='twice_daily'&&f.is_daytime===false))continue;seen.add(key);days.push(f);if(days.length>=5)break}
+  const wx=wxData();
+  if(w.weatherStyle!=='off'&&wx){const deg=v=>v==null?'—':Math.round(v)+'°',ok=!wx.none,fc=wx.fc;
+    let h=`<div class="now"><span class="em">${ok?WEATHER_EM[wx.cond]||'🌡️':'⛅'}</span><b>${ok?deg(wx.temp):'—°'}</b><div><div>${ok?esc(wText(wx.cond)):'Weather'}</div><div class="sub">${ok?[wx.place?`📍 ${esc(wx.place)}`:'',wx.hum!=null?`💧 ${Math.round(wx.hum)}%`:'',wx.wind!=null?`💨 ${Math.round(wx.wind)} ${esc(wx.wu||'')}`:''].filter(Boolean).join(' · '):esc(wx.msg||'Connect to Home Assistant')}</div></div></div>`;
+    if(w.weatherStyle==='forecast'&&fc&&fc.list.length){const hourly=fc.type==='hourly',seen=new Set(),days=[];
+      for(const f of fc.list){const t=new Date(f.datetime),key=hourly?t.getHours():t.toDateString();if(t<d&&!hourly&&t.toDateString()!==d.toDateString())continue;if(seen.has(key)||(fc.type==='twice_daily'&&f.is_daytime===false))continue;seen.add(key);days.push(f);if(days.length>=5)break}
       h+=`<div class="wfc">${days.map(f=>{const t=new Date(f.datetime);return`<div>${hourly?String(t.getHours()).padStart(2,'0')+':00':esc(t.toLocaleDateString(undefined,{weekday:'short'}))}<span class="em">${WEATHER_EM[f.condition]||'🌡️'}</span>${deg(f.temperature)}${f.templow!=null?` <s>${deg(f.templow)}</s>`:''}</div>`}).join('')}</div>`}
     add(w.weatherPos,'weather',`<div class="${cls} wweather" style="font-size:${cs}px">${h}</div>`)}
   const chips=[];
@@ -1954,7 +1986,8 @@ function setWall(on){if(on===WALL.on)return;WALL.on=on;document.body.classList.t
 let lastMin=-1;
 function wallTick(){const w=W(),d=new Date();
   if(wlines(w.cams).length&&Date.now()-(WALL.camT||0)>w.camRefresh*1000)camRefresh();
-  if(w.weatherStyle==='forecast'&&ha.on&&Date.now()-(WALL.fcT||0)>30*60000)wallForecast();
+  if(w.weatherStyle==='forecast'&&w.weatherSrc==='entity'&&ha.on&&Date.now()-(WALL.fcT||0)>30*60000)wallForecast();
+  if(w.weatherStyle!=='off'&&w.weatherSrc!=='entity'&&Date.now()-(WALL.wxT||0)>15*60000)wallGeoWeather();
   if(w.secs||w.clock==='analog'||d.getMinutes()!==lastMin||!$('#saver').hidden||(ha.on&&d.getSeconds()%2===0)){lastMin=d.getMinutes();wallRender()}
   if(d.getSeconds()===0){if(wallNight()){$('#wallBar').querySelector('[data-w=night]').classList.toggle('on',ui.night);refreshViews()}
     if(!$('#saver').hidden){const k=$('#saver .in');k.style.transform=`translate(${Math.round(Math.random()*16-8)}vw,${Math.round(Math.random()*16-8)}vh)`}}
@@ -1983,7 +2016,7 @@ const WS_FIELDS=[['quick'],
   ['sec','Clock'],['clock','Clock style',[['digital','Digital'],['analog','Analog'],['minimal','Small'],['off','No clock']]],['pos','Clock position',POS],
   ['size','Size (clock & text)',[['s','Small'],['m','Medium'],['l','Large'],['xl','Huge']]],['h24','Format',[[true,'24-hour'],[false,'12-hour (AM/PM)']]],['secs','Seconds',[[false,'Hide'],[true,'Show']]],['date','Date',[[true,'Show'],[false,'Hide']]],
   ['color','Text colour','color'],['card','Background',[[true,'Frosted glass card'],[false,'None (text only)']]],
-  ['sec','Weather'],['weatherStyle','Weather',[['forecast','Now + next days'],['now','Now only'],['off','Hidden']]],['weatherPos','Weather position',POS],['weather','Weather entity (empty = first one in HA)','ent'],
+  ['sec','Weather'],['weatherStyle','Weather',[['forecast','Now + next days'],['now','Now only'],['off','Hidden']]],['weatherPos','Weather position',POS],['weatherSrc','Weather for',[['device','Where this tablet / phone is'],['home','Home (from Home Assistant)'],['tracker','A person or phone in Home Assistant'],['entity','A Home Assistant weather entity']]],['weatherTracker','Person or phone (for “A person or phone”)','ent','person.me'],['weather','Weather entity (for “weather entity”; empty = first one)','ent','weather.home'],
   ['sec','Info'],['info','Info position',POS],['lights','Lights-on counter',[[true,'Show'],[false,'Hide']]],['sensors','Values to show — one per line: entity | label','area','sensor.outside_temperature | Outside&#10;sensor.pool_temperature | Pool'],
   ['sec','Scenes'],['scenesPos','Scene buttons position',POS],['scenes','Scene buttons — one per line: entity | label | emoji (scenes, scripts or buttons)','area','scene.movie_night | Movie | 🎬&#10;scene.good_night | Good night | 🌙&#10;script.pool_party | Pool party | 🏊','scenes'],
   ['sec','Cameras'],['camPos','Cameras position',POS],['camSize','Camera size',[['s','Small'],['m','Medium'],['l','Large'],['xl','Huge']]],['camRefresh','Refresh picture every',[[2,'2 seconds'],[5,'5 seconds'],[10,'10 seconds'],[30,'30 seconds']]],
@@ -1994,7 +2027,7 @@ function wallForm(){const w=W();$('#wsForm').innerHTML=WS_FIELDS.map(([k,l,c,ph,
   if(k==='quick')return`<div class="wsq"><button data-wq="clean">🧹 House only — hide clock, weather & everything</button><button data-wq="all">✨ Show clock, weather & info</button></div>`;
   if(k==='sec')return`<div class="seclbl">${l}</div>`;
   if(c==='color')return`<label class="f"><span>${l}</span><select data-ws="color">${[['auto','Automatic'],['#ffffff','White'],['#1b2230','Black'],['#f5b400','Gold'],['#5b8cff','Blue']].map(([v,t])=>`<option value="${v}"${w.color===v?' selected':''}>${t}</option>`).join('')}${['auto','#ffffff','#1b2230','#f5b400','#5b8cff'].includes(w.color)?'':`<option value="${esc(w.color)}" selected>Custom</option>`}</select></label>`;
-  if(c==='ent')return`<label class="f"><span>${l}</span><input data-ws="${k}" list="entList" value="${esc(w[k])}" placeholder="weather.home" spellcheck="false" autocomplete="off"></label>`;
+  if(c==='ent')return`<label class="f"><span>${l}</span><input data-ws="${k}" list="entList" value="${esc(w[k])}" placeholder="${ph||''}" spellcheck="false" autocomplete="off"></label>`;
   if(c==='area')return`<label class="f" style="grid-column:1/-1"><span>${l}</span><textarea data-ws="${k}" rows="3" placeholder="${ph}" spellcheck="false">${esc(w[k])}</textarea></label>`+(fill?`<div class="wsq"><button data-wq="${fill}">${fill==='scenes'?'＋ Add all my scenes & scripts from Home Assistant':'＋ Add all my cameras from Home Assistant'}</button></div>`:'');
   return`<label class="f"><span>${l}</span><select data-ws="${k}">${c.map(([v,t])=>`<option value="${v}"${String(w[k])===String(v)?' selected':''}>${t}</option>`).join('')}</select></label>`}).join('')}
 $('#wsForm').addEventListener('click',e=>{const b=e.target.closest('[data-wq]');if(!b)return;e.preventDefault();const w=doc.wall=W(),q=b.dataset.wq;
@@ -2007,7 +2040,7 @@ $('#wsForm').addEventListener('click',e=>{const b=e.target.closest('[data-wq]');
   save();wallForm();WALL.fcT=0;wallApply()});
 $('#wsForm').addEventListener('change',e=>{const t=e.target,k=t.dataset.ws;if(!k)return;const w=doc.wall=W();let v=t.value;
   if(typeof WALL_DEF[k]==='boolean')v=v==='true';else if(typeof WALL_DEF[k]==='number')v=+v;w[k]=v;save();
-  if(k==='weather'||k==='weatherStyle'){WALL.fc=null;WALL.fcT=0}
+  if(/^weather/.test(k)){WALL.fc=null;WALL.fcT=0;WALL.wx=null;WALL.wxT=0}
   if(['view','all','full','labels','area','devices','night'].includes(k))wallApply();else{wallSpin();wallRender();wallBar(true)}});
 $('#wsClose').onclick=()=>$('#wallSet').close();
 $('#wallSet').addEventListener('click',e=>{if(e.target===$('#wallSet'))$('#wallSet').close()});
