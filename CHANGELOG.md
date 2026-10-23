@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.6.0 (2026-10-23): Pool, pergola & yard
+
+- **New catalog group "Pool, pergola & yard":** louvered pergola, outdoor kitchen (gas or charcoal grill, sink, mini fridge), outdoor LED screen, garden / boundary wall with lights, outdoor steps, car, and a corner L-shaped sofa (in Living & media).
+- **Outdoor room types:** Garden / lawn, Outdoor paving, Gravel yard and Parking. They have no walls and don't count toward the house area. New floor: outdoor grey porcelain 80 cm.
+- **Pool:** water color, steps at either end, and a stone edge in any color, together with the electric cover / shade screen and underwater lights. A new pool has no cover until you choose one.
+- **Gate:** the sliding track is only as long as needed.
+- Designs made with other copies of the designer that use these items now open with the same look.
+
 ## 1.5.1 (2026-10-23): Any entity works with any button
 
 - **Fix:** a button only worked when its entity matched the button type, so a **Light** linked to a Sonoff `switch.…`, or a **TV** linked to a `remote.…`, said "link it to a Home Assistant entity first". Now any entity works with any button.

@@ -235,15 +235,16 @@ function shade(hex,amt){const v=parseInt(hex.slice(1),16),t=amt<0?0:255,p=Math.a
 /* ---------- palettes ---------- */
 const PAL={
   light:{bg:'#f7f8fa',grid:'#e3e7ed',wall:'#2b3340',label:'#1d2430',sub:'#6b7484',fur:'#ffffff',fur2:'#eef2f7',furS:'#8c95a5',hatch:'#a9c9b1',rug:'#efe7dc',plant:'#6cb27a',plantS:'#3f7d4c',pot:'#c58b5c',dev:'#ffffff',glass:'#cfe8f5',glassS:'#5fa9cf',wall3d:'#f4f1ec',wallTop:'#3a4250',base3d:'#c9ced6',
-    rooms:{living:'#e3edfb',dining:'#e8e6f8',kitchen:'#fbefd9',bedroom:'#ece4f8',kids:'#fae4ee',office:'#dff2ef',bathroom:'#d9f0f6',toilet:'#e1f1f4',laundry:'#e4ebf1',hallway:'#eef0f3',stairs:'#e9ebef',storage:'#ebe9e6',safe:'#f3e3e1',balcony:'#e2f2e5'}},
+    rooms:{living:'#e3edfb',dining:'#e8e6f8',kitchen:'#fbefd9',bedroom:'#ece4f8',kids:'#fae4ee',office:'#dff2ef',bathroom:'#d9f0f6',toilet:'#e1f1f4',laundry:'#e4ebf1',hallway:'#eef0f3',stairs:'#e9ebef',storage:'#ebe9e6',safe:'#f3e3e1',balcony:'#e2f2e5',yard:'#dcefd6',patio:'#ecebe7',gravel:'#ece6da',parking:'#e6e7ea'}},
   dark:{bg:'#10141b',grid:'#1b212c',wall:'#c9d1dd',label:'#e6ebf2',sub:'#8a94a6',fur:'#252c38',fur2:'#2e3644',furS:'#74809a',hatch:'#2f4a37',rug:'#2d2822',plant:'#4f9a5c',plantS:'#2f6b3b',pot:'#8a5d3b',dev:'#1b212b',glass:'#1f3a4a',glassS:'#5fa9cf',wall3d:'#5a6475',wallTop:'#c9d1dd',base3d:'#0a0d12',
-    rooms:{living:'#1f2d42',dining:'#28293f',kitchen:'#372d1e',bedroom:'#2a2340',kids:'#382433',office:'#1d3432',bathroom:'#163440',toilet:'#1a3038',laundry:'#212d38',hallway:'#1e232b',stairs:'#22262e',storage:'#272523',safe:'#382526',balcony:'#1c3123'}}
+    rooms:{living:'#1f2d42',dining:'#28293f',kitchen:'#372d1e',bedroom:'#2a2340',kids:'#382433',office:'#1d3432',bathroom:'#163440',toilet:'#1a3038',laundry:'#212d38',hallway:'#1e232b',stairs:'#22262e',storage:'#272523',safe:'#382526',balcony:'#1c3123',yard:'#1d3322',patio:'#26282c',gravel:'#2c2a25',parking:'#22252a'}}
 };
-const ROOM_TYPES=[['living','Living room'],['dining','Dining room'],['kitchen','Kitchen'],['bedroom','Bedroom'],['kids','Kids room'],['office','Office'],['bathroom','Bathroom'],['toilet','Toilet'],['laundry','Laundry'],['hallway','Hallway'],['stairs','Stairs'],['storage','Storage / closet'],['safe','Safe room'],['balcony','Balcony / patio']];
+const ROOM_TYPES=[['living','Living room'],['dining','Dining room'],['kitchen','Kitchen'],['bedroom','Bedroom'],['kids','Kids room'],['office','Office'],['bathroom','Bathroom'],['toilet','Toilet'],['laundry','Laundry'],['hallway','Hallway'],['stairs','Stairs'],['storage','Storage / closet'],['safe','Safe room'],['balcony','Balcony / patio'],['yard','Garden / lawn'],['patio','Outdoor paving'],['gravel','Gravel yard'],['parking','Parking']];
+const OUTDOOR=new Set(['yard','patio','gravel','parking']);
 const ROOM_LABEL=Object.fromEntries(ROOM_TYPES);
-const FLOOR_MATS=[['auto','Automatic'],['wood','Light wood planks'],['wood_dark','Dark wood planks'],['herringbone','Herringbone parquet'],['tile','Tiles 30 cm'],['big_tile','Large tiles 60 cm'],['marble','Marble'],['terrazzo','Terrazzo'],['carpet','Carpet'],['concrete','Concrete'],['deck','Wood deck'],['deck_grey','Grey composite deck'],['pavers','Stone pavers'],['pebbles','Pebbles'],['grass','Grass']];
-const FLOOR_COL={wood:'#bea68c',wood_dark:'#7d5d43',tile:'#d6dbe0',marble:'#ece9e4',carpet:'#9aa3b5',concrete:'#b8b3ab',deck:'#97806a',grass:'#6f9e5a'};
-const AUTO_FLOOR={living:'wood',dining:'wood',bedroom:'wood',kids:'wood',office:'wood',hallway:'wood',stairs:'wood',kitchen:'tile',bathroom:'tile',toilet:'tile',laundry:'tile',storage:'concrete',safe:'concrete',balcony:'deck'};
+const FLOOR_MATS=[['auto','Automatic'],['wood','Light wood planks'],['wood_dark','Dark wood planks'],['herringbone','Herringbone parquet'],['tile','Tiles 30 cm'],['big_tile','Large tiles 60 cm'],['marble','Marble'],['terrazzo','Terrazzo'],['carpet','Carpet'],['concrete','Concrete'],['deck','Wood deck'],['deck_grey','Grey composite deck'],['pavers','Stone pavers'],['porcelain','Outdoor grey porcelain 80 cm'],['pebbles','Pebbles'],['grass','Grass']];
+const FLOOR_COL={wood:'#bea68c',wood_dark:'#7d5d43',tile:'#d6dbe0',marble:'#ece9e4',carpet:'#9aa3b5',concrete:'#b8b3ab',deck:'#97806a',grass:'#6f9e5a',porcelain:'#bdbcb8',pebbles:'#a8a194',pavers:'#b5ab9b',big_tile:'#d8d3cb'};
+const AUTO_FLOOR={living:'wood',dining:'wood',bedroom:'wood',kids:'wood',office:'wood',hallway:'wood',stairs:'wood',kitchen:'tile',bathroom:'tile',toilet:'tile',laundry:'tile',storage:'concrete',safe:'concrete',balcony:'deck',yard:'grass',patio:'porcelain',gravel:'pebbles',parking:'concrete'};
 const floorColor=r=>FLOOR_COL[r.floor&&r.floor!=='auto'?r.floor:AUTO_FLOOR[r.type]||'wood'];
 
 /* ---------- smart devices ---------- */
@@ -467,6 +468,7 @@ function floorTexture(k){
     case'terrazzo':{S=1;speck('#e9e4dc',1600,['#b9a68f','#8e9aa6','#d99c82','#6f7c6a','#ffffff','#c7b299'],6);break}
     case'pavers':{S=1.6;x.fillStyle='#7d766b';x.fillRect(0,0,512,512);const cols=['#b5ab9b','#a39886','#c4bba9','#9b917f','#b0a18a'];const rw=512/5;
       for(let r=0;r<5;r++){let px=-(r%2)*rw*.5;while(px<512){const len=rw*(.8+rnd()*.7);x.fillStyle=cols[Math.floor(rnd()*cols.length)];const X=px+3,Y=r*rw+3,W=len-6,Hh=rw-6;x.beginPath();x.moveTo(X+6,Y);x.arcTo(X+W,Y,X+W,Y+Hh,6);x.arcTo(X+W,Y+Hh,X,Y+Hh,6);x.arcTo(X,Y+Hh,X,Y,6);x.arcTo(X,Y,X+W,Y,6);x.fill();px+=len}}break}
+    case'porcelain':S=tiles('#c4c3bf',2,'#9d9c98',1.6);break;
     case'concrete':speck('#b9b5ae',5000,['#a7a39c','#c9c5be','#8f8b84'],2);break;
     case'carpet':S=1;speck('#9aa3b5',9000,['#8a93a5','#aab3c5','#7f889a'],2);break;
     case'grass':{S=1;x.fillStyle='#5a8c44';x.fillRect(0,0,512,512);for(let i=0;i<9000;i++){x.strokeStyle=['#6fa352','#4c7a38','#7db35f','#3f6a2e'][i%4];x.globalAlpha=.7;x.lineWidth=1.4;const X=rnd()*512,Y=rnd()*512;x.beginPath();x.moveTo(X,Y);x.lineTo(X+(rnd()-.5)*5,Y-4-rnd()*7);x.stroke()}x.globalAlpha=1;break}
@@ -494,7 +496,7 @@ function bumpOf(c,str){const w=c.width,h=c.height,src=c.getContext('2d').getImag
   ox.putImageData(img,0,0);return repTex(new THREE.CanvasTexture(o))}
 let _rf=0;function refresh3D(){clearTimeout(_rf);_rf=setTimeout(()=>{if(ui.view==='3d'&&V.root){V.sig=null;render3DView()}},60)}
 const PLANKY=new Set(['wood','wood_dark','deck','deck_grey','herringbone']);
-const PAT2D={wood:'pl',wood_dark:'pl',deck:'pl',deck_grey:'pl',herringbone:'pl',tile:'tl',big_tile:'tb',marble:'tb',pavers:'pv',terrazzo:'dt',carpet:'dt',concrete:'dt',grass:'dt',pebbles:'dt'};
+const PAT2D={wood:'pl',wood_dark:'pl',deck:'pl',deck_grey:'pl',herringbone:'pl',tile:'tl',big_tile:'tb',marble:'tb',porcelain:'pv8',pavers:'pv',terrazzo:'dt',carpet:'dt',concrete:'dt',grass:'dt',pebbles:'dt'};
 
 Object.assign(FURN,{
   shower:{label:'Shower',group:'wet',w:.9,h:.9,opts:[O.sel('style','Type',[['corner','Glass corner with door'],['panel','Walk-in glass panel'],['curtain','Shower curtain']],'corner'),GLASS_OPT,O.color('#7fb3c9','Curtain color','curtain')],
@@ -774,11 +776,11 @@ function gateOpen(fl,it,kind='gate'){const cx=it.x+it.w/2,cy=it.y+it.h/2;let bes
   if(!best)return null;let st=null;try{st=typeof haState==='function'?haState(best):typeof HA!=='undefined'&&HA.hass&&HA.hass.states[best.entity]}catch(e){}
   const pos=st&&st.attributes&&st.attributes.current_position;return pos!=null?clamp(pos/100,0,1):ON.has(best.id)?1:0}
 Object.assign(FURN,{
-  gate:{label:'Electric gate',group:'out',kw:'electric gate driveway garage door sliding swing motor entrance outside fence yard parking',w:4,h:.2,
+  gate:{label:'Electric gate',group:'yard',kw:'electric gate driveway garage door sliding swing motor entrance outside fence yard parking',w:4,h:.2,
     tip:'To open and close it from Home Assistant, put an <b>Electric gate</b> device (Doors, blinds &amp; locks) next to it and link it to your gate’s cover entity. With <b>Position → From Home Assistant</b> the 3D gate opens and closes live.',
     opts:[O.sel('type','Type',[['sliding','Sliding gate'],['swing','Swing gate (2 leaves)'],['single','Swing gate (1 leaf)'],['garage','Garage door (roll-up)']],'sliding'),
-      O.sel('style','Style',[['slats','Horizontal slats'],['bars','Vertical bars'],['solid','Solid panel']],'slats'),O.color('#2a2e35','Color'),
-      O.sel('height','Height',[['1.2','1.2 m'],['1.6','1.6 m'],['1.8','1.8 m'],['2','2.0 m'],['2.4','2.4 m']],'1.8'),
+      O.sel('style','Style',[['slats','Horizontal slats'],['bars','Vertical bars'],['solid','Solid panel']],'slats'),O.color('#3a3f46','Color'),
+      O.sel('height','Height',[['1.2','1.2 m'],['1.6','1.6 m'],['1.8','1.8 m'],['2','2.0 m'],['2.4','2.4 m']],'1.6'),
       O.sel('state','Position',[['auto','From Home Assistant (nearby gate device)'],['closed','Closed'],['half','Half open'],['open','Open']],'auto'),
       O.sel('light','Warning light',[['yes','Yes'],['no','No']],'yes')],
     draw:(w,h,P,o)=>{const pw=.14,m=h/2;let s='';if(o.type!=='garage')s+=R(-pw,m-pw/2,pw,pw,P,{fill:P.wall})+R(w,m-pw/2,pw,pw,P,{fill:P.wall});
@@ -798,31 +800,74 @@ Object.assign(FURN,{
         if(o.style==='solid')for(let y=ht*op;y<ht-.01;y+=.5)b.box(0,z0-.025,w,.05,y,Math.min(.495,ht-y),c,mo);else for(let y=ht*op;y<ht-.01;y+=.1)b.box(0,z0-.022,w,.044,y,Math.min(.095,ht-y),c,mo);
         lamp(w+.15,z0,ht+.2);return}
       for(const x of[-pw,w])b.box(x,z0-pw/2,pw,pw,0,ht+.12,'#5d6168',{rough:.7});lamp(w+pw/2,z0,ht+.18);
-      if(o.type==='sliding'){const zc=z0+pw/2+t/2+.01;b.box(0,zc-.03,w*1.95,.06,0,.02,dark,mo);b.box(w+pw+.05,zc+.05,.32,.22,0,.36,dark);panel(b,op*w*.95,w,zc,.05,ht-.05);return}
+      if(o.type==='sliding'){const zc=z0+pw/2+t/2+.01;b.box(0,zc-.03,w*(1+op*.95),.06,0,.02,dark,mo);b.box(w+pw+.05,zc+.05,.32,.22,0,.36,dark);panel(b,op*w*.95,w,zc,.05,ht-.05);return}
       const leaf=(hx,len,dir)=>{const pv=new THREE.Group();b.add(pv,hx,z0,0);const B=builder(pv,0,0);panel(B,dir>0?.02:-len-.02,len,0,.05,ht-.05);pv.rotation.y=-dir*op*1.45;
         B.box(dir>0?.02:-.1,.03,.08,.1,.5,.08,dark)};
       if(o.type==='swing'){leaf(0,w/2-.03,1);leaf(w,w/2-.03,-1)}else leaf(0,w-.04,1)}},
 });
 /* ---------- swimming pool with an electric cover or shade screen (nearest "Pool cover" device) ---------- */
 Object.assign(FURN,{
-  pool:{label:'Swimming pool',group:'out',kw:'pool swimming water cover screen shade electric awning',w:6,h:3,
-    tip:'For the electric cover or shade screen, put a <b>Pool cover / screen</b> device (Doors, blinds &amp; locks) next to the pool and link it to its cover entity. With <b>Position → From Home Assistant</b> it opens and closes live.',
-    opts:[O.sel('cover','Electric cover',[['slats','Slatted cover on the water'],['screen','Shade screen above'],['none','None']],'slats'),O.color('#9aa3ad','Cover color','ccolor'),
-      O.sel('state','Position',[['auto','From Home Assistant (nearby pool cover)'],['open','Open'],['half','Half open'],['closed','Closed']],'auto'),
-      O.sel('lights','Underwater lights',[['yes','Yes'],['no','No']],'yes'),O.color('#5ec8ff','Light color','lc'),
-      O.sel('tiles','Pool tiles',[['#7fc8e0','Light blue'],['#e9e6e0','White'],['#3d5a66','Dark grey']],'#7fc8e0'),O.sel('coping','Edge',[['#e9e6e0','White stone'],['#b9b2a6','Sand'],['#6b6f75','Grey']],'#e9e6e0')],
-    draw:(w,h,P,o)=>{const e=.25,op=o.state==='closed'?0:o.state==='half'?.5:1,cl=(1-op)*(w-2*e);let s=R(0,0,w,h,P,{fill:o.coping})+R(e,e,w-2*e,h-2*e,P,{fill:'#9fd6ea'});
-      if(o.cover!=='none'&&cl>.01){s+=R(w-e-cl,e,cl,h-2*e,P,{fill:o.ccolor});for(let x=w-e-cl+.25;x<w-e;x+=.25)s+=L(x,e,x,h-e,P,{sw:.015})}
+  pool:{label:'Swimming pool',group:'yard',kw:'pool swimming water fiberglass cover screen shade electric awning',w:4,h:8,
+    tip:'For an electric cover or shade screen, choose it under <b>Electric cover</b>, then put a <b>Pool cover / screen</b> device (Doors, blinds &amp; locks) next to the pool and link it to its cover entity. With <b>Cover position → From Home Assistant</b> it opens and closes live.',
+    opts:[O.sel('water','Water',[['#4fb3d9','Blue'],['#3e8fa8','Deep teal'],['#7fd0e6','Light blue']],'#4fb3d9'),O.color('#d9d6cf','Edge stone','coping'),
+      O.sel('tiles','Pool tiles',[['#7fc8e0','Light blue'],['#e9e6e0','White'],['#3d5a66','Dark grey']],'#7fc8e0'),O.sel('steps','Steps',[['near','At the near end'],['far','At the far end'],['none','No steps']],'near'),
+      O.sel('light','Underwater lights',[['no','Off'],['yes','On']],'no'),O.color('#5ec8ff','Light color','lc'),
+      O.sel('cover','Electric cover',[['none','None'],['slats','Slatted cover on the water'],['screen','Shade screen above']],'none'),O.color('#9aa3ad','Cover color','ccolor'),
+      O.sel('state','Cover position',[['auto','From Home Assistant (nearby pool cover)'],['open','Open'],['half','Half open'],['closed','Closed']],'auto')],
+    draw:(w,h,P,o)=>{const c=Math.min(.35,w*.12),iw=w-2*c,op=o.state==='closed'?0:o.state==='half'?.5:1,cl=(1-op)*iw;
+      let s=R(0,0,w,h,P,{fill:o.coping,rx:.05})+R(c,c,iw,h-2*c,P,{fill:o.water,stroke:shade(o.water,-.35),rx:.25});
+      if(o.steps!=='none'){const sw=Math.min(1.8,iw*.55);for(let i=1;i<=3;i++){const y=o.steps==='far'?c+i*.3:h-c-i*.3;s+=L(c+.05,y,c+sw,y,P,{stroke:'#ffffff',sw:.025})}}
+      if(o.cover!=='none'&&cl>.01){s+=R(w-c-cl,c,cl,h-2*c,P,{fill:o.ccolor});for(let x=w-c-cl+.25;x<w-c;x+=.25)s+=L(x,c,x,h-c,P,{sw:.015})}
       if(o.cover==='slats')s+=R(w,0,.3,h,P,{fill:o.coping});return s},
-    d3:(b,w,d,H,o)=>{const e=.25,top=.12,cc=o.ccolor,op=o.state==='open'?1:o.state==='half'?.5:o.state==='closed'?0:(o._open??1),iw=w-2*e,id=d-2*e,Lc=(1-op)*iw,lit={emis:o.lc,ei:2.2};
+    d3:(b,w,d,H,o)=>{const e=Math.min(.35,w*.12),top=.1,cc=o.ccolor,op=o.state==='open'?1:o.state==='half'?.5:o.state==='closed'?0:(o._open??1),iw=w-2*e,id=d-2*e,Lc=(1-op)*iw,lit={emis:o.lc,ei:2.2};
       for(const[x,z,sw,sd]of[[0,0,w,e],[0,d-e,w,e],[0,e,e,id],[w-e,e,e,id]])b.box(x,z,sw,sd,0,top,o.coping,{rough:.6});
       b.box(e,e,iw,id,0,.006,shade(o.tiles,-.3));for(const[x,z,sw,sd]of[[e,e,iw,.012],[e,d-e-.012,iw,.012],[e,e,.012,id],[w-e-.012,e,.012,id]])b.box(x,z,sw,sd,.006,top-.03,o.tiles,{rough:.3});
-      b.box(e,e,iw,id,top-.035,.006,'#46b8e0',{opacity:.55,rough:.03,metal:.1});
-      if(o.lights==='yes'){for(let x=e+iw/6;x<w-e;x+=iw/3)b.box(x-.06,e+.012,.12,.006,.035,.04,o.lc,lit);b.add(new THREE.PointLight(o.lc,ui.night?2.2:.3,Math.max(iw,id)*1.2,2),w/2,d/2,top+.3)}
+      if(o.steps!=='none'){const sw=Math.min(1.8,iw*.55);for(let i=0;i<3;i++){const z=o.steps==='far'?e+i*.3:d-e-(i+1)*.3;b.box(e,z,sw,.3,.006,(top-.04)*(3-i)/3,'#e8f6fb',{rough:.3})}}
+      b.box(e,e,iw,id,top-.035,.006,o.water,o.light==='yes'?{opacity:.6,emis:shade(o.water,-.1),ei:.25,rough:.03,metal:.1}:{opacity:.6,rough:.03,metal:.1});
+      if(o.light==='yes'){for(let x=e+iw/6;x<w-e;x+=iw/3)b.box(x-.06,e+.012,.12,.006,.03,.035,o.lc,lit);b.add(new THREE.PointLight(o.lc,ui.night?2.2:.3,Math.max(iw,id)*1.2,2),w/2,d/2,top+.3)}
       if(o.cover==='slats'){b.box(w,0,.35,d,0,.38,o.coping,{rough:.6});if(Lc>.02)for(let x=w-e-Lc;x<w-e-.01;x+=.1)b.box(x,e,.096,id,top-.02,.022,cc,{rough:.35})}
       else if(o.cover==='screen'){const ph=2.6,pt=.1;for(const[x,z]of[[0,0],[w-pt,0],[0,d-pt],[w-pt,d-pt]])b.box(x,z,pt,pt,0,ph,'#3a3d42');
-        for(const z of[0,d-pt])b.box(0,z,w,pt,ph-.12,.12,'#3a3d42');b.cyl(w-pt/2,d/2,.07,ph-.08,.01,'#3a3d42');const drum=b.cyl(w-.15,d/2,.07,0,d-.1,'#3a3d42');drum.rotation.x=Math.PI/2;drum.position.y=ph-.1;
+        for(const z of[0,d-pt])b.box(0,z,w,pt,ph-.12,.12,'#3a3d42');const drum=b.cyl(w-.15,d/2,.07,0,d-.1,'#3a3d42');drum.rotation.x=Math.PI/2;drum.position.y=ph-.1;
         if(Lc>.02)b.box(w-e-Lc,pt,Lc,d-2*pt,ph-.06,.012,cc,{tex:'fabric'})}}},
+});
+/* ---------- pergola & yard ---------- */
+const pergolaPosts=(w,h,o)=>{const i=.1,c=[[i,i],[w-i,i],[i,h-i],[w-i,h-i]];if(o.posts==='2')return[[w-i,i],[w-i,h-i]];if(o.posts==='6')return c.concat([[i,h/2],[w-i,h/2]]);return c};
+Object.assign(FURN,{
+  pergola:{label:'Louvered pergola',group:'yard',w:4,h:6,opts:[O.color('#f2f2f0','Frame'),O.sel('slats','Louvers run',[['across','Across (short side)'],['along','Along (long side)']],'across'),O.sel('posts','Posts',[['2','2 — attached to a wall on the left'],['4','4 corners'],['6','6 posts']],'4'),O.sel('ht','Height',[['2.6','2.6 m'],['2.8','2.8 m'],['3','3 m']],'2.6')],
+    draw:(w,h,P,o)=>{let s=R(0,0,w,h,P,{fill:'none',stroke:P.furS,sw:.05,dash:'0.2 0.1'});
+      if(o.slats==='across')for(let y=.2;y<h-.1;y+=.3)s+=L(.1,y,w-.1,y,P,{stroke:P.furS,sw:.012});else for(let x=.2;x<w-.1;x+=.3)s+=L(x,.1,x,h-.1,P,{stroke:P.furS,sw:.012});
+      for(const[x,y]of pergolaPosts(w,h,o))s+=R(x-.07,y-.07,.14,.14,P,{fill:o.color,stroke:P.wall,sw:.02});return s},
+    d3:(b,w,d,H,o)=>{const ht=+o.ht,c=o.color;for(const[x,z]of pergolaPosts(w,d,o))b.box(x-.07,z-.07,.14,.14,0,Math.min(ht,H),c,{rough:.5});
+      if(H<ht)return;const bh=.22;b.box(0,0,w,.14,ht-bh,bh,c);b.box(0,d-.14,w,.14,ht-bh,bh,c);b.box(0,.14,.14,d-.28,ht-bh,bh,c);b.box(w-.14,.14,.14,d-.28,ht-bh,bh,c);
+      if(o.slats==='across')for(let z=.24;z<d-.2;z+=.2){const m=b.box(.14,z-.08,w-.28,.16,ht-.12,.025,c,{rough:.5});m.rotation.x=.35}
+      else for(let x=.24;x<w-.2;x+=.2){const m=b.box(x-.08,.14,.16,d-.28,ht-.12,.025,c,{rough:.5});m.rotation.z=.35}}},
+  outdoor_kitchen:{label:'Outdoor kitchen',group:'yard',w:3,h:.7,surf:.9,opts:[O.sel('finish','Finish',[['#8c8a85','Grey concrete'],['#2f3236','Anthracite'],['#c9b28f','Sandstone'],['#f3f1ec','White']],'#8c8a85'),O.sel('grill','Grill',[['gas','Gas grill'],['charcoal','Charcoal grill']],'gas'),O.sel('fridge','Mini fridge',[['yes','Yes'],['no','No']],'yes')],
+    draw:(w,h,P,o)=>{let s=R(0,0,w,h,P,{fill:o.finish})+R(.15,.08,Math.min(.9,w*.32),h-.16,P,{fill:'#2a2e35'});for(let x=.25;x<.15+Math.min(.9,w*.32);x+=.12)s+=L(x,.12,x,h-.12,P,{stroke:'#8c95a5',sw:.015});
+      const sk=Math.min(.6,w*.2);s+=R(w*.68-sk/2,.1,sk,h-.2,P,{fill:P.fur2,rx:.05})+C(w*.68,.1,.03,P,{fill:P.furS});return s},
+    d3:(b,w,d,H,o)=>{const gw=Math.min(.9,w*.32),sk=Math.min(.6,w*.2);b.box(0,0,w,d,0,.86,o.finish,{rough:.8});b.box(-.02,-.02,w+.04,d+.04,.86,.04,'#3a3d42',{rough:.35});
+      b.box(.15,.06,gw,d-.12,.9,.05,'#c3c8cf',CHROME);b.box(.15,.04,gw,.06,.9,.45,'#c3c8cf',CHROME);if(o.grill==='charcoal')b.box(.2,.15,gw-.1,d-.3,.951,.01,'#f08a24',{emis:'#ff6a1a',ei:.8});else for(let x=.25;x<.15+gw;x+=.1)b.box(x,.15,.015,d-.3,.951,.01,'#2a2e35');
+      b.box(w*.68-sk/2,.1,sk,d-.2,.9,.006,'#3d4249');b.cyl(w*.68,.12,.02,.9,.3,'#c3c8cf',CHROME);
+      for(let i=1;i<4;i++)b.box(w*i/4-.004,d,.008,.005,.06,.76,shade(o.finish,-.25));if(o.fridge==='yes')b.box(w*.78,d,w*.2,.01,.06,.76,'#c3c8cf',CHROME)}},
+  led_screen:{label:'Outdoor LED screen',group:'yard',w:2.6,h:.3,opts:[O.sel('mount','Mount',[['stand','Free-standing'],['wall','On the wall']],'stand'),O.sel('pic','Picture',[['off','Off'],['on','On']],'off')],
+    draw:(w,h,P,o)=>R(0,0,w,h*.45,P,{fill:'#1d2127',stroke:P.wall})+(o.mount==='stand'?R(w*.15,h*.45,.08,h*.55,P,{fill:P.furS})+R(w*.85-.08,h*.45,.08,h*.55,P,{fill:P.furS}):''),
+    d3:(b,w,d,H,o)=>{const ph=w*.5625,y0=o.mount==='stand'?.35:.9;if(o.mount==='stand'){for(const x of[w*.15,w*.85-.08]){b.box(x,.04,.08,.08,0,y0+ph*.5,C3.dark);b.box(x-.1,0,.28,d,0,.04,C3.dark)}}
+      b.box(0,0,w,.1,y0,ph,'#15181d',{rough:.3});b.box(.03,.101,w-.06,.003,y0+.03,ph-.06,o.pic==='on'?'#5aa0d8':'#0b0d10',o.pic==='on'?{emis:'#3f7fc0',ei:.9,rough:.1}:{rough:.08})}},
+  garden_wall:{label:'Garden / boundary wall',group:'yard',w:4,h:.2,opts:[O.sel('height','Height',[['1.6','1.6 m'],['1.2','1.2 m'],['2','2 m'],['0.6','0.6 m (low)']],'1.6'),O.sel('finish','Finish',[['#ebe8e2','White plaster'],['#c9c3b8','Light stone'],['#8e8b86','Grey concrete'],['#a4553b','Red brick']],'#ebe8e2'),O.sel('lights','Wall lights',[['yes','Yes'],['no','No']],'yes')],
+    draw:(w,h,P,o)=>{let s=R(0,0,w,h,P,{fill:o.finish,stroke:P.wall,sw:.02});if(o.lights==='yes')for(let x=1;x<w-.3;x+=2.5)s+=R(x-.06,h-.04,.12,.05,P,{fill:'#ffcf4a',sw:.01});return s},
+    d3:(b,w,d,H,o)=>{const ht=Math.min(+o.height,Math.max(H,1));b.box(0,0,w,d,0,ht,o.finish,{rough:.95});b.box(-.01,-.01,w+.02,d+.02,ht,.03,shade(o.finish,-.08));
+      if(o.lights==='yes')for(let x=1;x<w-.3;x+=2.5)b.box(x-.06,d,.12,.03,Math.min(ht-.25,.5),.08,'#2a2e35',{emis:'#ffd27a',ei:.6})}},
+  steps:{label:'Outdoor steps',group:'yard',w:1.2,h:1.1,opts:[O.sel('n','Steps',[['3','3'],['2','2'],['4','4'],['5','5']],'3'),O.color('#cfcac2','Stone')],
+    draw:(w,h,P,o)=>{const k=+o.n,st=h/k;let s=R(0,0,w,h,P,{fill:o.color});for(let i=1;i<k;i++)s+=L(0,i*st,w,i*st,P,{sw:.02});return s+`<path d="M${n(w/2-.15)} ${n(h-.35)} L${n(w/2)} ${n(h-.15)} L${n(w/2+.15)} ${n(h-.35)} M${n(w/2)} .15 V${n(h-.15)}" fill="none" stroke="${P.furS}" stroke-width="0.035"/>`},
+    d3:(b,w,d,H,o)=>{const k=+o.n,st=d/k;for(let i=0;i<k;i++)b.box(0,i*st,w,st,0,(k-i)*.16,o.color,{rough:.8})}},
+  car:{label:'Car',group:'yard',w:1.85,h:4.6,opts:[O.color('#9aa3ad','Paint')],
+    draw:(w,h,P,o)=>R(0,0,w,h,P,{fill:o.color,rx:.35})+R(w*.12,h*.25,w*.76,h*.18,P,{fill:P.glass,rx:.12})+R(w*.14,h*.44,w*.72,h*.3,P,{fill:shade(o.color,-.12),rx:.1})+R(w*.15,h*.75,w*.7,h*.1,P,{fill:P.glass,rx:.08}),
+    d3:(b,w,d,H,o)=>{b.box(.03,.05,w-.06,d-.1,.25,.5,o.color,{rough:.3,metal:.4});b.box(.12,d*.28,w-.24,d*.48,.75,.48,'#2c3a45',{rough:.1,metal:.2,opacity:.85});b.box(.14,d*.4,w-.28,d*.24,1.22,.02,o.color,{rough:.3,metal:.4});
+      for(const z of[d*.18,d*.8])for(const x of[.12,w-.12]){const m=b.cyl(x,z,.33,0,.22,'#1b1d21');m.rotation.z=Math.PI/2;m.position.y=.33}
+      for(const x of[.2,w-.45])b.box(x,0,.25,.04,.55,.1,'#fff4cc',{emis:'#fff0b0',ei:.5})}},
+  sofa_l:{label:'Corner sofa (L)',group:'living',w:2.6,h:2.6,surf:.45,opts:[O.color('#f1efea')],
+    draw:(w,h,P,o)=>{const d=Math.min(.95,w*.45,h*.45),f={fill:o.color};return R(0,0,w,d,P,{...f,rx:.1})+R(w-d,0,d,h,P,{...f,rx:.1})+R(0,0,w,.22,P,{...f,rx:.06})+R(w-.22,0,.22,h,P,{...f,rx:.06})+R(0,0,.2,d,P,{...f,rx:.06})+R(w-d,h-.2,d,.2,P,{...f,rx:.06})},
+    d3:(b,w,d,H,o)=>{const c=o.color,dd=Math.min(.95,w*.45,d*.45);b.box(.04,.04,w-.08,dd-.08,0,.08,C3.woodD);b.box(w-dd+.04,dd,dd-.08,d-dd-.04,0,.08,C3.woodD);
+      b.box(0,0,w,dd,.08,.34,c);b.box(w-dd,dd,dd,d-dd,.08,.34,c);b.box(0,0,w,.22,.42,.38,shade(c,-.05));b.box(w-.22,0,.22,d,.42,.38,shade(c,-.05));b.box(0,0,.2,dd,.42,.16,c);b.box(w-dd,d-.2,dd,.2,.42,.16,c)}}
 });
 /* ---------- curtains & extra furniture ---------- */
 const curtainPanels=(w,o)=>o.style==='closed'?[[0,w/2],[w/2,w]]:o.style==='one'?[[0,w*.3]]:[[0,w*.2],[w*.8,w]];
@@ -907,7 +952,7 @@ for(const[k,v]of Object.entries(SURF))if(FURN[k]&&FURN[k].surf==null)FURN[k].sur
 function surfTop(it){const f=FURN[it.kind];if(!f||f.surf==null||isWallItem(it))return null;const s=typeof f.surf==='function'?f.surf(optv(it)):f.surf;return n((it.z||0)+s)}
 function inItem(p,o){const a=-(o.rot||0)*Math.PI/180,dx=p.x-(o.x+o.w/2),dy=p.y-(o.y+o.h/2),lx=dx*Math.cos(a)-dy*Math.sin(a),ly=dx*Math.sin(a)+dy*Math.cos(a);return Math.abs(lx)<=o.w/2+.01&&Math.abs(ly)<=o.h/2+.01}
 function surfaceBelow(fl,it){const c=center(it);let best=0;for(const o of fl.items){if(o===it)continue;const t=surfTop(o);if(t!=null&&inItem(c,o)&&t>best)best=t}return best}
-const FURN_GROUPS=[['struct','Doors, windows & walls'],['living','Living & media'],['bed','Bedroom, closet & office'],['wet','Kitchen & bath'],['fun','Gaming, shelves & small things'],['green','Plants & pets'],['out','Balcony & outdoor']];
+const FURN_GROUPS=[['struct','Doors, windows & walls'],['living','Living & media'],['bed','Bedroom, closet & office'],['wet','Kitchen & bath'],['fun','Gaming, shelves & small things'],['green','Plants & pets'],['out','Balcony & outdoor'],['yard','Pool, pergola & yard']];
 const isWallItem=it=>!!(FURN[it.kind]&&FURN[it.kind].wall);
 const optv=it=>{const f=FURN[it.kind],o={};for(const s of f.opts||[])o[s.k]=s.def;return{...o,...(it.o||{})}};
 
@@ -990,7 +1035,7 @@ const touching=(a,b)=>a.x<=b.x+b.w+.01&&b.x<=a.x+a.w+.01&&a.y<=b.y+b.h+.01&&b.y<
 function syncGroup(fl,r){for(const x of groupOf(fl,r))if(x!==r){x.name=r.name;x.type=r.type;x.floor=r.floor;x.fdir=r.fdir;x.open=r.open}}
 function wallEdges(fl){
   const E=[],hid=[];
-  for(const r of fl.rooms){const rail=r.type==='balcony'||!!r.open,hd=r.hide||{};
+  for(const r of fl.rooms){if(OUTDOOR.has(r.type))continue;const rail=r.type==='balcony'||!!r.open,hd=r.hide||{};
     for(const[sd,ax,c,a,b]of sidesOf(r))(hd[sd]?hid:E).push({ax,c,a,b,rail,room:r})}
   for(const e of E){let p=[[e.a,e.b]];for(const h of hid)if(h.ax===e.ax&&Math.abs(h.c-e.c)<.06)p=subI(p,h.a,h.b);
     if(e.room.link)for(const r2 of fl.rooms)if(r2!==e.room&&r2.link===e.room.link)for(const[,ax,c,a,b]of sidesOf(r2))if(ax===e.ax&&Math.abs(c-e.c)<.06)p=subI(p,a,b);
@@ -1094,7 +1139,7 @@ function renderInner(fl,P,o={}){
   out.push(`<defs><pattern id="${id}g" width="1" height="1" patternUnits="userSpaceOnUse"><path d="M1 0H0V1" fill="none" stroke="${P.grid}" stroke-width="0.02"/></pattern>`+
     `<pattern id="${id}h" width="0.25" height="0.25" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="0.25" stroke="${P.hatch}" stroke-width="0.05"/></pattern>`+
     `<pattern id="${id}pl" width="1.1" height="0.2" patternUnits="userSpaceOnUse"><path d="M0 0.2H1.1M0.45 0V0.2" stroke="${P.wall}" stroke-opacity="0.16" stroke-width="0.012"/></pattern><pattern id="${id}plv" width="0.2" height="1.1" patternUnits="userSpaceOnUse"><path d="M0.2 0V1.1M0 0.45H0.2" stroke="${P.wall}" stroke-opacity="0.16" stroke-width="0.012"/></pattern>`+
-    `<pattern id="${id}tl" width="0.3" height="0.3" patternUnits="userSpaceOnUse"><path d="M0.3 0V0.3H0" fill="none" stroke="${P.wall}" stroke-opacity="0.16" stroke-width="0.012"/></pattern><pattern id="${id}tb" width="0.6" height="0.6" patternUnits="userSpaceOnUse"><path d="M0.6 0V0.6H0" fill="none" stroke="${P.wall}" stroke-opacity="0.16" stroke-width="0.012"/></pattern>`+
+    `<pattern id="${id}tl" width="0.3" height="0.3" patternUnits="userSpaceOnUse"><path d="M0.3 0V0.3H0" fill="none" stroke="${P.wall}" stroke-opacity="0.16" stroke-width="0.012"/></pattern><pattern id="${id}tb" width="0.6" height="0.6" patternUnits="userSpaceOnUse"><path d="M0.6 0V0.6H0" fill="none" stroke="${P.wall}" stroke-opacity="0.16" stroke-width="0.012"/></pattern><pattern id="${id}pv8" width="0.8" height="0.8" patternUnits="userSpaceOnUse"><path d="M0.8 0V0.8H0" fill="none" stroke="${P.wall}" stroke-opacity="0.2" stroke-width="0.014"/></pattern>`+
     `<pattern id="${id}pv" width="0.8" height="0.64" patternUnits="userSpaceOnUse"><path d="M0 0.32H0.8M0 0.64H0.8M0.4 0V0.32M0 0.32V0.64M0.8 0.32V0.64" fill="none" stroke="${P.wall}" stroke-opacity="0.22" stroke-width="0.015"/></pattern><pattern id="${id}dt" width="0.12" height="0.12" patternUnits="userSpaceOnUse"><circle cx="0.06" cy="0.06" r="0.012" fill="${P.wall}" fill-opacity="0.18"/></pattern>`+
     `<clipPath id="${id}v">${voids.map(r=>`<rect x="${n(r.x)}" y="${n(r.y)}" width="${n(r.w)}" height="${n(r.h)}"/>`).join('')}</clipPath>`+
     `<radialGradient id="${id}glow"><stop offset="0" stop-color="#ffcf4a" stop-opacity="0.7"/><stop offset="1" stop-color="#ffcf4a" stop-opacity="0"/></radialGradient></defs>`);
@@ -1180,7 +1225,7 @@ function renderProps(){
     h+=`<div class="ph"><h3>${esc(fl.name)}</h3></div>`+txt('fname','Floor name',fl.name)+`<div class="row2">${num('fw','Width (m)',fl.w,.5)}${num('fh','Depth (m)',fl.h,.5)}</div>`+
       `<div class="row2">${num('fch','Ceiling height (m)',fl.ch||2.7,.1)}<label class="f"><span>Floor level</span><input disabled value="+${doc.floors.slice(0,fi).reduce((a,x)=>a+lvlOf(x),0).toFixed(2)} m"></label></div>`+
       `<div class="btns"><button data-act="addAbove" class="primary">＋ Floor above</button><button data-act="addBelow">＋ Floor below / basement</button></div>`;
-    const area=fl.rooms.filter(r=>r.type!=='balcony'&&!r.open).reduce((a,r)=>a+r.w*r.h,0);
+    const area=fl.rooms.filter(r=>r.type!=='balcony'&&!OUTDOOR.has(r.type)&&!r.open).reduce((a,r)=>a+r.w*r.h,0);
     h+=`<div class="stat"><span>${fl.rooms.filter(r=>mainOf(fl,r)===r).length} rooms · ${fl.devices.length} devices</span><b>${area.toFixed(0)} m²</b></div>`;
     h+=`<h4>Devices on this floor</h4>`+(fl.devices.length?`<div class="dlist">${fl.devices.map(devRow).join('')}</div>`:`<p class="muted">None yet. Add them from the device lists on the left.</p>`);
     h+=`<div class="card"><h4>3D look</h4><label class="f"><span>Wall color</span><input type="color" data-f="wallColor" value="${doc.look.wall||P.wall3d}"></label><div class="btns" style="margin:0"><button data-act="wallReset">Default color</button></div></div>`;
