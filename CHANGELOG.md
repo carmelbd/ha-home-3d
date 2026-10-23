@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.1 (2026-10-23): Instant light switching
+
+- Turning a light (or any device) on or off in 3D is instant again. Only the changed light updates; the house isn't rebuilt and the realistic materials aren't recompiled. Live changes from Home Assistant update the same fast way.
+
 ## 1.1.0 (2026-10-23): Realistic 3D
 
 - **Real photo textures.** Wood planks, herringbone parquet, concrete, decking, stone pavers, pebbles and grass use real CC0 textures from [Poly Haven](https://polyhaven.com), with depth and shine. Tiles, marble, terrazzo and carpet keep their exact sizes and colours and get real relief on grout lines and surfaces.
