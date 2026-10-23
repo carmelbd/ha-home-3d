@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.5.1 (2026-10-23): Any entity works with any button
+
+- **Fix:** a button only worked when its entity matched the button type, so a **Light** linked to a Sonoff `switch.…`, or a **TV** linked to a `remote.…`, said "link it to a Home Assistant entity first". Now any entity works with any button.
+- If the entity doesn't exist in Home Assistant, the panel now says so, so typos are easy to spot. Entity IDs are made lowercase automatically.
+
 ## 1.5.0 (2026-10-23): View mode
 
 - **View mode for everyday use.** In Home Assistant, Home 3D now opens as just your house in 3D, with no editor panels. Drag to rotate, scroll or pinch to zoom, and tap a light to switch it. Other devices open Home Assistant's control window. Switch floors with the tabs at the top, and use Whole house, Night and All lights at the bottom.

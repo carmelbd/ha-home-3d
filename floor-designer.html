@@ -1170,7 +1170,9 @@ const num=(f,label,v,step)=>`<label class="f"><span>${label}</span><input type="
 const txt=(f,label,v,extra='')=>`<label class="f"><span>${label}</span><input data-f="${f}" value="${esc(v)}" ${extra}></label>`;
 const sel=(attr,label,choices,v)=>`<label class="f"><span>${label}</span><select ${attr}>${choices.map(([k,l])=>`<option value="${k}"${String(k)===String(v)?' selected':''}>${l}</option>`).join('')}</select></label>`;
 const ck=(attr,label,v)=>`<label><input type="checkbox" ${attr}${v?' checked':''}> ${label}</label>`;
-function validEntity(d){const k=DEV[d.kind];return /^[a-z0-9_]+\.[a-z0-9_]+$/.test(d.entity||'')&&(!k||d.entity.split('.')[0]===k.domain||(k.domain==='switch'&&/^(light|input_boolean)$/.test(d.entity.split('.')[0])))}
+/* any entity works with any button (a Sonoff switch.… can be a Light, a remote.… a TV) */
+function validEntity(d){return /^[a-z0-9_]+\.[a-z0-9_]+$/.test(d.entity||'')}
+function haKnows(id){try{const st=(typeof hass==='function'&&typeof ha!=='undefined'&&ha.on&&hass()&&hass().states)||(typeof HA!=='undefined'&&HA.hass&&HA.hass.states);return st?(id in st):null}catch(e){return null}}
 function devRow(d){const k=DEV[d.kind]||DEV.light,ok=validEntity(d);return`<button data-pick="${d.id}"><span class="em">${k.emoji}</span><span class="t"><b>${esc(d.name)}</b><code class="${ok?'':'bad'}">${esc(d.entity||'no entity yet')}</code></span></button>`}
 function renderProps(){
   const fl=cur(),P=curP(),s=ui.sel&&findObj(ui.sel),fi=floorIdx(fl);let h='';
@@ -1220,8 +1222,8 @@ function renderProps(){
     const d=s.o,k=DEV[d.kind],room=roomAt(fl,d.x,d.y),ok=validEntity(d),b=btnOf(d);
     h+=`<div class="ph"><span class="em">${k.emoji}</span><h3>${k.label}</h3></div>`+
       sel('data-f="kind"','Device type',Object.entries(DEV).map(([kk,v])=>[kk,`${v.emoji} ${v.label}`]),d.kind)+
-      txt('name','Name',d.name)+txt('entity',`Entity ID (${k.domain}.…)`,d.entity,'list="entList" spellcheck="false" autocomplete="off"')+
-      (ok?'':`<p class="warn">${d.entity?`This should look like <b>${k.domain}.something</b>.`:'Add the entity ID from Home Assistant.'} You can find it under Settings → Devices &amp; services → Entities.</p>`)+
+      txt('name','Name',d.name)+txt('entity',`Entity ID (for example ${k.domain}.…)`,d.entity,'list="entList" spellcheck="false" autocomplete="off"')+
+      (ok?(haKnows(d.entity)===false?`<p class="warn">Home Assistant has no entity called <b>${esc(d.entity)}</b>. Check the spelling, or pick one from the list while you type.</p>`:''):`<p class="warn">${d.entity?`This should look like <b>${k.domain}.something</b> (lowercase, no spaces).`:'Add the entity ID from Home Assistant.'} You can find it under Settings → Devices &amp; services → Entities.</p>`)+
       `<div class="card"><h4>Button design</h4><div class="bprev">${(()=>{const r=BSIZE[b.size],pw=b.shape==='pill'?r*2.2+Math.min(300,d.name.length*r*.5)+30:110,ph=b.name&&b.shape!=='pill'?110:100;return`<svg id="bpv" width="${n(Math.min(pw,250))}" height="${n(ph*Math.min(1,250/pw))}" viewBox="${b.shape==='pill'?-r-15:-55} -50 ${n(pw)} ${ph}">`})()}${markerSVG(d,P,{on:true})}</svg></div>`+
       `<div class="row2">${sel('data-b="shape"','Shape',[['circle','Circle'],['square','Rounded square'],['pill','Pill with name']],b.shape)}${sel('data-b="size"','Size',[['s','Small'],['m','Medium'],['l','Large']],b.size)}</div>`+
       `<label class="f"><span>Opacity · <b id="bOpV">${Math.round(b.op*100)}%</b></span><input type="range" min="0.1" max="1" step="0.05" data-b="op" value="${b.op}" style="padding:0;accent-color:var(--accent)"></label>`+
@@ -1360,7 +1362,7 @@ $('#props').addEventListener('input',e=>{
   if(f==='fdir'){o.fdir=+v;syncGroup(fl,o);finishField();refreshViews();return}
   if(f==='z'){const x=parseFloat(v);if(x>=0&&x<=4){o.z=x;refreshViews()}return}
   if(f==='kind'){const old=DEV[o.kind],nk=DEV[v];if(o.entity&&o.entity.startsWith(old.domain+'.'))o.entity=nk.domain+o.entity.slice(old.domain.length);o.kind=v;finishField();renderAll();return}
-  o[f]=f==='entity'?v.trim():v;if(s.t==='rooms'&&f==='name')syncGroup(fl,o);renderPlan();
+  o[f]=f==='entity'?v.trim().toLowerCase():v;if(s.t==='rooms'&&f==='name')syncGroup(fl,o);renderPlan();
 });
 function finishField(){if(focusBefore!==null){commit(focusBefore);focusBefore=snap0()}else save()}
 $('#props').addEventListener('change',e=>{const t=e.target;if(!t.dataset.f&&!t.dataset.o&&!t.dataset.b)return;finishField();renderTabs();if(t.tagName!=='SELECT'&&t.type!=='checkbox')renderProps()});
