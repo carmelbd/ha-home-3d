@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.1 (2026-10-23): Faster 3D
+
+- **Smoother rotating and zooming.** Each piece of furniture, the walls and the soft floor shadows are drawn in far fewer pieces (about 40% fewer draw calls). The sun shadows are only redrawn when the house changes, not on every camera move. On high-resolution screens the 3D view renders at 1.5× instead of 2×.
+- **Lamps cost nothing while they're off.** Only lights that are on add a lamp (in groups of 4, so switching stays instant).
+
 ## 1.2.0 (2026-10-23): Kitchen and glass closet
 
 - **Kitchen chair** with 4 legs: table, counter or bar height, with backrest, low back or no back, and any seat and legs color.
