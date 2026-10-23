@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.3.0 (2026-10-23): Electric gate
+
+- **Electric gate** (Balcony & outdoor): sliding gate (with track and motor), swing gate with 2 leaves or 1 leaf, or roll-up garage door. Choose the style (horizontal slats, vertical bars or solid), color and height (1.2–2.4 m), plus an amber warning light that glows while it's open.
+- **Opens live from Home Assistant.** Add the new **Electric gate** device (Doors, blinds & locks) next to it and link it to your gate's `cover.` entity. The 3D gate opens and closes with the real one, including half-open positions. Tapping the device opens Home Assistant's control window (no accidental opening). You can also set the position by hand: closed, half open or open.
+
 ## 1.2.1 (2026-10-23): Faster 3D
 
 - **Smoother rotating and zooming.** Each piece of furniture, the walls and the soft floor shadows are drawn in far fewer pieces (about 40% fewer draw calls). The sun shadows are only redrawn when the house changes, not on every camera move. On high-resolution screens the 3D view renders at 1.5× instead of 2×.

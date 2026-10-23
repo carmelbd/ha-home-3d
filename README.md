@@ -8,6 +8,10 @@ Draw your home, walk around it in 3D, and control your real devices from the pla
 
 **Now on HACS!** [Install with HACS](#install-with-hacs-about-2-minutes) and future updates arrive as one click. **Already installed by hand?** See [Updating](#updating-to-a-new-version). Your design is kept.
 
+- **🚧 Electric gate (1.3.0).** Sliding, swing or garage gate that opens and closes in 3D together with your real gate in Home Assistant.
+
+![Electric gates](screenshots/gates.png)
+
 - **🍳 Kitchen and glass closet (1.2.0).** A kitchen chair with 4 legs in any colors, colors, countertops and handles for the kitchen counter and island (including a **big gold ring** handle), tall built-in kitchen cabinets with oven or fridge, and a glass closet with LED lights inside.
 
 | Kitchen | Gold ring handles |

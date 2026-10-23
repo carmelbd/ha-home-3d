@@ -257,6 +257,7 @@ const DEV={
   humidity:{label:'Humidity',emoji:'💧',mdi:'mdi:water-percent',domain:'sensor',tap:'more-info',color:'#3b82f6',asLabel:true,g:'climate'},
   cover:{label:'Shutter / blinds',emoji:'🪟',mdi:'mdi:window-shutter',domain:'cover',tap:'more-info',color:'#8b5cf6',g:'open'},
   curtain:{label:'Curtains',emoji:'🎭',mdi:'mdi:curtains',domain:'cover',tap:'more-info',color:'#c084fc',g:'open'},
+  gate:{label:'Electric gate',emoji:'🚧',mdi:'mdi:gate',domain:'cover',tap:'more-info',color:'#f59e0b',g:'open'},
   lock:{label:'Smart lock',emoji:'🔒',mdi:'mdi:lock',domain:'lock',tap:'more-info',color:'#eab308',g:'open'},
   contact:{label:'Door / window sensor',emoji:'🚪',mdi:'mdi:door',domain:'binary_sensor',tap:'more-info',color:'#a855f7',g:'sense'},
   motion:{label:'Motion sensor',emoji:'🏃',mdi:'mdi:motion-sensor',domain:'binary_sensor',tap:'more-info',color:'#f97316',g:'sense'},
@@ -759,6 +760,41 @@ Object.assign(FURN,{
 {const sb=FURN.shoeboxes,old=sb.d3;sb.opts=[...sb.opts,O.sel('led','LEDs inside',[['none','No'],['yes','Yes']],'none'),O.color('#ffe9c4','LED color','ledc')];
   sb.d3=(b,w,d,H,o)=>{old(b,w,d,H,o);if(o.led!=='yes')return;const k=Math.max(1,Math.round(w/.34)),cw=w/k,lv=+o.stack,lit=ledLit(o.ledc);
     for(let i=0;i<k;i++)for(let l=0;l<lv;l++)b.box(i*cw+.02,d-.03,cw-.04,.01,l*.145+.125,.006,o.ledc,lit);b.add(new THREE.PointLight(o.ledc,ui.night?.9:.3,2,2),w/2,d,lv*.145*.6)}}
+/* ---------- electric gate: opens in 3D from the nearest "Electric gate" device (a cover entity) ---------- */
+function gateOpen(fl,it){const cx=it.x+it.w/2,cy=it.y+it.h/2;let best=null,bd=Math.max(4,it.w);
+  for(const d of fl.devices)if(d.kind==='gate'){const dd=Math.hypot(d.x-cx,d.y-cy);if(dd<bd){bd=dd;best=d}}
+  if(!best)return 0;let st=null;try{st=typeof haState==='function'?haState(best):typeof HA!=='undefined'&&HA.hass&&HA.hass.states[best.entity]}catch(e){}
+  const pos=st&&st.attributes&&st.attributes.current_position;return pos!=null?clamp(pos/100,0,1):ON.has(best.id)?1:0}
+Object.assign(FURN,{
+  gate:{label:'Electric gate',group:'out',kw:'electric gate driveway garage door sliding swing motor entrance outside fence yard parking',w:4,h:.2,
+    tip:'To open and close it from Home Assistant, put an <b>Electric gate</b> device (Doors, blinds &amp; locks) next to it and link it to your gate’s cover entity. With <b>Position → From Home Assistant</b> the 3D gate opens and closes live.',
+    opts:[O.sel('type','Type',[['sliding','Sliding gate'],['swing','Swing gate (2 leaves)'],['single','Swing gate (1 leaf)'],['garage','Garage door (roll-up)']],'sliding'),
+      O.sel('style','Style',[['slats','Horizontal slats'],['bars','Vertical bars'],['solid','Solid panel']],'slats'),O.color('#2a2e35','Color'),
+      O.sel('height','Height',[['1.2','1.2 m'],['1.6','1.6 m'],['1.8','1.8 m'],['2','2.0 m'],['2.4','2.4 m']],'1.8'),
+      O.sel('state','Position',[['auto','From Home Assistant (nearby gate device)'],['closed','Closed'],['half','Half open'],['open','Open']],'auto'),
+      O.sel('light','Warning light',[['yes','Yes'],['no','No']],'yes')],
+    draw:(w,h,P,o)=>{const pw=.14,m=h/2;let s='';if(o.type!=='garage')s+=R(-pw,m-pw/2,pw,pw,P,{fill:P.wall})+R(w,m-pw/2,pw,pw,P,{fill:P.wall});
+      const arc=(x0,x1,sw)=>`<path d="M${n(x1)} ${n(m)} A${n(Math.abs(x1-x0))} ${n(Math.abs(x1-x0))} 0 0 ${sw} ${n(x0)} ${n(m+Math.abs(x1-x0))}" fill="none" stroke="${P.furS}" stroke-width="0.015" stroke-dasharray="0.06 0.05"/>`;
+      if(o.type==='sliding')s+=R(0,m-.035,w,.07,P,{fill:o.color})+L(w*.62,m+.2,w*.92,m+.2,P,{sw:.025})+L(w*.86,m+.15,w*.92,m+.2,P,{sw:.025})+L(w*.86,m+.25,w*.92,m+.2,P,{sw:.025});
+      else if(o.type==='garage')s+=R(0,m-.05,w,.1,P,{fill:o.color})+L(0,m,w,m,P,{dash:'0.1 0.08',sw:.015});
+      else if(o.type==='swing')s+=L(0,m,w/2,m,P,{stroke:o.color,sw:.06})+L(w/2,m,w,m,P,{stroke:o.color,sw:.06})+arc(0,w/2,1)+`<path d="M${n(w/2)} ${n(m)} A${n(w/2)} ${n(w/2)} 0 0 0 ${n(w)} ${n(m+w/2)}" fill="none" stroke="${P.furS}" stroke-width="0.015" stroke-dasharray="0.06 0.05"/>`;
+      else s+=L(0,m,w,m,P,{stroke:o.color,sw:.06})+arc(0,w,1);return s},
+    d3:(b,w,d,H,o)=>{const ht=+o.height,c=o.color,mo={metal:.45,rough:.4},t=.05,pw=.14,z0=d/2,dark='#3a3d42',
+        op=o.state==='open'?1:o.state==='half'?.5:o.state==='closed'?0:(o._open||0);
+      const panel=(B,x0,len,zc,y0,hh)=>{if(o.style==='solid'){B.box(x0,zc-t/2,len,t,y0,hh,c,mo);return}
+        B.box(x0,zc-t/2,len,t,y0,.06,c,mo);B.box(x0,zc-t/2,len,t,y0+hh-.06,.06,c,mo);B.box(x0,zc-t/2,.06,t,y0,hh,c,mo);B.box(x0+len-.06,zc-t/2,.06,t,y0,hh,c,mo);
+        if(o.style==='slats')for(let y=y0+.08;y<y0+hh-.15;y+=.13)B.box(x0+.06,zc-t*.35,len-.12,t*.7,y,.1,c,mo);
+        else for(let x=x0+.15;x<x0+len-.1;x+=.12)B.box(x-.0125,zc-.0125,.025,.025,y0+.06,hh-.12,c,mo)};
+      const lamp=(x,z,y)=>{if(o.light==='yes')b.sph(x,z,y,.055,'#ffb020',op>0?{emis:'#ffb020',ei:2.2}:{rough:.35})};
+      if(o.type==='garage'){const hv=ht*(1-op);b.box(-.06,z0-.16,w+.12,.32,ht,.32,c,mo);for(const x of[-.06,w])b.box(x,z0-.05,.06,.1,0,ht,dark);
+        if(o.style==='solid')for(let y=ht*op;y<ht-.01;y+=.5)b.box(0,z0-.025,w,.05,y,Math.min(.495,ht-y),c,mo);else for(let y=ht*op;y<ht-.01;y+=.1)b.box(0,z0-.022,w,.044,y,Math.min(.095,ht-y),c,mo);
+        lamp(w+.15,z0,ht+.2);return}
+      for(const x of[-pw,w])b.box(x,z0-pw/2,pw,pw,0,ht+.12,'#5d6168',{rough:.7});lamp(w+pw/2,z0,ht+.18);
+      if(o.type==='sliding'){const zc=z0+pw/2+t/2+.01;b.box(0,zc-.03,w*1.95,.06,0,.02,dark,mo);b.box(w+pw+.05,zc+.05,.32,.22,0,.36,dark);panel(b,op*w*.95,w,zc,.05,ht-.05);return}
+      const leaf=(hx,len,dir)=>{const pv=new THREE.Group();b.add(pv,hx,z0,0);const B=builder(pv,0,0);panel(B,dir>0?.02:-len-.02,len,0,.05,ht-.05);pv.rotation.y=-dir*op*1.45;
+        B.box(dir>0?.02:-.1,.03,.08,.1,.5,.08,dark)};
+      if(o.type==='swing'){leaf(0,w/2-.03,1);leaf(w,w/2-.03,-1)}else leaf(0,w-.04,1)}},
+});
 /* ---------- curtains & extra furniture ---------- */
 const curtainPanels=(w,o)=>o.style==='closed'?[[0,w/2],[w/2,w]]:o.style==='one'?[[0,w*.3]]:[[0,w*.2],[w*.8,w]];
 const wave2D=(x0,x1,y,amp,col,op)=>{let d=`M${n(x0)} ${n(y)}`,i=0;for(let x=x0+.06;x<x1+.06;x+=.06)d+=` L${n(Math.min(x,x1))} ${n(y+(i++%2?-amp:amp))}`;return`<path d="${d}" fill="none" stroke="${col}" stroke-width="0.045" stroke-linejoin="round"${op<1?` stroke-opacity="${op}"`:''}/>`};
@@ -1144,7 +1180,7 @@ function renderProps(){
   }else if(s.t==='items'){
     const it=s.o,f=FURN[it.kind],o=optv(it);
     h+=`<div class="ph">${miniSVG(f,P,o)}<h3>${f.label}</h3></div>`;
-    if(f.opts)h+=`<div class="card"><h4>Options</h4>${f.opts.map(sp=>sp.type==='color'?`<label class="f"><span>${sp.label}</span><input type="color" data-o="${sp.k}" value="${o[sp.k]}"></label>`:sel(`data-o="${sp.k}"`,sp.label,sp.choices,o[sp.k])).join('')}</div>`;
+    if(f.opts)h+=`<div class="card"><h4>Options</h4>${f.opts.map(sp=>sp.type==='color'?`<label class="f"><span>${sp.label}</span><input type="color" data-o="${sp.k}" value="${o[sp.k]}"></label>`:sel(`data-o="${sp.k}"`,sp.label,sp.choices,o[sp.k])).join('')}${f.tip?`<p class="tip">${f.tip}</p>`:''}</div>`;
     h+=`<div class="row2">${num('x','X (m)',it.x,.05)}${num('y','Y (m)',it.y,.05)}${num('w',it.kind==='wall'?'Length (m)':'Width (m)',it.w,.05)}${num('h',it.kind==='wall'?'Thickness (m)':'Depth (m)',it.h,.05)}</div>`+
       sel('data-f="rot"','Rotation',[0,90,180,270].map(a=>[a,a+'°']),(it.rot||0)%360)+
       (isWallItem(it)?'':`<div class="card"><h4>Height</h4><div class="row2">${num('z','Above floor (m)',it.z||0,.05)}<label class="f"><span>Move</span><span class="btns" style="margin:0;flex-wrap:nowrap"><button data-act="zup" title="Up 10 cm (Page Up)">▲</button><button data-act="zdown" title="Down 10 cm (Page Down)">▼</button></span></label></div><div class="btns" style="margin:0"><button data-act="zsurf">⤓ Put on the furniture below</button><button data-act="zfloor">On the floor</button></div></div>`)+
@@ -1466,7 +1502,7 @@ function buildFloor(fl,P,o){
     for(const[a,b]of pcs){if(e.rail){seg(a,b,0,hgt-.04,glassM);seg(a,b,hgt-.04,hgt,railM)}else seg(a,b,0,hgt,wm)}
   }
   const upFl=o.fromAbove&&doc.floors[floorIdx(fl)+1],its=[...fl.items.map(it=>[it,isDown(it)?-stairLvl(fl,it):0]),...(upFl?upFl.items.filter(isDown).map(it=>[it,0]):[])];
-  for(const[it,y0]of its){const f=FURN[it.kind];if(!f||!f.d3)continue;const ig=new THREE.Group(),inner=new THREE.Group();ig.add(inner);if(it.fx)inner.scale.x=-1;f.d3(builder(inner,it.w,it.h),it.w,it.h,H,{...optv(it),_lvl:y0?-y0:lvl});mergeMeshes(inner,true);
+  for(const[it,y0]of its){const f=FURN[it.kind];if(!f||!f.d3)continue;const ig=new THREE.Group(),inner=new THREE.Group();ig.add(inner);if(it.fx)inner.scale.x=-1;f.d3(builder(inner,it.w,it.h),it.w,it.h,H,{...optv(it),_lvl:y0?-y0:lvl,_open:it.kind==='gate'?gateOpen(fl,it):0});mergeMeshes(inner,true);
     if(!y0&&!it.z&&f.group!=='struct'&&!NO_BLOB.has(it.kind))flatOn(g,it.w+.22,it.h+.22,blobMat(),it.x+it.w/2,it.y+it.h/2,-(it.rot||0)*Math.PI/180);
     ig.position.set(it.x+it.w/2,(it.z||0)+y0,it.y+it.h/2);ig.rotation.y=-(it.rot||0)*Math.PI/180;ig.userData.id=it.id;if(upFl&&upFl.items.includes(it))ig.userData.floor=floorIdx(upFl);g.add(ig)}
   if(o.devices){const dy=o.full?1.6:1.4;
@@ -1520,7 +1556,7 @@ function draw3D(){if(V.r&&V.root)V.r.render(V.scene,V.cam)}
 function frame3D(box){const c=box.getCenter(new THREE.Vector3()),s=box.getSize(new THREE.Vector3()),span=Math.max(s.x,s.z,4)+s.y*.6;
   V.cam.position.set(c.x,c.y+span*.95,c.z+span*1.2);V.ctl.target.copy(c);V.ctl.update()}
 /* fast path: when only on/off states or the selection changed, update the existing scene instead of rebuilding it */
-function sig3D(){return JSON.stringify([doc.floors,doc.look,ui.floor,ui.v3all,ui.v3full,ui.explode,ui.night,curP()===PAL.dark])}
+function sig3D(){return JSON.stringify([doc.floors,doc.look,ui.floor,ui.v3all,ui.v3full,ui.explode,ui.night,curP()===PAL.dark,doc.floors.map(f=>f.items.filter(i=>i.kind==='gate').map(i=>gateOpen(f,i)))])}
 function selHelper(){if(V.helper){V.scene.remove(V.helper);V.helper.geometry.dispose();V.helper=null}
   if(ui.sel){let found=null;V.root.traverse(x=>{if(x.userData.id===ui.sel&&!x.isSprite&&!found)found=x});if(found){V.helper=new THREE.BoxHelper(found,0x2f6fed);V.scene.add(V.helper)}}}
 /* lamps: a pool of point lights sized in steps of 4 for the lights that are on; switching inside a step needs no shader rebuild */
