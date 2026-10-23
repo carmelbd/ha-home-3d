@@ -8,6 +8,10 @@ Draw your home, walk around it in 3D, and control your real devices from the pla
 
 **Now on HACS!** [Install with HACS](#install-with-hacs-about-2-minutes) and future updates arrive as one click. **Already installed by hand?** See [Updating](#updating-to-a-new-version). Your design is kept.
 
+- **✨ Realistic 3D (1.1.0).** Real photo textures for wood floors, parquet, concrete, decking, pavers and grass, wood grain and fabric on furniture, real sky lighting, sharper sun shadows, soft shadows in the corners and under furniture, and rounded furniture edges.
+
+![Realistic 3D living room](screenshots/3d-realistic.png)
+
 - **🪜 Stairs that connect to the floor above.** Stairs now cut a matching opening in the floor above automatically, with a glass railing around it, so they go up *through* the floor and look right in 3D. On the upper floor's 2D plan the opening shows as "↓ stairs". Don't want it? Set **Opening in the floor above → No**.
 - **⬇️ Stairs going down.** Set a stair's **Direction → Down to the floor below** and it starts on the floor you're on, sinks through it and lands on the floor below (great for a basement). The floor gets the opening and railing automatically, and the floor below shows where the stairs land. In "Whole house" 3D it's one continuous staircase.
 - **🔢 Choose the number of steps.** Stairs have a **Number of steps** option: *Auto* picks comfortable steps for you, or pick any number from 3 to 30. The panel shows how high each step is and warns you if they're too steep or too shallow.
@@ -99,7 +103,7 @@ To update later, replace the file and raise `?v=1` to `?v=2` so browsers and the
 
 - **Saving needs an admin user.** Changes are saved into the dashboard itself, and Home Assistant only lets admins change dashboards. Other users can still view and control.
 - **Backup or share a design:** ⋯ → **Save design file** / **Open design file**.
-- **It needs internet** the first time it loads, because the 3D engine (three.js) comes from a CDN.
+- **It needs internet** the first time it loads, because the 3D engine (three.js) and the photo textures (free CC0 textures from [Poly Haven](https://polyhaven.com)) are downloaded. Without internet it still works with simpler drawn textures.
 - You can also open `floor-designer.html` on its own, outside Home Assistant, to play with a design. Devices are then simulated and the design is saved in that browser only.
 
 ## Updating to a new version

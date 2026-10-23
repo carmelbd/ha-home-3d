@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.1.0 (2026-10-23): Realistic 3D
+
+- **Real photo textures.** Wood planks, herringbone parquet, concrete, decking, stone pavers, pebbles and grass use real CC0 textures from [Poly Haven](https://polyhaven.com), with depth and shine. Tiles, marble, terrazzo and carpet keep their exact sizes and colours and get real relief on grout lines and surfaces.
+- **Wood grain and fabric** on furniture: tables, chairs, cabinets and stairs show wood grain, and sofas, armchairs and beds show a fabric weave in any colour. Walls have a subtle plaster surface.
+- **Realistic light.** Filmic colours, a lower warm sun with sharper wall shadows, light and reflections from a real sky, and soft contact shadows where walls meet the floor and under furniture. Furniture edges are softly rounded. Metal, mirrors and glass reflect.
+- **Nicer night mode.** Lamp light falls off more naturally and is less blown out.
+- Textures download the first time they're used (about 2 MB each). Offline, the previous drawn textures are used.
+
 ## 1.0.0 (2026-10-22): Install with HACS
 
 - **HACS support.** Add the repository to HACS as a **Dashboard** plugin, download it, and use the `custom:home-3d-card` card. There are no files to copy, and updates arrive through HACS.
