@@ -158,6 +158,43 @@ body.wall.wnight #stage{background:#070a10}
 .wweather .sub{opacity:.75;font-size:.8em}
 .wfc{display:flex;gap:14px;margin-top:10px;padding-top:10px;border-top:1px solid color-mix(in srgb,var(--wc) 18%,transparent)}
 .wfc div{text-align:center;font-size:.8em;line-height:1.35}.wfc .em{font-size:1.5em;display:block}.wfc s{text-decoration:none;opacity:.6}
+/* weather card */
+.wx{text-align:left;width:17em;max-width:calc(100vw - 48px);box-sizing:border-box;border-radius:24px;padding:1em 1.1em .9em;color:#fff;position:relative;overflow:hidden;box-shadow:0 12px 32px rgba(10,20,40,.22);line-height:1.15}
+.wx.glass{color:var(--wc);box-shadow:none}
+.wx.glass .wxi{filter:drop-shadow(0 1px 2px rgba(0,0,0,.35))}
+.wx-foot svg{width:1.15em;height:1.15em;vertical-align:-.2em;margin-right:.2em;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.wx-top{display:flex;justify-content:space-between;align-items:flex-start;gap:.4em}
+.wx-place{font-size:.78em;font-weight:600;opacity:.92;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:11em}
+.wx-temp{font-size:3.3em;font-weight:200;letter-spacing:-.03em;line-height:1;margin:.04em 0 .02em}
+.wx-cond{font-size:.95em;font-weight:600}
+.wx-hl{font-size:.78em;opacity:.85;margin-top:.15em}
+.wx-ic{width:4.6em;height:4.6em;flex:none;margin:-.3em -.3em 0 0;filter:drop-shadow(0 4px 8px rgba(0,0,0,.18))}
+.wx-days{display:grid;grid-template-columns:auto 1.7em 2.2em 1fr 2.2em;column-gap:.55em;row-gap:.3em;align-items:center;font-size:.82em;margin-top:.75em;padding-top:.6em;border-top:1px solid color-mix(in srgb,currentColor 22%,transparent)}
+.wx-days .d{font-weight:600;min-width:2.6em}.wx-days .lo{opacity:.65;text-align:right}.wx-days .hi{text-align:right;font-weight:600}
+.wx-days svg{width:1.7em;height:1.7em;display:block}
+.wx-bar{height:.34em;border-radius:1em;background:color-mix(in srgb,currentColor 18%,transparent);position:relative}
+.wx-bar i{position:absolute;top:0;bottom:0;border-radius:1em;background:linear-gradient(90deg,#7dd3fc,#a7f3d0,#fde047,#fb923c,#f43f5e);background-size:var(--bw,100%) 100%;background-position:var(--bp,0) 0}
+.wx-bar b{position:absolute;top:50%;width:.62em;height:.62em;border-radius:50%;background:#fff;box-shadow:0 0 0 2px rgba(0,0,0,.25);transform:translate(-50%,-50%)}
+.wx-foot{display:flex;justify-content:space-between;gap:.6em;flex-wrap:wrap;margin-top:.7em;padding-top:.55em;border-top:1px solid color-mix(in srgb,currentColor 22%,transparent);font-size:.74em;opacity:.92}
+.wx-foot span{white-space:nowrap}
+.wx-msg{font-size:.8em;opacity:.85;margin-top:.3em}
+.wx.g-day{background:linear-gradient(165deg,#2f80ed 0%,#56a8f5 55%,#8cc8fb 100%)}
+.wx.g-cloud{background:linear-gradient(165deg,#5b7189 0%,#7f93a8 60%,#a3b3c4 100%)}
+.wx.g-rain{background:linear-gradient(165deg,#3a4a5e 0%,#55667b 60%,#738398 100%)}
+.wx.g-storm{background:linear-gradient(165deg,#25233f 0%,#3d3a63 60%,#5b5687 100%)}
+.wx.g-snow{background:linear-gradient(165deg,#7d98b6 0%,#a5bbd2 60%,#cbd8e6 100%)}
+.wx.g-fog{background:linear-gradient(165deg,#7c8792 0%,#9ca6b0 60%,#bcc4cb 100%)}
+.wx.g-night{background:linear-gradient(165deg,#0b1430 0%,#1b2b5a 60%,#2f4479 100%)}
+.wx.g-ncloud{background:linear-gradient(165deg,#161d2b 0%,#2a3445 60%,#3d4859 100%)}
+@keyframes wxspin{to{transform:rotate(360deg)}}
+@keyframes wxdrop{0%{transform:translateY(-5px);opacity:0}25%{opacity:1}100%{transform:translateY(7px);opacity:0}}
+@keyframes wxdrift{50%{transform:translateX(2.5px)}}
+@keyframes wxflash{0%,86%,100%{opacity:1}90%{opacity:.25}94%{opacity:1}}
+.wxi .spin{animation:wxspin 30s linear infinite}
+.wxi .drop{animation:wxdrop 1.3s linear infinite}
+.wxi .drift{animation:wxdrift 7s ease-in-out infinite}
+.wxi .flash{animation:wxflash 4s linear infinite}
+@media (prefers-reduced-motion:reduce){.wxi *{animation:none!important}}
 #camPop{width:min(1100px,calc(100vw - 24px));background:#000;border-color:#222}
 #camPop .dh button{background:#222;color:#fff;border-color:#444}
 #camPop img{width:100%;display:block;max-height:calc(100vh - 120px);object-fit:contain}
@@ -1861,7 +1898,7 @@ $('#mdiList').innerHTML=MDI.map(m=>`<option value="mdi:${m}">`).join('');
 try{const s=JSON.parse(localStorage.getItem(KEY+'-3d')||'{}');ui.v3all=!!s.all;ui.v3full=!!s.full;ui.night=!!s.night;ui.explode=!!s.explode}catch(e){}
 /* ---------- wall display ---------- */
 const WALL_DEF={view:'3d',all:true,full:false,clock:'digital',pos:'tl',size:'l',date:true,h24:true,secs:false,color:'auto',card:true,
-  info:'tr',weather:'',weatherStyle:'forecast',weatherPos:'tr',weatherSrc:'device',weatherTracker:'',sensors:'',lights:true,
+  info:'tr',weather:'',weatherStyle:'forecast',weatherLook:'color',weatherPos:'tr',weatherSrc:'device',weatherTracker:'',sensors:'',lights:true,
   scenes:'',scenesPos:'bl',cams:'',camPos:'br',camSize:'m',camRefresh:5,
   buttons:'tap',labels:false,area:false,devices:true,control:true,
   rotate:'off',night:'auto',saver:0,saverStyle:'clock',wake:true};
@@ -1881,7 +1918,7 @@ function stOf(id){const h=ha.on&&hass();return h&&h.states[id]}
 const wHass=()=>ha.on&&hass();
 function wxData(){const w=W();
   if(w.weatherSrc==='entity'){const id=weatherId();if(!id)return null;const s=stOf(id);if(!s)return{none:true};const a=s.attributes||{};
-    return{cond:s.state,temp:a.temperature,hum:a.humidity,wind:a.wind_speed,wu:a.wind_speed_unit||'',fc:WALL.fc}}
+    const sun=stOf('sun.sun'),sa=sun?sun.attributes||{}:{};return{cond:s.state,temp:a.temperature,feels:a.apparent_temperature,hum:a.humidity,wind:a.wind_speed,wu:a.wind_speed_unit||'',day:sun?sun.state==='above_horizon':null,rise:sa.next_rising,set:sa.next_setting,fc:WALL.fc}}
   return WALL.wx||{none:true,msg:WALL.wxMsg||'Finding the location…'}}
 /* where to show the weather for: this device's GPS (needs https), the logged-in person's phone in HA, a chosen person/phone, or home */
 function geoBrowser(){return new Promise(ok=>{if(!window.isSecureContext||!navigator.geolocation)return ok(null);
@@ -1901,15 +1938,41 @@ async function wxFetch(at){
   const lat=at.lat.toFixed(2),lon=at.lon.toFixed(2),key=lat+','+lon;  // rounded to about 1 km
   try{const h=wHass(),f=!!(h&&h.config&&h.config.unit_system&&h.config.unit_system.temperature==='°F');
     const to=()=>(AbortSignal.timeout?{signal:AbortSignal.timeout(10000)}:{});
-    const j=await(await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code,is_day&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=auto&forecast_days=6${f?'&temperature_unit=fahrenheit&wind_speed_unit=mph':''}`,to())).json(),c=j.current;
+    const j=await(await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,apparent_temperature,relative_humidity_2m,wind_speed_10m,weather_code,is_day&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset&timezone=auto&forecast_days=6${f?'&temperature_unit=fahrenheit&wind_speed_unit=mph':''}`,to())).json(),c=j.current;
     let cond=WMO(c.weather_code);if(cond==='sunny'&&!c.is_day)cond='clear-night';
     const place=WALL.wx&&WALL.wx.key===key?WALL.wx.place:'';
-    WALL.wx={key,cond,temp:c.temperature_2m,hum:c.relative_humidity_2m,wind:c.wind_speed_10m,wu:f?'mph':'km/h',place:place||at.src,
+    WALL.wx={key,cond,temp:c.temperature_2m,feels:c.apparent_temperature,day:!!c.is_day,rise:j.daily.sunrise&&j.daily.sunrise[0],set:j.daily.sunset&&j.daily.sunset[0],hum:c.relative_humidity_2m,wind:c.wind_speed_10m,wu:f?'mph':'km/h',place:place||at.src,
       fc:{type:'daily',list:j.daily.time.map((t,i)=>({datetime:t+'T12:00',condition:WMO(j.daily.weather_code[i]),temperature:j.daily.temperature_2m_max[i],templow:j.daily.temperature_2m_min[i]}))}};WALL.wxMsg='';
     if(!place){wallRender();let g={};try{g=await(await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=${encodeURIComponent((navigator.language||'en').slice(0,2))}`,to())).json()}catch(e){}
       const nm=g.city||g.locality||g.principalSubdivision;if(nm&&WALL.wx&&WALL.wx.key===key)WALL.wx.place=nm}}
   catch(e){WALL.wxMsg='Weather service not reachable'}
   wallRender()}
+/* weather icons, drawn (the same on every device), gently animated */
+function wIcon(c,night,cls='wx-ic'){const P=(d,f,o='')=>`<path d="${d}" fill="${f}" ${o}/>`,
+  sun=(x,y,r)=>`<g class="spin" style="transform-origin:${x}px ${y}px">${[0,1,2,3,4,5,6,7].map(i=>{const a=i*Math.PI/4,c1=Math.cos(a),s1=Math.sin(a);return`<line x1="${n(x+c1*(r+4))}" y1="${n(y+s1*(r+4))}" x2="${n(x+c1*(r+8.5))}" y2="${n(y+s1*(r+8.5))}" stroke="#FFC93C" stroke-width="3" stroke-linecap="round"/>`}).join('')}</g><circle cx="${x}" cy="${y}" r="${r}" fill="#FFC93C"/>`,
+  moon=(x,y,r)=>{const a1=-1.05,a2=.7,p1=[x+r*Math.cos(a1),y+r*Math.sin(a1)],p2=[x+r*Math.cos(a2),y+r*Math.sin(a2)];return P(`M${n(p1[0])} ${n(p1[1])}A${r} ${r} 0 1 0 ${n(p2[0])} ${n(p2[1])}A${n(r*.78)} ${n(r*.78)} 0 0 1 ${n(p1[0])} ${n(p1[1])}Z`,'#F6E7A8')},
+  cloud=(dx,dy,col,sc=1)=>`<g transform="translate(${dx} ${dy}) scale(${sc})">${P('M47 46H19.5a9.5 9.5 0 0 1-1.2-18.9A13.5 13.5 0 0 1 44.4 23a11.5 11.5 0 0 1 2.6 23z',col)}</g>`,
+  drops=(k,col='#8fd3ff')=>[...Array(k)].map((_,i)=>{const x=22+i*(20/(Math.max(1,k-1)));return`<line class="drop" style="animation-delay:${(i*.27).toFixed(2)}s" x1="${n(x)}" y1="49" x2="${n(x-2)}" y2="55" stroke="${col}" stroke-width="2.6" stroke-linecap="round"/>`}).join(''),
+  flakes=()=>[[24,52],[32,57],[40,52]].map(([x,y],i)=>`<circle class="drop" style="animation-delay:${i*.4}s" cx="${x}" cy="${y}" r="2.3" fill="#fff"/>`).join(''),
+  bolt=`<polygon class="flash" points="35,40 26,53 32,53 28,63 41,48 34,48 38,40" fill="#FFD43B"/>`;
+  const W2='#ffffff',G='#dbe3ec',D='#aab7c6';let b;
+  switch(c){
+    case'sunny':b=night?moon(32,30,14):sun(32,32,12);break;
+    case'clear-night':b=moon(32,30,14);break;
+    case'partlycloudy':b=(night?moon(24,22,10):sun(24,22,9))+`<g class="drift">${cloud(4,6,W2,.95)}</g>`;break;
+    case'cloudy':b=`<g class="drift">${cloud(-6,-4,D,.8)}</g>${cloud(2,4,G)}`;break;
+    case'rainy':b=cloud(0,-2,G)+drops(3);break;
+    case'pouring':b=cloud(0,-2,D)+drops(5,'#6cc0ff');break;
+    case'lightning':b=cloud(0,-4,D)+bolt;break;
+    case'lightning-rainy':b=cloud(0,-4,D)+bolt+drops(2);break;
+    case'snowy':case'snowy-rainy':b=cloud(0,-2,W2)+flakes();break;
+    case'hail':b=cloud(0,-2,D)+[[24,52],[33,56],[42,51]].map(([x,y],i)=>`<circle class="drop" style="animation-delay:${i*.3}s" cx="${x}" cy="${y}" r="2.6" fill="#e8f4ff" stroke="#9fb6cc"/>`).join('');break;
+    case'fog':b=cloud(0,-8,G,.9)+[44,50,56].map((y,i)=>`<line class="drift" style="animation-delay:${i*.8}s" x1="${14+i*3}" y1="${y}" x2="${50-i*2}" y2="${y}" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".85"/>`).join('');break;
+    case'windy':case'windy-variant':b=P('M10 26h30a6 6 0 1 0-6-6','none','stroke="#fff" stroke-width="3.2" stroke-linecap="round"')+P('M10 36h40a7 7 0 1 1-7 7','none','stroke="#fff" stroke-width="3.2" stroke-linecap="round"')+P('M10 46h18','none','stroke="#fff" stroke-width="3.2" stroke-linecap="round" opacity=".7"');break;
+    default:b=cloud(0,0,G)}
+  return`<svg class="wxi ${cls}" viewBox="0 0 64 64" aria-hidden="true">${b}</svg>`}
+const wxGrad=(c,night)=>c==='sunny'||c==='clear-night'?(night||c==='clear-night'?'g-night':'g-day'):c==='partlycloudy'?(night?'g-ncloud':'g-day'):/rain|pouring|hail/.test(c)&&!/lightning/.test(c)?'g-rain':/lightning/.test(c)?'g-storm':/snow/.test(c)?'g-snow':c==='fog'?'g-fog':night?'g-ncloud':'g-cloud';
+const wxClock=(t,h24)=>{if(!t)return'';const d=new Date(t);if(isNaN(d))return'';let h=d.getHours(),m=String(d.getMinutes()).padStart(2,'0');return h24?`${String(h).padStart(2,'0')}:${m}`:`${h%12||12}:${m}${h<12?'am':'pm'}`};
 const wlines=t=>(t||'').split('\n').map(l=>l.split('|').map(x=>x.trim())).filter(a=>a[0]);
 function weatherId(){const w=W();return w.weather||(ha.on&&Object.keys(hass().states).find(k=>k.startsWith('weather.')))||''}
 function camSrc(id){const s=stOf(id),pic=s&&s.attributes&&s.attributes.entity_picture;if(!pic)return'';const base='';return base+pic+(pic.includes('?')?'&':'?')+'t='+Date.now()}
@@ -1931,12 +1994,25 @@ function wallRender(){if(!WALL.on)return;const w=W(),d=new Date(),col=wallColor(
     else{const sz=w.clock==='minimal'?fs*.55:fs;c=`<div class="${cls}"><div class="wtime" style="font-size:${sz}px">${fmtTime(d,w)}</div>${w.date?`<div class="wdate" style="font-size:${Math.max(14,sz*.2)}px">${esc(fmtDate(d))}</div>`:''}</div>`}
     add(w.pos,'clock',c)}
   const wx=wxData();
-  if(w.weatherStyle!=='off'&&wx){const deg=v=>v==null?'—':Math.round(v)+'°',ok=!wx.none,fc=wx.fc;
-    let h=`<div class="now"><span class="em">${ok?WEATHER_EM[wx.cond]||'🌡️':'⛅'}</span><b>${ok?deg(wx.temp):'—°'}</b><div><div>${ok?esc(wText(wx.cond)):'Weather'}</div><div class="sub">${ok?[wx.place?`📍 ${esc(wx.place)}`:'',wx.hum!=null?`💧 ${Math.round(wx.hum)}%`:'',wx.wind!=null?`💨 ${Math.round(wx.wind)} ${esc(wx.wu||'')}`:''].filter(Boolean).join(' · '):esc(wx.msg||'Connect to Home Assistant')}</div></div></div>`;
-    if(w.weatherStyle==='forecast'&&fc&&fc.list.length){const hourly=fc.type==='hourly',seen=new Set(),days=[];
-      for(const f of fc.list){const t=new Date(f.datetime),key=hourly?t.getHours():t.toDateString();if(t<d&&!hourly&&t.toDateString()!==d.toDateString())continue;if(seen.has(key)||(fc.type==='twice_daily'&&f.is_daytime===false))continue;seen.add(key);days.push(f);if(days.length>=5)break}
-      h+=`<div class="wfc">${days.map(f=>{const t=new Date(f.datetime);return`<div>${hourly?String(t.getHours()).padStart(2,'0')+':00':esc(t.toLocaleDateString(undefined,{weekday:'short'}))}<span class="em">${WEATHER_EM[f.condition]||'🌡️'}</span>${deg(f.temperature)}${f.templow!=null?` <s>${deg(f.templow)}</s>`:''}</div>`}).join('')}</div>`}
-    add(w.weatherPos,'weather',`<div class="${cls} wweather" style="font-size:${cs}px">${h}</div>`)}
+  if(w.weatherStyle!=='off'&&wx){const deg=v=>v==null||isNaN(v)?'—':Math.round(v)+'°',ok=!wx.none,fc=ok&&wx.fc&&wx.fc.list&&wx.fc.list.length?wx.fc:null;
+    const night=wx.day===false||wx.cond==='clear-night',look=w.weatherLook==='glass'?'glass'+(w.card?' wcard':''):wxGrad(wx.cond||'',night);
+    // forecast rows: today first, one per day (or per hour when that's all there is)
+    const rows=[];if(fc){const hourly=fc.type==='hourly',seen=new Set();
+      for(const f of fc.list){const t=new Date(f.datetime);if(isNaN(t))continue;const key=hourly?t.toISOString().slice(0,13):t.toDateString();
+        if(!hourly&&t<d&&t.toDateString()!==d.toDateString())continue;if(hourly&&t<d-36e5)continue;if(seen.has(key)||(fc.type==='twice_daily'&&f.is_daytime===false))continue;
+        seen.add(key);rows.push({t,f,label:hourly?String(t.getHours()).padStart(2,'0')+':00':t.toDateString()===d.toDateString()?'Today':t.toLocaleDateString(undefined,{weekday:'short'})});if(rows.length>=5)break}}
+    const today=rows[0]&&rows[0].label==='Today'?rows[0].f:null,hi=today?today.temperature:null,lo=today?today.templow:null;
+    let h='';
+    if(!ok)h=`<div class="wx-top"><div><div class="wx-place">Weather</div><div class="wx-cond" style="margin-top:.6em">${esc(wx.msg||'Connect to Home Assistant')}</div></div>${wIcon('partlycloudy',false)}</div>`;
+    else{h=`<div class="wx-top"><div style="min-width:0">${wx.place?`<div class="wx-place">📍 ${esc(wx.place)}</div>`:''}<div class="wx-temp">${deg(wx.temp)}</div><div class="wx-cond">${esc(wText(wx.cond))}</div>`+
+        `<div class="wx-hl">${[hi!=null?`H ${deg(hi)}`:'',lo!=null?`L ${deg(lo)}`:'',wx.feels!=null?`Feels ${deg(wx.feels)}`:''].filter(Boolean).join(' · ')}</div></div>${wIcon(wx.cond,night)}</div>`;
+      if(w.weatherStyle==='forecast'&&rows.length){const lows=rows.map(r=>r.f.templow??r.f.temperature),highs=rows.map(r=>r.f.temperature),mn=Math.min(...lows,wx.temp??Infinity),mx=Math.max(...highs,wx.temp??-Infinity),span=Math.max(1,mx-mn);
+        h+=`<div class="wx-days">${rows.map((r,ix)=>{const l=r.f.templow??r.f.temperature,u=r.f.temperature,a=(l-mn)/span*100,b=Math.max(4,(u-l)/span*100),now=ix===0&&r.label==='Today'&&wx.temp!=null?(wx.temp-mn)/span*100:null;
+          return`<span class="d">${esc(r.label)}</span>${wIcon(r.f.condition,false,'')}<span class="lo">${deg(l)}</span><span class="wx-bar"><i style="left:${n(a)}%;width:${n(b)}%;--bw:${n(10000/b)}%;--bp:${n(b>=99.9?0:a/(100-b)*100)}%"></i>${now!=null?`<b style="left:${n(Math.min(100,Math.max(0,now)))}%"></b>`:''}</span><span class="hi">${deg(u)}</span>`}).join('')}</div>`}
+      const I=d=>`<svg viewBox="0 0 24 24">${d}</svg>`,IC={hum:I('<path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/>'),wind:I('<path d="M3 9h11a3 3 0 1 0-3-3M3 15h15a3 3 0 1 1-3 3"/>'),rise:I('<path d="M4 18h16M7 14a5 5 0 0 1 10 0M12 3v5M9 6l3-3 3 3"/>'),set:I('<path d="M4 18h16M7 14a5 5 0 0 1 10 0M12 3v5M9 5l3 3 3-3"/>')};
+      const foot=[wx.hum!=null?`<span>${IC.hum}${Math.round(wx.hum)}%</span>`:'',wx.wind!=null?`<span>${IC.wind}${Math.round(wx.wind)} ${esc(wx.wu||'')}</span>`:'',wx.rise?`<span>${IC.rise}${wxClock(wx.rise,w.h24)}</span>`:'',wx.set?`<span>${IC.set}${wxClock(wx.set,w.h24)}</span>`:''].filter(Boolean);
+      if(foot.length)h+=`<div class="wx-foot">${foot.join('')}</div>`}
+    add(w.weatherPos,'weather',`<div class="wx ${look}" style="font-size:${cs}px">${h}</div>`)}
   const chips=[];
   for(const[id,label]of wlines(w.sensors)){const s=stOf(id),a=s?s.attributes||{}:{};
     const v=s?(isNaN(+s.state)?s.state:(+s.state).toFixed(Math.abs(+s.state)<10&&+s.state%1?1:0))+(a.unit_of_measurement?' '+a.unit_of_measurement:''):'—';
@@ -2016,7 +2092,7 @@ const WS_FIELDS=[['quick'],
   ['sec','Clock'],['clock','Clock style',[['digital','Digital'],['analog','Analog'],['minimal','Small'],['off','No clock']]],['pos','Clock position',POS],
   ['size','Size (clock & text)',[['s','Small'],['m','Medium'],['l','Large'],['xl','Huge']]],['h24','Format',[[true,'24-hour'],[false,'12-hour (AM/PM)']]],['secs','Seconds',[[false,'Hide'],[true,'Show']]],['date','Date',[[true,'Show'],[false,'Hide']]],
   ['color','Text colour','color'],['card','Background',[[true,'Frosted glass card'],[false,'None (text only)']]],
-  ['sec','Weather'],['weatherStyle','Weather',[['forecast','Now + next days'],['now','Now only'],['off','Hidden']]],['weatherPos','Weather position',POS],['weatherSrc','Weather for',[['device','Where this tablet / phone is'],['home','Home (from Home Assistant)'],['tracker','A person or phone in Home Assistant'],['entity','A Home Assistant weather entity']]],['weatherTracker','Person or phone (for “A person or phone”)','ent','person.me'],['weather','Weather entity (for “weather entity”; empty = first one)','ent','weather.home'],
+  ['sec','Weather'],['weatherStyle','Weather',[['forecast','Now + next days'],['now','Now only'],['off','Hidden']]],['weatherPos','Weather position',POS],['weatherLook','Weather look',[['color','Colourful (changes with the weather)'],['glass','Like the clock card']]],['weatherSrc','Weather for',[['device','Where this tablet / phone is'],['home','Home (from Home Assistant)'],['tracker','A person or phone in Home Assistant'],['entity','A Home Assistant weather entity']]],['weatherTracker','Person or phone (for “A person or phone”)','ent','person.me'],['weather','Weather entity (for “weather entity”; empty = first one)','ent','weather.home'],
   ['sec','Info'],['info','Info position',POS],['lights','Lights-on counter',[[true,'Show'],[false,'Hide']]],['sensors','Values to show — one per line: entity | label','area','sensor.outside_temperature | Outside&#10;sensor.pool_temperature | Pool'],
   ['sec','Scenes'],['scenesPos','Scene buttons position',POS],['scenes','Scene buttons — one per line: entity | label | emoji (scenes, scripts or buttons)','area','scene.movie_night | Movie | 🎬&#10;scene.good_night | Good night | 🌙&#10;script.pool_party | Pool party | 🏊','scenes'],
   ['sec','Cameras'],['camPos','Cameras position',POS],['camSize','Camera size',[['s','Small'],['m','Medium'],['l','Large'],['xl','Huge']]],['camRefresh','Refresh picture every',[[2,'2 seconds'],[5,'5 seconds'],[10,'10 seconds'],[30,'30 seconds']]],

@@ -12,6 +12,8 @@ Draw your home, walk around it in 3D, and control your real devices from the pla
 
 ![Wall display with clock, weather and scene buttons](screenshots/wall.png)
 
+![The weather card in different weather](screenshots/weather-looks.png)
+
 - **👆 View mode (1.5.0).** In Home Assistant it opens as just your house: rotate it and tap lights to switch them. **✏️ Edit** (top right) opens the designer.
 
 - **🏊 Pool with electric cover, and alarm (1.4.0).** A swimming pool whose electric cover or shade screen opens and closes with the real one, plus an Alarm button.
@@ -127,7 +129,7 @@ In **⚙ Wall settings** you can choose:
 
 - **The house:** 3D or 2D, whole house or one floor, cut-away or full-height walls. It can turn slowly by itself, and the night look can switch on after sunset. Room names and device buttons can be shown or hidden, and tapping a device can control it or do nothing (view only).
 - **Clock:** digital, analog, small or none. Choose the position, size, 24 or 12 hour, seconds, date, color, and a frosted-glass card or plain text.
-- **Weather:** now plus the next days, or now only. **Weather for:** where this tablet or phone is (its GPS when Home Assistant is opened over https, otherwise the location the Home Assistant app reports for you), your home, a chosen person or phone, or a Home Assistant weather entity. Location weather comes from [Open-Meteo](https://open-meteo.com), free and with no account; only a rounded location (about 1 km) is sent.
+- **Weather:** a card with the temperature, today's high and low, "feels like", animated weather icons, a row per day with a temperature bar, and humidity, wind, sunrise and sunset. Choose **Colourful** (the background follows the weather and time of day) or **Like the clock card**, and now plus the next days, or now only. **Weather for:** where this tablet or phone is (its GPS when Home Assistant is opened over https, otherwise the location the Home Assistant app reports for you), your home, a chosen person or phone, or a Home Assistant weather entity. Location weather comes from [Open-Meteo](https://open-meteo.com), free and with no account; only a rounded location (about 1 km) is sent.
 - **Info:** any values (for example `sensor.pool_temperature | Pool`) and a lights-on counter.
 - **Scenes:** big buttons for scenes, scripts and buttons, one per line as `entity | label | emoji`. **＋ Add all my scenes & scripts** fills the list for you.
 - **Cameras:** pictures that refresh every 2–30 seconds, in 4 sizes. Tap one to see it big. **＋ Add all my cameras** fills the list for you.

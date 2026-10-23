@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.7.2 (2026-10-23): A better-looking weather card
+
+- **New weather card design:** a big temperature with the town name, today's high and low and "feels like", drawn weather icons that move gently (turning sun, falling rain, flashing lightning), one row per day with a temperature range bar (and a dot for the temperature right now), and humidity, wind, sunrise and sunset at the bottom.
+- **Weather look:** **Colourful**, a background that changes with the weather and time of day (blue sky, grey clouds, dark rain, purple storm, night blue…), or **Like the clock card** (frosted glass in your text colour).
+
 ## 1.7.1 (2026-10-23): Weather where you are
 
 - **Weather for** setting in the wall display: **Where this tablet / phone is** (the new default), **Home**, **A person or phone in Home Assistant**, or **A Home Assistant weather entity** (as before).
