@@ -2037,7 +2037,7 @@ function wallRender(){if(!WALL.on)return;const w=W(),d=new Date(),col=wallColor(
   if(w.lights){const ls=doc.floors.flatMap(f=>f.devices).filter(x=>DEV[x.kind].domain==='light'),k=ls.filter(x=>ON.has(x.id)).length;chips.push(`<div class="wchip"><span class="em">💡</span><b>${k}</b><span>${k===1?'light on':'lights on'}</span></div>`)}
   if(chips.length)add(w.info,'info',`<div class="${cls}" style="--ws:${cs}px;display:flex;flex-direction:column;gap:6px">${chips.join('')}</div>`);
   const sc=wlines(w.scenes);
-  if(sc.length)add(w.scenesPos,'scenes',`<div class="wscenes">${sc.map(([id,label,em])=>{const s=stOf(id);return`<button class="wscene" data-scene="${esc(id)}"><span class="em">${esc(em||(id.startsWith('script.')?'▶️':'🎬'))}</span>${esc(label||(s&&s.attributes.friendly_name)||id.split('.')[1].replace(/_/g,' '))}</button>`}).join('')}</div>`);
+  if(sc.length)add(w.scenesPos,'scenes',`<div class="wscenes">${sc.map(([id,label,em])=>{const s=stOf(id);return`<button class="wscene" data-scene="${esc(id)}">${em?`<span class="em">${esc(em)}</span>`:''}${esc(label||(s&&s.attributes.friendly_name)||id.split('.')[1].replace(/_/g,' '))}</button>`}).join('')}</div>`);
   const cm=wlines(w.cams);
   if(cm.length){const cw={s:200,m:290,l:420,xl:560}[w.camSize]||290,cc=cm.length>3&&w.camSize!=='l'&&w.camSize!=='xl'?2:1;
     add(w.camPos,'cams',`<div class="wcams" style="--cw:${cw}px;--cc:${cc}">${cm.map(([id,label])=>{const s=stOf(id);return`<button class="wcam" data-campop="${esc(id)}"><img data-cam="${esc(id)}" alt="" hidden><i>${ha.on?(s?'Loading…':'Not found in HA'):'Camera picture appears when connected to HA'}</i><span>${esc(label||(s&&s.attributes.friendly_name)||id)}</span></button>`}).join('')}</div>`)}

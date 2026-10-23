@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.7.4 (2026-10-23): Scene buttons without a default icon
+
+- Scene buttons on the wall display no longer add 🎬 (or ▶️ for scripts) when you don't give an emoji. Write your own as `scene.good_night | Good night | 🌙`, or leave it out for a text-only button.
+
 ## 1.7.3 (2026-10-23): Turn your cameras from the wall
 
 - **Camera arrows:** tap a camera in the wall display to see it big. Pan-and-tilt cameras from **Eufy Security** or **ONVIF** now show ◀ ▲ ▼ ▶ arrows to turn them, and ⟳ for a full turn (Eufy).
