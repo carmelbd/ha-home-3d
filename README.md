@@ -8,6 +8,8 @@ Draw your home, walk around it in 3D, and control your real devices from the pla
 
 **Now on HACS!** [Install with HACS](#install-with-hacs-about-2-minutes) and future updates arrive as one click. **Already installed by hand?** See [Updating](#updating-to-a-new-version). Your design is kept.
 
+- **👆 View mode (1.5.0).** In Home Assistant it opens as just your house: rotate it and tap lights to switch them. **✏️ Edit** (top right) opens the designer.
+
 - **🏊 Pool with electric cover, and alarm (1.4.0).** A swimming pool whose electric cover or shade screen opens and closes with the real one, plus an Alarm button.
 
 ![Pool with electric cover at night](screenshots/pool-night.png)
@@ -89,7 +91,7 @@ views:
       - type: custom:home-3d-card
 ```
 
-3. Open **Home 3D** in the sidebar. That's it.
+3. Open **Home 3D** in the sidebar. That's it. It opens in **view mode**: drag to rotate, scroll or pinch to zoom, and tap a light to switch it. Tap **✏️ Edit** (top right) to change the design and **✓ Done** to go back.
 
 The card is also in the normal **Add card** list, under the name **Home 3D**. It works best in a view of type **Panel (single card)**, which gives it the whole screen. In other views you can set its height, for example `height: 700px`.
 

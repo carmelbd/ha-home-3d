@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.5.0 (2026-10-23): View mode
+
+- **View mode for everyday use.** In Home Assistant, Home 3D now opens as just your house in 3D, with no editor panels. Drag to rotate, scroll or pinch to zoom, and tap a light to switch it. Other devices open Home Assistant's control window. Switch floors with the tabs at the top, and use Whole house, Night and All lights at the bottom.
+- **✏️ Edit** (top right) brings back the designer, and **✓ Done** returns to view mode. Each device remembers your choice. Opening the page with `#edit` at the end of the address starts in edit mode.
+- Leaving Preview or the catalog no longer resets the live on/off states in Home Assistant.
+
 ## 1.4.0 (2026-10-23): Pool with electric cover, and alarm
 
 - **Swimming pool** (Balcony & outdoor) with an **electric slatted cover** on the water or an **electric shade screen** above it, underwater lights in any color, and a choice of tiles, edge stone and cover color.

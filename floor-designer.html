@@ -109,6 +109,11 @@ dialog::backdrop{background:rgba(0,0,0,.45)}
 ol.steps{padding-left:20px;margin:0}
 ol.steps li{margin-bottom:6px}
 .chk{display:flex;align-items:center;gap:6px;font-size:13px;padding-top:20px}
+/* view mode: only the house, for everyday use (rotate, tap lights); ✏️ Edit brings the designer back */
+body.view main{grid-template-columns:minmax(0,1fr)}
+body.view #palette,body.view #props,body.view .ed{display:none!important}
+#viewBtn{font-weight:600}
+@media (max-width:900px){body.view #stage{height:calc(100vh - 60px)}}
 @media (max-width:900px){
   body{height:auto;display:block}
   main{display:flex;flex-direction:column}
@@ -123,13 +128,14 @@ ol.steps li{margin-bottom:6px}
   <div class="brand"><b>🏠 Floor Designer</b><small>for Home Assistant</small></div>
   <nav class="tabs" id="tabs"></nav>
   <div class="actions">
-    <span id="saved"></span>
-    <button id="undoBtn" title="Undo (Ctrl/⌘+Z)">↶</button>
-    <button id="redoBtn" title="Redo (Ctrl/⌘+Shift+Z)">↷</button>
+    <span id="saved" class="ed"></span>
+    <button id="viewBtn"></button>
+    <button id="undoBtn" class="ed" title="Undo (Ctrl/⌘+Z)">↶</button>
+    <button id="redoBtn" class="ed" title="Redo (Ctrl/⌘+Shift+Z)">↷</button>
     <div class="seg"><button id="v2Btn" title="Edit the plan from above">2D</button><button id="v3Btn" title="Walk around your home in 3D">3D</button></div>
-    <button id="previewBtn" title="Try the plan like a dashboard">▶ Preview</button>
-    <button id="exportBtn" class="primary">Export to HA</button>
-    <details class="menu"><summary>⋯</summary><div>
+    <button id="previewBtn" class="ed" title="Try the plan like a dashboard">▶ Preview</button>
+    <button id="exportBtn" class="primary ed">Export to HA</button>
+    <details class="menu ed"><summary>⋯</summary><div>
       <button data-menu="save">💾 Save design file (.json)</button>
       <button data-menu="open">📂 Open design file…</button>
       <button data-menu="example">🏡 Load example home</button>
@@ -1136,7 +1142,7 @@ function renderPlan(){
 }
 function refreshViews(){renderPlan();if(ui.view==='3d')render3DView()}
 function renderTabs(){
-  $('#tabs').innerHTML=doc.floors.map((f,i)=>`<button data-floor="${i}" class="${i===ui.floor?'active':''}" title="Double-click to rename">${esc(f.name)}</button>`).join('')+`<button data-floor="add" title="Add a floor">＋ Floor</button>`;
+  $('#tabs').innerHTML=doc.floors.map((f,i)=>`<button data-floor="${i}" class="${i===ui.floor?'active':''}" title="Double-click to rename">${esc(f.name)}</button>`).join('')+`<button data-floor="add" class="ed" title="Add a floor">＋ Floor</button>`;
   $('#undoBtn').disabled=!undoS.length;$('#redoBtn').disabled=!redoS.length;
   $('#previewBtn').classList.toggle('on',ui.preview);$('#previewBtn').hidden=ui.view==='3d';
   $('#v2Btn').classList.toggle('on',ui.view!=='3d');$('#v3Btn').classList.toggle('on',ui.view==='3d');
@@ -1325,7 +1331,7 @@ $('#zbar').addEventListener('click',e=>{const b=e.target.closest('[data-z]');if(
 /* ---------- panels & header events ---------- */
 $('#palette').addEventListener('click',e=>{
   const b=e.target.closest('button');if(!b)return;
-  if(ui.preview){ui.preview=false;ON.clear()}
+  if(ui.preview){ui.preview=false;if(!ha.on)ON.clear()}
   if(b.dataset.room){const t=b.dataset.room;ui.extend=null;if(ui.view==='3d')ui.view='2d';if(ui.tool==='draw'&&ui.drawType===t)ui.tool='select';else{ui.tool='draw';ui.drawType=t}renderAll()}
   else if(b.dataset.item)addItem(b.dataset.item);
   else if(b.dataset.dev)addDevice(b.dataset.dev);
@@ -1383,7 +1389,12 @@ $('#tabs').addEventListener('click',e=>{const b=e.target.closest('button');if(!b
   else{ui.floor=+b.dataset.floor;ui.sel=null;ui.draft=null;renderAll()}});
 $('#tabs').addEventListener('dblclick',e=>{const b=e.target.closest('[data-floor]');if(!b||b.dataset.floor==='add')return;const fl=doc.floors[+b.dataset.floor],v=prompt('Floor name',fl.name);if(v&&v.trim())mutate(()=>{fl.name=v.trim()})});
 $('#undoBtn').onclick=doUndo;$('#redoBtn').onclick=doRedo;
-$('#previewBtn').onclick=()=>{ui.preview=!ui.preview;ui.tool='select';ui.draft=null;if(!ui.preview)ON.clear();renderAll()};
+$('#previewBtn').onclick=()=>{ui.preview=!ui.preview;ui.tool='select';ui.draft=null;if(!ui.preview&&!ha.on)ON.clear();renderAll()};
+const isView=()=>document.body.classList.contains('view');
+function setViewMode(on,init){document.body.classList.toggle('view',on);ui.preview=on;ui.tool='select';ui.draft=null;ui.sel=null;if(!on&&!ha.on)ON.clear();
+  $('#viewBtn').textContent=on?'✏️ Edit':'✓ Done';$('#viewBtn').title=on?'Change the design':'Back to the house view';try{localStorage.setItem(KEY+'-view',on?'1':'0')}catch(e){}
+  if(!init){renderAll();if(ui.view==='3d')requestAnimationFrame(size3D)}}
+$('#viewBtn').onclick=()=>setViewMode(!isView());
 document.addEventListener('keydown',e=>{
   if(/INPUT|TEXTAREA|SELECT/.test(e.target.tagName||'')||$('#exp').open)return;
   const mod=e.metaKey||e.ctrlKey,key=e.key.toLowerCase();
@@ -1620,7 +1631,8 @@ function pick3D(e){
   const hit=hits.find(h=>h.object.isSprite)||hits.find(h=>idOf(h.object));
   if(!hit){ui.sel=null;renderAll();return}
   const o=idOf(hit.object);let f=o;while(f&&f.userData.floor===undefined)f=f.parent;
-  if(f)ui.floor=f.userData.floor;ui.sel=o.userData.id;
+  if(f&&!isView())ui.floor=f.userData.floor;ui.sel=o.userData.id;
+  if(isView()){const dv=doc.floors.flatMap(q=>q.devices).find(x=>x.id===ui.sel);ui.sel=null;if(dv)toggleDev(dv);renderAll();return}
   const d=cur().devices.find(x=>x.id===ui.sel);
   if(d&&ha.on)haToggle(d);
   else if(d&&DEV[d.kind].tap==='toggle'){ON.has(d.id)?ON.delete(d.id):ON.add(d.id);hintMsg=`${d.name}: ${ON.has(d.id)?'on':'off'}`;clearTimeout(hintTimer);hintTimer=setTimeout(()=>{hintMsg=null;renderPlan()},2200)}
@@ -1735,6 +1747,7 @@ if(/^#f\d/.test(hs))ui.floor=clamp(+hs[2]-1,0,doc.floors.length-1);
 if(hs.includes('3d'))ui.view='3d';if(hs.includes('all'))ui.v3all=true;if(hs.includes('full'))ui.v3full=true;if(hs.includes('night')){ui.night=true;for(const f of doc.floors)for(const d of f.devices)if(DEV[d.kind].domain==='light')ON.add(d.id)}
 if(hs.includes('sel')){const d=cur().devices[0];if(d)ui.sel=d.id}
 if(ha.on){ui.view='3d';$('#exportBtn').style.display='none'}
+{let v=null;try{v=localStorage.getItem(KEY+'-view')}catch(e){}setViewMode(hs.includes('edit')?false:v!=null?v==='1':ha.on,true)}
 renderAll();
 if(ha.on)haInit().catch(e=>flash('Could not reach Home Assistant: '+(e.message||e)));
 if(hs==='#export')$('#exportBtn').click();
