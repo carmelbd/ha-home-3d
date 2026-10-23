@@ -258,12 +258,14 @@ const DEV={
   cover:{label:'Shutter / blinds',emoji:'🪟',mdi:'mdi:window-shutter',domain:'cover',tap:'more-info',color:'#8b5cf6',g:'open'},
   curtain:{label:'Curtains',emoji:'🎭',mdi:'mdi:curtains',domain:'cover',tap:'more-info',color:'#c084fc',g:'open'},
   gate:{label:'Electric gate',emoji:'🚧',mdi:'mdi:gate',domain:'cover',tap:'more-info',color:'#f59e0b',g:'open'},
+  pool_cover:{label:'Pool cover / screen',emoji:'🏊',mdi:'mdi:pool',domain:'cover',tap:'more-info',color:'#0ea5e9',g:'open'},
   lock:{label:'Smart lock',emoji:'🔒',mdi:'mdi:lock',domain:'lock',tap:'more-info',color:'#eab308',g:'open'},
   contact:{label:'Door / window sensor',emoji:'🚪',mdi:'mdi:door',domain:'binary_sensor',tap:'more-info',color:'#a855f7',g:'sense'},
   motion:{label:'Motion sensor',emoji:'🏃',mdi:'mdi:motion-sensor',domain:'binary_sensor',tap:'more-info',color:'#f97316',g:'sense'},
   presence:{label:'Presence sensor',emoji:'🧍',mdi:'mdi:account-eye',domain:'binary_sensor',tap:'more-info',color:'#22c55e',g:'sense'},
   leak:{label:'Water leak sensor',emoji:'💦',mdi:'mdi:water-alert',domain:'binary_sensor',tap:'more-info',color:'#0284c7',g:'sense'},
   smoke:{label:'Smoke detector',emoji:'🚨',mdi:'mdi:smoke-detector',domain:'binary_sensor',tap:'more-info',color:'#dc2626',g:'sense'},
+  alarm:{label:'Alarm',emoji:'🛡️',mdi:'mdi:shield-home',domain:'alarm_control_panel',tap:'more-info',color:'#dc2626',g:'sense'},
   camera:{label:'Camera',emoji:'📷',mdi:'mdi:cctv',domain:'camera',tap:'more-info',color:'#64748b',g:'sense'},
   doorbell:{label:'Doorbell',emoji:'🔔',mdi:'mdi:doorbell-video',domain:'camera',tap:'more-info',color:'#f59e0b',g:'sense'},
   tv:{label:'TV',emoji:'📺',mdi:'mdi:television',domain:'media_player',tap:'more-info',color:'#6366f1',g:'media'},
@@ -761,9 +763,9 @@ Object.assign(FURN,{
   sb.d3=(b,w,d,H,o)=>{old(b,w,d,H,o);if(o.led!=='yes')return;const k=Math.max(1,Math.round(w/.34)),cw=w/k,lv=+o.stack,lit=ledLit(o.ledc);
     for(let i=0;i<k;i++)for(let l=0;l<lv;l++)b.box(i*cw+.02,d-.03,cw-.04,.01,l*.145+.125,.006,o.ledc,lit);b.add(new THREE.PointLight(o.ledc,ui.night?.9:.3,2,2),w/2,d,lv*.145*.6)}}
 /* ---------- electric gate: opens in 3D from the nearest "Electric gate" device (a cover entity) ---------- */
-function gateOpen(fl,it){const cx=it.x+it.w/2,cy=it.y+it.h/2;let best=null,bd=Math.max(4,it.w);
-  for(const d of fl.devices)if(d.kind==='gate'){const dd=Math.hypot(d.x-cx,d.y-cy);if(dd<bd){bd=dd;best=d}}
-  if(!best)return 0;let st=null;try{st=typeof haState==='function'?haState(best):typeof HA!=='undefined'&&HA.hass&&HA.hass.states[best.entity]}catch(e){}
+function gateOpen(fl,it,kind='gate'){const cx=it.x+it.w/2,cy=it.y+it.h/2;let best=null,bd=Math.max(4,it.w);
+  for(const d of fl.devices)if(d.kind===kind){const dd=Math.hypot(d.x-cx,d.y-cy);if(dd<bd){bd=dd;best=d}}
+  if(!best)return null;let st=null;try{st=typeof haState==='function'?haState(best):typeof HA!=='undefined'&&HA.hass&&HA.hass.states[best.entity]}catch(e){}
   const pos=st&&st.attributes&&st.attributes.current_position;return pos!=null?clamp(pos/100,0,1):ON.has(best.id)?1:0}
 Object.assign(FURN,{
   gate:{label:'Electric gate',group:'out',kw:'electric gate driveway garage door sliding swing motor entrance outside fence yard parking',w:4,h:.2,
@@ -794,6 +796,27 @@ Object.assign(FURN,{
       const leaf=(hx,len,dir)=>{const pv=new THREE.Group();b.add(pv,hx,z0,0);const B=builder(pv,0,0);panel(B,dir>0?.02:-len-.02,len,0,.05,ht-.05);pv.rotation.y=-dir*op*1.45;
         B.box(dir>0?.02:-.1,.03,.08,.1,.5,.08,dark)};
       if(o.type==='swing'){leaf(0,w/2-.03,1);leaf(w,w/2-.03,-1)}else leaf(0,w-.04,1)}},
+});
+/* ---------- swimming pool with an electric cover or shade screen (nearest "Pool cover" device) ---------- */
+Object.assign(FURN,{
+  pool:{label:'Swimming pool',group:'out',kw:'pool swimming water cover screen shade electric awning',w:6,h:3,
+    tip:'For the electric cover or shade screen, put a <b>Pool cover / screen</b> device (Doors, blinds &amp; locks) next to the pool and link it to its cover entity. With <b>Position → From Home Assistant</b> it opens and closes live.',
+    opts:[O.sel('cover','Electric cover',[['slats','Slatted cover on the water'],['screen','Shade screen above'],['none','None']],'slats'),O.color('#9aa3ad','Cover color','ccolor'),
+      O.sel('state','Position',[['auto','From Home Assistant (nearby pool cover)'],['open','Open'],['half','Half open'],['closed','Closed']],'auto'),
+      O.sel('lights','Underwater lights',[['yes','Yes'],['no','No']],'yes'),O.color('#5ec8ff','Light color','lc'),
+      O.sel('tiles','Pool tiles',[['#7fc8e0','Light blue'],['#e9e6e0','White'],['#3d5a66','Dark grey']],'#7fc8e0'),O.sel('coping','Edge',[['#e9e6e0','White stone'],['#b9b2a6','Sand'],['#6b6f75','Grey']],'#e9e6e0')],
+    draw:(w,h,P,o)=>{const e=.25,op=o.state==='closed'?0:o.state==='half'?.5:1,cl=(1-op)*(w-2*e);let s=R(0,0,w,h,P,{fill:o.coping})+R(e,e,w-2*e,h-2*e,P,{fill:'#9fd6ea'});
+      if(o.cover!=='none'&&cl>.01){s+=R(w-e-cl,e,cl,h-2*e,P,{fill:o.ccolor});for(let x=w-e-cl+.25;x<w-e;x+=.25)s+=L(x,e,x,h-e,P,{sw:.015})}
+      if(o.cover==='slats')s+=R(w,0,.3,h,P,{fill:o.coping});return s},
+    d3:(b,w,d,H,o)=>{const e=.25,top=.12,cc=o.ccolor,op=o.state==='open'?1:o.state==='half'?.5:o.state==='closed'?0:(o._open??1),iw=w-2*e,id=d-2*e,Lc=(1-op)*iw,lit={emis:o.lc,ei:2.2};
+      for(const[x,z,sw,sd]of[[0,0,w,e],[0,d-e,w,e],[0,e,e,id],[w-e,e,e,id]])b.box(x,z,sw,sd,0,top,o.coping,{rough:.6});
+      b.box(e,e,iw,id,0,.006,shade(o.tiles,-.3));for(const[x,z,sw,sd]of[[e,e,iw,.012],[e,d-e-.012,iw,.012],[e,e,.012,id],[w-e-.012,e,.012,id]])b.box(x,z,sw,sd,.006,top-.03,o.tiles,{rough:.3});
+      b.box(e,e,iw,id,top-.035,.006,'#46b8e0',{opacity:.55,rough:.03,metal:.1});
+      if(o.lights==='yes'){for(let x=e+iw/6;x<w-e;x+=iw/3)b.box(x-.06,e+.012,.12,.006,.035,.04,o.lc,lit);b.add(new THREE.PointLight(o.lc,ui.night?2.2:.3,Math.max(iw,id)*1.2,2),w/2,d/2,top+.3)}
+      if(o.cover==='slats'){b.box(w,0,.35,d,0,.38,o.coping,{rough:.6});if(Lc>.02)for(let x=w-e-Lc;x<w-e-.01;x+=.1)b.box(x,e,.096,id,top-.02,.022,cc,{rough:.35})}
+      else if(o.cover==='screen'){const ph=2.6,pt=.1;for(const[x,z]of[[0,0],[w-pt,0],[0,d-pt],[w-pt,d-pt]])b.box(x,z,pt,pt,0,ph,'#3a3d42');
+        for(const z of[0,d-pt])b.box(0,z,w,pt,ph-.12,.12,'#3a3d42');b.cyl(w-pt/2,d/2,.07,ph-.08,.01,'#3a3d42');const drum=b.cyl(w-.15,d/2,.07,0,d-.1,'#3a3d42');drum.rotation.x=Math.PI/2;drum.position.y=ph-.1;
+        if(Lc>.02)b.box(w-e-Lc,pt,Lc,d-2*pt,ph-.06,.012,cc,{tex:'fabric'})}}},
 });
 /* ---------- curtains & extra furniture ---------- */
 const curtainPanels=(w,o)=>o.style==='closed'?[[0,w/2],[w/2,w]]:o.style==='one'?[[0,w*.3]]:[[0,w*.2],[w*.8,w]];
@@ -899,7 +922,7 @@ let saveTimer;
 function save(){if(ha.on){haSave();return}try{localStorage.setItem(KEY,JSON.stringify(doc));$('#saved').textContent='Saved ✓';clearTimeout(saveTimer);saveTimer=setTimeout(()=>$('#saved').textContent='',1500)}catch(e){$('#saved').textContent='Not saved'}}
 
 /* ---------- Home Assistant live mode (when opened from the HA sidebar) ---------- */
-const HA_OFF=new Set(['off','closed','locked','idle','standby','unavailable','unknown','docked','not_home','']);
+const HA_OFF=new Set(['off','disarmed','closed','locked','idle','standby','unavailable','unknown','docked','not_home','']);
 const ha={on:false,dash:null,cfg:null,saveT:null,liveT:null};
 function haRoot(){try{return window.parent!==window&&window.parent.document.querySelector('home-assistant')}catch(e){return null}}
 function hass(){const r=haRoot();return r&&r.hass}
@@ -1502,7 +1525,7 @@ function buildFloor(fl,P,o){
     for(const[a,b]of pcs){if(e.rail){seg(a,b,0,hgt-.04,glassM);seg(a,b,hgt-.04,hgt,railM)}else seg(a,b,0,hgt,wm)}
   }
   const upFl=o.fromAbove&&doc.floors[floorIdx(fl)+1],its=[...fl.items.map(it=>[it,isDown(it)?-stairLvl(fl,it):0]),...(upFl?upFl.items.filter(isDown).map(it=>[it,0]):[])];
-  for(const[it,y0]of its){const f=FURN[it.kind];if(!f||!f.d3)continue;const ig=new THREE.Group(),inner=new THREE.Group();ig.add(inner);if(it.fx)inner.scale.x=-1;f.d3(builder(inner,it.w,it.h),it.w,it.h,H,{...optv(it),_lvl:y0?-y0:lvl,_open:it.kind==='gate'?gateOpen(fl,it):0});mergeMeshes(inner,true);
+  for(const[it,y0]of its){const f=FURN[it.kind];if(!f||!f.d3)continue;const ig=new THREE.Group(),inner=new THREE.Group();ig.add(inner);if(it.fx)inner.scale.x=-1;f.d3(builder(inner,it.w,it.h),it.w,it.h,H,{...optv(it),_lvl:y0?-y0:lvl,_open:it.kind==='gate'?gateOpen(fl,it):it.kind==='pool'?gateOpen(fl,it,'pool_cover'):0});mergeMeshes(inner,true);
     if(!y0&&!it.z&&f.group!=='struct'&&!NO_BLOB.has(it.kind))flatOn(g,it.w+.22,it.h+.22,blobMat(),it.x+it.w/2,it.y+it.h/2,-(it.rot||0)*Math.PI/180);
     ig.position.set(it.x+it.w/2,(it.z||0)+y0,it.y+it.h/2);ig.rotation.y=-(it.rot||0)*Math.PI/180;ig.userData.id=it.id;if(upFl&&upFl.items.includes(it))ig.userData.floor=floorIdx(upFl);g.add(ig)}
   if(o.devices){const dy=o.full?1.6:1.4;
@@ -1556,7 +1579,7 @@ function draw3D(){if(V.r&&V.root)V.r.render(V.scene,V.cam)}
 function frame3D(box){const c=box.getCenter(new THREE.Vector3()),s=box.getSize(new THREE.Vector3()),span=Math.max(s.x,s.z,4)+s.y*.6;
   V.cam.position.set(c.x,c.y+span*.95,c.z+span*1.2);V.ctl.target.copy(c);V.ctl.update()}
 /* fast path: when only on/off states or the selection changed, update the existing scene instead of rebuilding it */
-function sig3D(){return JSON.stringify([doc.floors,doc.look,ui.floor,ui.v3all,ui.v3full,ui.explode,ui.night,curP()===PAL.dark,doc.floors.map(f=>f.items.filter(i=>i.kind==='gate').map(i=>gateOpen(f,i)))])}
+function sig3D(){return JSON.stringify([doc.floors,doc.look,ui.floor,ui.v3all,ui.v3full,ui.explode,ui.night,curP()===PAL.dark,doc.floors.map(f=>f.items.filter(i=>i.kind==='gate'||i.kind==='pool').map(i=>gateOpen(f,i,i.kind==='pool'?'pool_cover':'gate')))])}
 function selHelper(){if(V.helper){V.scene.remove(V.helper);V.helper.geometry.dispose();V.helper=null}
   if(ui.sel){let found=null;V.root.traverse(x=>{if(x.userData.id===ui.sel&&!x.isSprite&&!found)found=x});if(found){V.helper=new THREE.BoxHelper(found,0x2f6fed);V.scene.add(V.helper)}}}
 /* lamps: a pool of point lights sized in steps of 4 for the lights that are on; switching inside a step needs no shader rebuild */

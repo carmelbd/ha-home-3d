@@ -8,6 +8,10 @@ Draw your home, walk around it in 3D, and control your real devices from the pla
 
 **Now on HACS!** [Install with HACS](#install-with-hacs-about-2-minutes) and future updates arrive as one click. **Already installed by hand?** See [Updating](#updating-to-a-new-version). Your design is kept.
 
+- **🏊 Pool with electric cover, and alarm (1.4.0).** A swimming pool whose electric cover or shade screen opens and closes with the real one, plus an Alarm button.
+
+![Pool with electric cover at night](screenshots/pool-night.png)
+
 - **🚧 Electric gate (1.3.0).** Sliding, swing or garage gate that opens and closes in 3D together with your real gate in Home Assistant.
 
 ![Electric gates](screenshots/gates.png)

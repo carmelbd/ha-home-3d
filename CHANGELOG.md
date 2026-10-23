@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.4.0 (2026-10-23): Pool with electric cover, and alarm
+
+- **Swimming pool** (Balcony & outdoor) with an **electric slatted cover** on the water or an **electric shade screen** above it, underwater lights in any color, and a choice of tiles, edge stone and cover color.
+- **Pool cover / screen** button (Doors, blinds & locks): link it to the cover entity and the 3D cover or screen opens and closes live with the real one, including half open.
+- **Alarm** button (Sensors & cameras) for `alarm_control_panel` entities. It lights up when the alarm is armed or triggered. Tapping it opens Home Assistant's alarm keypad.
+
 ## 1.3.0 (2026-10-23): Electric gate
 
 - **Electric gate** (Balcony & outdoor): sliding gate (with track and motor), swing gate with 2 leaves or 1 leaf, or roll-up garage door. Choose the style (horizontal slats, vertical bars or solid), color and height (1.2–2.4 m), plus an amber warning light that glows while it's open.
