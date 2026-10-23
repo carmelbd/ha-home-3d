@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.2.0 (2026-10-23): Kitchen and glass closet
+
+- **Kitchen chair** with 4 legs: table, counter or bar height, with backrest, low back or no back, and any seat and legs color.
+- **Kitchen counter and island options:** cabinet color, countertop (dark stone, white marble, white quartz, black, wood), handles, and doors/drawers. The counter can get wall cabinets above it. The island can get a seating overhang, waterfall sides, and a sink or cooktop.
+- **Tall kitchen cabinets** (built-in): pantry doors, built-in oven + microwave, or built-in fridge, at 2.0 / 2.2 / 2.4 m.
+- **Handles** for all kitchen cabinets: steel bar, black bar, **big gold ring**, gold knob, or handleless (integrated groove).
+- **Glass closet with LEDs:** glass doors, 1–6 glass shelves, LEDs under each shelf and/or side strips in any color, any frame color, filled with bags, shoes or folded clothes. It glows at night.
+- **Clear shoe boxes** can have LEDs inside.
+
 ## 1.1.1 (2026-10-23): Instant light switching
 
 - Turning a light (or any device) on or off in 3D is instant again. Only the changed light updates; the house isn't rebuilt and the realistic materials aren't recompiled. Live changes from Home Assistant update the same fast way.

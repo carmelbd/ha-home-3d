@@ -673,6 +673,91 @@ Object.assign(FURN,{
       s+=bunny2D(w*.55,h*.56,P,o.breed,-20);if(o.count==='2')s+=bunny2D(w*.26,h*.72,P,o.breed2,40);return s},
     d3:(b,w,d,H,o)=>{penBuild(b,w,d,H,o);addBunny(b,w*.55,d*.56,o.breed,'sit',-.5,1.1);if(o.count==='2')addBunny(b,w*.26,d*.74,o.breed2,'loaf',.9,1.05)}}
 });
+/* ---------- kitchen: chairs, cabinet fronts with handles, glass closet with LEDs ---------- */
+const HANDLES=[['bar','Steel bar'],['black','Black bar'],['gold_ring','Big gold ring'],['gold_knob','Gold knob'],['none','Handleless (integrated)']];
+const TOPS=[['stone','Dark stone'],['marble','White marble'],['white','White quartz'],['black','Black'],['wood','Wood']];
+const GOLD={metal:1,rough:.22},GOLD_C='#d4af37';
+let _marble=null;
+function marbleTex(){if(_marble)return _marble;const c=document.createElement('canvas');c.width=c.height=512;const x=c.getContext('2d');let sd=7;const rnd=()=>{sd=(sd*1664525+1013904223)>>>0;return sd/4294967296};
+  x.fillStyle='#f3f1ed';x.fillRect(0,0,512,512);x.lineCap='round';
+  for(let v=0;v<16;v++){const y0=rnd()*512;x.strokeStyle=rnd()>.4?'rgba(120,122,128,.2)':'rgba(176,160,140,.22)';x.lineWidth=.5+rnd()*(v<4?3.5:1.5);x.shadowColor=x.strokeStyle;x.shadowBlur=v<4?6:2;
+    x.beginPath();x.moveTo(-20,y0);for(let i=1;i<=6;i++)x.quadraticCurveTo(i*90-45,y0+(rnd()-.5)*160,i*90,y0+(rnd()-.5)*90);x.stroke()}
+  _marble=canvasTex(c);_marble.wrapS=_marble.wrapT=THREE.RepeatWrapping;_marble.repeat.set(1/1.2,1/1.2);return _marble}
+const topMat=k=>k==='marble'?['#fefefe',{map:'marble',rough:.18}]:k==='white'?['#f4f4f2',{rough:.25}]:k==='black'?['#1f2124',{rough:.3}]:k==='wood'?[C3.wood,{}]:[C3.stone,{rough:.35}];
+/* a handle on a door surface at z=zs, facing +z (dir 1) or -z (dir -1); vertical ('v') or horizontal ('h') */
+function handleAt(b,k,x,zs,y,dir,orient,len){const out=v=>dir>0?zs+v:zs-v;
+  if(k==='gold_ring'){const r=.055,m=mesh(new THREE.TorusGeometry(r,.0075,12,40),mat(GOLD_C,GOLD));b.add(m,x,out(.014),y-r);b.sph(x,out(.012),y+.004,.013,GOLD_C,GOLD);return}
+  if(k==='gold_knob'){b.cyl(x,out(.01),.006,y-.006,.012,GOLD_C,GOLD).rotation.x=Math.PI/2;b.sph(x,out(.026),y,.02,GOLD_C,GOLD);return}
+  const col=k==='black'?'#1c1f23':C3.steel,mo=k==='black'?{rough:.45}:CHROME,th=.014,zb=dir>0?zs+.022:zs-.022-th;
+  if(orient==='h'){b.box(x-len/2,zb,len,th,y-th/2,th,col,mo);for(const px of[x-len/2+.02,x+len/2-.03])b.box(px,dir>0?zs:zs-.022,.01,.022,y-.005,.01,col,mo)}
+  else{b.box(x-th/2,zb,th,th,y-len/2,len,col,mo);for(const py of[y-len/2+.02,y+len/2-.03])b.box(x-.005,dir>0?zs:zs-.022,.01,.022,py,.01,col,mo)}}
+/* a row of n doors (or one drawer) on the face z=zf */
+function fronts(b,x0,w,zf,dir,y0,ht,c,hk,o={}){const n=o.n||Math.max(1,Math.round(w/.6)),dw=w/n,t=.018,z=dir>0?zf:zf-t,zs=dir>0?zf+t:zf-t;
+  for(let i=0;i<n;i++){const x=x0+i*dw;b.box(x+.002,z,dw-.004,t,y0,ht,c);
+    if(hk==='none'){b.box(x+.002,dir>0?zs:zs-.004,dw-.004,.004,y0+ht-.03,.016,'#202326');continue}
+    const left=o.left??(i%2===1);
+    if(o.drawer)handleAt(b,hk,x+dw/2,zs,y0+ht-(hk==='gold_ring'?.02:.06),dir,'h',Math.min(.32,dw*.5));
+    else if(ht>1.2)handleAt(b,hk,left?x+.06:x+dw-.06,zs,y0+Math.min(1.1,ht*.5)+(hk==='gold_ring'?.06:0),dir,'v',.4);
+    else handleAt(b,hk,left?x+.06:x+dw-.06,zs,y0+ht-.08,dir,'v',.16)}}
+const ledLit=c=>({emis:c,ei:2.6});
+Object.assign(FURN,{
+  kitchen_chair:{label:'Kitchen chair',group:'wet',kw:'chair seat dining stool bar counter legs',w:.44,h:.48,
+    opts:[O.sel('height','Seat height',[['dining','Table (45 cm)'],['counter','Counter stool (65 cm)'],['bar','Bar stool (75 cm)']],'dining'),O.sel('back','Backrest',[['yes','Yes'],['low','Low'],['no','No']],'yes'),O.color('#c8a27a','Seat color'),O.color('#2a2e35','Legs color','legs')],
+    draw:(w,h,P,o)=>{let s=R(.02,.04,w-.04,h-.06,P,{rx:.05,fill:o.color});if(o.back!=='no')s+=L(.04,.03,w-.04,.03,P,{sw:.05});for(const[x,y]of[[.05,.07],[w-.05,.07],[.05,h-.05],[w-.05,h-.05]])s+=C(x,y,.018,P,{fill:o.legs,sw:.005});return s},
+    d3:(b,w,d,H,o)=>{const sh=o.height==='bar'?.75:o.height==='counter'?.65:.45,lg=o.legs,c=o.color,t=.032,ins=.03;
+      for(const[x,z]of[[ins,ins],[w-ins-t,ins],[ins,d-ins-t],[w-ins-t,d-ins-t]])b.box(x,z,t,t,0,sh-.02,lg);
+      if(sh>.5){const fy=sh*.38;b.box(ins,d-ins-t,w-2*ins,t*.7,fy,t*.7,lg);b.box(ins,ins,w-2*ins,t*.7,fy,t*.7,lg);b.box(ins,ins,t*.7,d-2*ins,fy,t*.7,lg);b.box(w-ins-t*.7,ins,t*.7,d-2*ins,fy,t*.7,lg)}
+      b.box(.01,.02,w-.02,d-.03,sh-.02,.055,c,{tex:'fabric'});
+      if(o.back!=='no'){const bh=o.back==='low'?.18:.4;for(const x of[ins,w-ins-t])b.box(x,ins,t,t,sh,bh,lg);b.box(.02,ins-.005,w-.04,.04,sh+bh*(o.back==='low'?.35:.45),bh*(o.back==='low'?.6:.5),c,{tex:'fabric'})}}},
+  counter:{...FURN.counter,opts:[O.color('#f3f4f6','Cabinet color'),O.sel('top','Countertop',TOPS,'stone'),O.sel('handle','Handles',HANDLES,'bar'),O.sel('fronts','Fronts',[['doors','Doors'],['drawers','Drawers'],['mix','Drawers + doors']],'mix'),O.sel('upper','Wall cabinets above',[['no','No'],['yes','Yes']],'no')],
+    d3:(b,w,d,H,o)=>{const c=o.color,[tc,to]=topMat(o.top),zf=d-.02,n=Math.max(1,Math.round(w/.6)),dw=w/n;
+      b.box(0,0,w,zf,.1,.76,c);b.box(.04,0,w-.08,zf-.05,0,.1,'#2a2e35');b.box(0,0,w,d,.86,.04,tc,to);
+      for(let i=0;i<n;i++){const x=i*dw;if(o.fronts==='drawers'||(o.fronts==='mix'&&i===0))for(let j=0;j<3;j++)fronts(b,x,dw,zf,1,.11+j*.25,.244,c,o.handle,{n:1,drawer:true});else fronts(b,x,dw,zf,1,.11,.74,c,o.handle,{n:1,left:i%2===1})}
+      const sk=Math.min(.75,w*.3);b.box(w*.68-sk/2,.08,sk,d-.16,.9,.006,'#3d4249');b.cyl(w*.68,.06,.018,.9,.28,C3.steel,CHROME);b.box(w*.68-.01,.06,.02,.16,1.16,.02,C3.steel,CHROME);if(w>=1.3)b.box(.15,.06,.62,d-.12,.9,.006,'#15171a',{rough:.15});
+      if(o.upper==='yes'&&H>1.6){const ud=.35,uy=1.45,uh=Math.min(.75,H-uy-.05);b.box(0,0,w,ud,uy,uh,c);fronts(b,0,w,ud,1,uy,uh,c,o.handle,{n})}}},
+  island:{...FURN.island,opts:[O.color('#f3f4f6','Cabinet color'),O.sel('top','Countertop',TOPS,'stone'),O.sel('handle','Handles',HANDLES,'bar'),O.sel('seat','Seating overhang',[['yes','Yes'],['no','No']],'yes'),O.sel('sides','Waterfall sides',[['no','No'],['yes','Yes (countertop down to the floor)']],'no'),O.sel('extra','On top',[['none','Nothing'],['sink','Sink'],['hob','Cooktop']],'none')],
+    draw:(w,h,P,o)=>{let s=R(0,0,w,h,P,{rx:.03})+R(.08,.08,w-.16,(o.seat==='yes'?h*.7:h)-.16,P,{fill:P.fur2});if(o.extra==='sink')s+=R(w/2-.3,.1,.6,.38,P,{rx:.04});if(o.extra==='hob')for(const[x,y]of[[-.13,.2],[.13,.2],[-.13,.42],[.13,.42]])s+=C(w/2+x,y,.08,P);return s},
+    d3:(b,w,d,H,o)=>{const c=o.color,[tc,to]=topMat(o.top),cd=o.seat==='yes'?d*.7:d,wf=o.sides==='yes',sx=wf?.04:0;
+      b.box(sx,.02,w-2*sx,cd-.02,.1,.78,c);b.box(sx+.04,.06,w-2*sx-.08,cd-.1,0,.1,'#2a2e35');b.box(0,0,w,d,.88,.04,tc,to);
+      if(wf)for(const x of[0,w-.04])b.box(x,0,.04,d,0,.88,tc,to);
+      fronts(b,sx,w-2*sx,.02,-1,.11,.76,c,o.handle);
+      if(o.extra==='sink'){b.box(w/2-.3,.1,.6,.38,.92,.006,'#3d4249');b.cyl(w/2,.06,.018,.92,.3,C3.steel,CHROME);b.box(w/2-.01,.06,.02,.17,1.2,.02,C3.steel,CHROME)}
+      if(o.extra==='hob')b.box(w/2-.3,.08,.6,.5,.92,.006,'#15171a',{rough:.15})}},
+  kitchen_tall:{label:'Tall kitchen cabinets',group:'wet',kw:'integrated built in pantry column cupboard closet oven fridge handles gold kitchen',w:1.2,h:.6,
+    opts:[O.color('#f3f4f6','Cabinet color'),O.sel('handle','Handles',HANDLES,'gold_ring'),O.sel('fill','Inside',[['doors','Pantry doors'],['oven','Oven + microwave'],['fridge','Built-in fridge']],'doors'),O.sel('tall','Height',[['2.2','2.2 m'],['2.4','2.4 m'],['2.0','2.0 m']],'2.2')],
+    draw:(w,h,P,o)=>{const k=Math.max(1,Math.round(w/.6));let s=R(0,0,w,h,P);for(let i=1;i<k;i++)s+=L(w*i/k,0,w*i/k,h,P);if(o.handle!=='none')for(let i=0;i<k;i++){const x=i%2?w*i/k+.07:w*(i+1)/k-.07;s+=o.handle==='gold_ring'||o.handle==='gold_knob'?C(x,h-.03,.04,P,{fill:'none',stroke:GOLD_C,sw:.015}):L(x,h-.03,x,h-.03,P,{sw:.04})}return s},
+    d3:(b,w,d,H,o)=>{const ht=Math.min(+o.tall,Math.max(H,1.2)),c=o.color,zf=d-.02,n=Math.max(1,Math.round(w/.6)),dw=w/n,hk=o.handle,top=ht>2.1?.38:0;
+      b.box(0,0,w,zf,.1,ht-.1,c);b.box(.04,0,w-.08,zf-.05,0,.1,'#2a2e35');
+      for(let i=0;i<n;i++){const x=i*dw,left=i%2===1,F=(y0,h,ex={})=>fronts(b,x,dw,zf,1,y0,h,c,hk,{n:1,left,...ex});
+        if(top)F(ht-top+.002,top-.004,{drawer:true});const hi=ht-top;
+        if(o.fill==='oven'&&i===0){F(.11,.6,{drawer:true});if(hi>.8){b.box(x+.02,zf,dw-.04,.02,.73,Math.min(.58,hi-.75),'#16181b',{rough:.12});b.box(x+.08,zf+.02,dw-.16,.02,.73+Math.min(.58,hi-.75)-.07,.02,C3.steel,CHROME)}
+          if(hi>1.75){b.box(x+.02,zf,dw-.04,.02,1.34,.38,'#16181b',{rough:.12});if(hi-1.74>.25)F(1.74,hi-1.74)}}
+        else if(o.fill==='fridge'&&i===0){F(.11,Math.min(.7,hi-.12));if(hi>.9)F(.83,hi-.83)}
+        else F(.11,hi-.11)}}},
+  glass_cabinet:{label:'Glass closet with LEDs',group:'bed',kw:'glass display cabinet vitrine showcase boxes led light closet bags shoes',w:1.2,h:.45,
+    opts:[O.sel('tall','Height',[['2.1','2.1 m'],['1.8','1.8 m'],['1.2','1.2 m'],['.6','60 cm (low box)']],'2.1'),O.sel('shelves','Shelves',[['1','1'],['2','2'],['3','3'],['4','4'],['5','5'],['6','6']],'4'),
+      O.sel('led','LEDs',[['shelves','Under each shelf'],['sides','Side strips'],['both','Both'],['none','No LEDs']],'shelves'),O.color('#ffe9c4','LED color','ledc'),O.color('#2a2e35','Frame color','frame'),GLASS_OPT,
+      O.sel('fill','Inside',[['bags','Bags'],['shoes','Shoes'],['clothes','Folded clothes'],['empty','Empty']],'bags')],
+    draw:(w,h,P,o)=>{const k=Math.max(1,Math.round(w/.6));let s=R(0,0,w,h,P,{fill:P.glass,stroke:o.frame,sw:.025});for(let i=1;i<k;i++)s+=L(w*i/k,0,w*i/k,h,P,{stroke:o.frame,sw:.02});if(o.led!=='none')s+=L(.05,h-.06,w-.05,h-.06,P,{stroke:o.ledc,sw:.03});return s},
+    d3:(b,w,d,H,o)=>{const ht=Math.min(+o.tall,Math.max(H,.6)),f=o.frame,t=.025,k=Math.max(1,Math.round(w/.6)),cw=w/k,ns=Math.max(0,Math.min(+o.shelves,Math.floor((ht-.1)/.2)-1)),ch=(ht-.1)/(ns+1),lit=ledLit(o.ledc);
+      b.box(0,0,w,.015,0,ht,f);b.box(0,0,w,d,0,.06,f);b.box(0,0,w,d,ht-.035,.035,f);
+      for(let i=0;i<=k;i++)b.box(Math.min(w-t,i*cw-(i?t/2:0)),0,t,d,0,ht,f);
+      for(let i=0;i<k;i++){const x=i*cw+t/2,iw=cw-t;
+        for(let j=0;j<=ns;j++){const y=.06+j*ch;
+          if(j)b.box(x,.015,iw,d-.04,y-.008,.008,'#e6f3fa',{opacity:.35,rough:.05});
+          if(o.led==='shelves'||o.led==='both'){const ly=j===ns?ht-.045:y+ch-.014;b.box(x+.01,d-.07,iw-.02,.02,ly-.004,.012,o.ledc,lit)}
+          if(ch<.17)continue;const cc=CLOTHES[(i*7+j*3)%CLOTHES.length];
+          if(o.fill==='bags'){const bw=Math.min(.24,iw*.38),bh=Math.min(.22,ch*.6);for(const q of[0,1]){const bx=x+iw*(q?.62:.12),c2=CLOTHES[(i*7+j*3+q*5)%CLOTHES.length];b.box(bx,.08,bw,.11,y+.002,bh,c2);b.box(bx+bw*.25,.125,bw*.5,.012,y+bh,.012,shade(c2,-.25))}}
+          else if(o.fill==='shoes'){for(let q=0;q<Math.max(1,Math.floor(iw/.2));q++){const sx=x+.03+q*.2;b.box(sx,.08,.07,.24,y+.002,.07,cc);b.box(sx+.08,.08,.07,.24,y+.002,.07,cc)}}
+          else if(o.fill==='clothes'){for(let q=0;q<Math.max(1,Math.floor(iw/.28));q++)for(let l=0;l<Math.min(4,Math.floor((ch-.05)/.05));l++)b.box(x+.03+q*.28,.06,.24,d-.14,y+.002+l*.05,.045,CLOTHES[(i*5+q*3+l*2+j)%CLOTHES.length])}}
+        if(o.led==='sides'||o.led==='both')for(const lx of[x+.002,x+iw-.01])b.box(lx,d-.05,.008,.012,.07,ht-.12,o.ledc,lit);
+        b.glass(x+.002,d-.012,iw-.004,.008,.065,ht-.1,o.glass);b.box(i%2?x+.03:x+iw-.045,d,.015,.015,ht*.4,Math.min(.3,ht*.25),f)}
+      if(o.led!=='none')b.add(new THREE.PointLight(o.ledc,ui.night?2.2:.4,3,2),w/2,d*.6,ht*.6);if(ui.night&&ht>1)b.add(new THREE.PointLight(o.ledc,1.2,2,2),w/2,d+.3,ht*.25)}},
+});
+/* LEDs inside the clear shoe boxes */
+{const sb=FURN.shoeboxes,old=sb.d3;sb.opts=[...sb.opts,O.sel('led','LEDs inside',[['none','No'],['yes','Yes']],'none'),O.color('#ffe9c4','LED color','ledc')];
+  sb.d3=(b,w,d,H,o)=>{old(b,w,d,H,o);if(o.led!=='yes')return;const k=Math.max(1,Math.round(w/.34)),cw=w/k,lv=+o.stack,lit=ledLit(o.ledc);
+    for(let i=0;i<k;i++)for(let l=0;l<lv;l++)b.box(i*cw+.02,d-.03,cw-.04,.01,l*.145+.125,.006,o.ledc,lit);b.add(new THREE.PointLight(o.ledc,ui.night?.9:.3,2,2),w/2,d,lv*.145*.6)}}
 /* ---------- curtains & extra furniture ---------- */
 const curtainPanels=(w,o)=>o.style==='closed'?[[0,w/2],[w/2,w]]:o.style==='one'?[[0,w*.3]]:[[0,w*.2],[w*.8,w]];
 const wave2D=(x0,x1,y,amp,col,op)=>{let d=`M${n(x0)} ${n(y)}`,i=0;for(let x=x0+.06;x<x1+.06;x+=.06)d+=` L${n(Math.min(x,x1))} ${n(y+(i++%2?-amp:amp))}`;return`<path d="${d}" fill="none" stroke="${col}" stroke-width="0.045" stroke-linejoin="round"${op<1?` stroke-opacity="${op}"`:''}/>`};
@@ -1287,8 +1372,9 @@ function surfSet(m,k){const T=surfT[k];if(T.n&&m.normalMap!==T.n){m.normalMap=T.
 function meterUV(geo){const p=geo.attributes.position,n=geo.attributes.normal,uv=geo.attributes.uv;geo.computeBoundingBox();const b=geo.boundingBox,sx=b.max.x-b.min.x,sy=b.max.y-b.min.y,sz=b.max.z-b.min.z;
   for(let i=0;i<uv.count;i++){const ax=Math.abs(n.getX(i)),ay=Math.abs(n.getY(i)),az=Math.abs(n.getZ(i)),X=p.getX(i)-b.min.x,Y=p.getY(i)-b.min.y,Z=p.getZ(i)-b.min.z;
     if(ax>=ay&&ax>=az)uv.setXY(i,Z,Y);else if(ay>=az)uv.setXY(i,X,Z);else uv.setXY(i,X,Y)}return geo}
-function mat(color,o={}){const op=o.opacity??1,h=MAT_HINT[color]||[],rough=o.rough??h[0]??.85,metal=o.metal??h[1]??0,k=[color,op,rough,metal,o.emis||'',o.ei||1,o.tex||''].join('|');
+function mat(color,o={}){const op=o.opacity??1,h=MAT_HINT[color]||[],rough=o.rough??h[0]??.85,metal=o.metal??h[1]??0,k=[color,op,rough,metal,o.emis||'',o.ei||1,o.tex||'',o.map||''].join('|');
   if(!matCache.has(k)){const m=new THREE.MeshStandardMaterial({color,roughness:rough,metalness:metal,transparent:op<1,opacity:op,depthWrite:op>=1});if(o.emis){m.emissive=new THREE.Color(o.emis);m.emissiveIntensity=o.ei||1}
+    if(o.map==='marble')m.map=marbleTex();
     const sk=o.tex||SURF_OF[color];if(sk&&!o.emis&&op>=1){surfM[sk].push(m);surfLoad(sk);surfSet(m,sk)}matCache.set(k,m)}return matCache.get(k)}
 let _plaster;function plasterN(){if(_plaster!==undefined)return _plaster;_plaster=null;const id='white_plaster_02';
   new THREE.TextureLoader().load(`${PH}${id}/${id}_nor_gl_1k.jpg`,t=>{_plaster=repTex(t);for(const[k,m]of matCache)if(k.startsWith('wall|')){m[0].normalMap=_plaster;m[0].normalScale.set(.5,.5);m[0].needsUpdate=true}refresh3D()});return null}

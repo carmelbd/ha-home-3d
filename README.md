@@ -8,6 +8,12 @@ Draw your home, walk around it in 3D, and control your real devices from the pla
 
 **Now on HACS!** [Install with HACS](#install-with-hacs-about-2-minutes) and future updates arrive as one click. **Already installed by hand?** See [Updating](#updating-to-a-new-version). Your design is kept.
 
+- **🍳 Kitchen and glass closet (1.2.0).** A kitchen chair with 4 legs in any colors, colors, countertops and handles for the kitchen counter and island (including a **big gold ring** handle), tall built-in kitchen cabinets with oven or fridge, and a glass closet with LED lights inside.
+
+| Kitchen | Gold ring handles |
+|---|---|
+| ![Kitchen with island and chairs](screenshots/kitchen.png) | ![Tall cabinets with gold ring handles](screenshots/kitchen-gold-handles.png) |
+
 - **✨ Realistic 3D (1.1.0).** Real photo textures for wood floors, parquet, concrete, decking, pavers and grass, wood grain and fabric on furniture, real sky lighting, sharper sun shadows, soft shadows in the corners and under furniture, and rounded furniture edges.
 
 ![Realistic 3D living room](screenshots/3d-realistic.png)
