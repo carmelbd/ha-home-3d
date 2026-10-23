@@ -109,6 +109,63 @@ dialog::backdrop{background:rgba(0,0,0,.45)}
 ol.steps{padding-left:20px;margin:0}
 ol.steps li{margin-bottom:6px}
 .chk{display:flex;align-items:center;gap:6px;font-size:13px;padding-top:20px}
+/* wall display: only the house, a clock and widgets */
+body.wall header,body.wall #palette,body.wall #props,body.wall #hint,body.wall #zbar,body.wall .v3bar{display:none!important}
+body.wall main{grid-template-columns:minmax(0,1fr)}
+body.wall #stage{padding:0;height:100vh;height:100dvh}
+body.wall.wnight #stage{background:#070a10}
+#wall{position:absolute;inset:0;pointer-events:none;z-index:3;padding:max(18px,env(safe-area-inset-top)) max(22px,env(safe-area-inset-right)) max(18px,env(safe-area-inset-bottom)) max(22px,env(safe-area-inset-left));--wc:var(--text)}
+.wz{position:absolute;display:flex;flex-direction:column;gap:10px;max-width:46%}
+.wz[data-pos=tl]{top:inherit;left:inherit;top:max(18px,env(safe-area-inset-top));left:max(22px,env(safe-area-inset-left))}
+.wz[data-pos=tr]{top:max(18px,env(safe-area-inset-top));right:max(22px,env(safe-area-inset-right));align-items:flex-end;text-align:right}
+.wz[data-pos=bl]{bottom:max(18px,env(safe-area-inset-bottom));left:max(22px,env(safe-area-inset-left))}
+.wz[data-pos=br]{bottom:max(18px,env(safe-area-inset-bottom));right:max(22px,env(safe-area-inset-right));align-items:flex-end;text-align:right}
+.wz[data-pos=tc]{top:max(18px,env(safe-area-inset-top));left:50%;transform:translateX(-50%);align-items:center;text-align:center}
+.wz[data-pos=bc]{bottom:max(18px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);align-items:center;text-align:center}
+.wcard{color:var(--wc);line-height:1.1}
+.wcard.glass{background:color-mix(in srgb,var(--panel) 62%,transparent);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border:1px solid color-mix(in srgb,var(--border) 70%,transparent);border-radius:18px;padding:12px 18px}
+.wtime{font-weight:200;letter-spacing:-.02em;font-variant-numeric:tabular-nums;white-space:nowrap}
+.wtime small{font-size:.38em;font-weight:400;margin-left:.15em;opacity:.7}
+.wdate{font-size:max(14px,.2em);opacity:.75;margin-top:.25em;font-weight:400}
+.wchip{display:flex;align-items:center;gap:8px;font-size:var(--ws,18px);white-space:nowrap}
+.wchip b{font-weight:600;font-variant-numeric:tabular-nums}
+.wchip .em{font-size:1.25em}
+.wbar{position:absolute;left:50%;bottom:max(16px,env(safe-area-inset-bottom));transform:translateX(-50%);display:flex;gap:4px;background:color-mix(in srgb,var(--panel) 80%,transparent);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border:1px solid var(--border);border-radius:14px;padding:5px;z-index:5;transition:opacity .35s,transform .35s;flex-wrap:wrap;justify-content:center;width:max-content;max-width:calc(100% - 24px)}
+.wbar button{border-color:transparent;background:transparent;font-size:15px;padding:8px 12px;min-height:40px}
+.wbar.off{opacity:0;pointer-events:none;transform:translate(-50%,12px)}
+#saver{position:absolute;inset:0;z-index:8;background:#000;color:#9aa3b2;display:grid;place-items:center;cursor:none}
+#saver.dim{background:rgba(0,0,0,.72)}
+#saver .wtime{font-size:min(22vw,180px);color:#c9d1dc}
+#saver .in{text-align:center;transition:transform 1.2s}
+#devPop .db{display:flex;flex-direction:column;gap:10px}
+#devPop .row{display:flex;gap:8px;flex-wrap:wrap}
+#devPop .row button{flex:1;min-height:44px;font-size:15px}
+#devPop .big{font-size:28px;font-weight:300}
+#devPop img{width:100%;border-radius:10px;background:#000}
+#wallSet .opts{grid-template-columns:repeat(auto-fit,minmax(190px,1fr))}
+#wallSet textarea{width:100%;box-sizing:border-box;font:13px ui-monospace,Menlo,monospace}
+.wscenes{display:flex;flex-wrap:wrap;gap:8px;max-width:min(560px,44vw)}
+.wz[data-pos=tr] .wscenes,.wz[data-pos=br] .wscenes{justify-content:flex-end}.wz[data-pos=tc] .wscenes,.wz[data-pos=bc] .wscenes{justify-content:center}
+.wscene{pointer-events:auto;display:flex;align-items:center;gap:8px;font-size:16px;padding:10px 16px;min-height:48px;border-radius:999px;color:var(--wc);background:color-mix(in srgb,var(--panel) 62%,transparent);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border:1px solid color-mix(in srgb,var(--border) 70%,transparent);transition:transform .15s,background .3s}
+.wscene .em{font-size:1.3em}.wscene:active{transform:scale(.95)}.wscene.hit{background:var(--accent);color:#fff;border-color:var(--accent)}
+.wcams{display:grid;grid-template-columns:repeat(var(--cc,1),var(--cw,240px));gap:10px}
+.wcam{pointer-events:auto;position:relative;padding:0;border:1px solid color-mix(in srgb,var(--border) 70%,transparent);border-radius:14px;overflow:hidden;background:#000;aspect-ratio:16/9;width:var(--cw,240px)}
+.wcam img{width:100%;height:100%;object-fit:cover;display:block}
+.wcam span{position:absolute;left:8px;bottom:6px;color:#fff;font-size:13px;font-weight:600;text-shadow:0 1px 3px #000}
+.wcam i{position:absolute;inset:0;display:grid;place-items:center;color:#8a94a6;font-style:normal;font-size:13px}
+.wweather .now{display:flex;align-items:center;gap:12px}
+.wweather .now .em{font-size:2.2em}.wweather .now b{font-size:2.3em;font-weight:300}
+.wweather .sub{opacity:.75;font-size:.8em}
+.wfc{display:flex;gap:14px;margin-top:10px;padding-top:10px;border-top:1px solid color-mix(in srgb,var(--wc) 18%,transparent)}
+.wfc div{text-align:center;font-size:.8em;line-height:1.35}.wfc .em{font-size:1.5em;display:block}.wfc s{text-decoration:none;opacity:.6}
+#camPop{width:min(1100px,calc(100vw - 24px));background:#000;border-color:#222}
+#camPop .dh button{background:#222;color:#fff;border-color:#444}
+#camPop img{width:100%;display:block;max-height:calc(100vh - 120px);object-fit:contain}
+.wsq{grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap}
+#wallSet .seclbl{grid-column:1/-1;font-weight:600;font-size:13px;margin:10px 0 -4px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+body.kiosk #palette,body.kiosk #props,body.kiosk .ed{display:none}
+#haLive{font-size:12px;padding:3px 8px;border-radius:999px;background:var(--accent-soft);color:var(--accent);white-space:nowrap}
+#haLive.warn{background:#fdf1dc;color:var(--warn)}
 /* view mode: only the house, for everyday use (rotate, tap lights); ✏️ Edit brings the designer back */
 body.view main{grid-template-columns:minmax(0,1fr)}
 body.view #palette,body.view #props,body.view .ed{display:none!important}
@@ -130,6 +187,7 @@ body.view #palette,body.view #props,body.view .ed{display:none!important}
   <div class="actions">
     <span id="saved" class="ed"></span>
     <button id="viewBtn"></button>
+    <button id="wallBtn" title="Full-screen wall display (for a tablet on the wall)">⛶ Wall</button>
     <button id="undoBtn" class="ed" title="Undo (Ctrl/⌘+Z)">↶</button>
     <button id="redoBtn" class="ed" title="Redo (Ctrl/⌘+Shift+Z)">↷</button>
     <div class="seg"><button id="v2Btn" title="Edit the plan from above">2D</button><button id="v3Btn" title="Walk around your home in 3D">3D</button></div>
@@ -148,6 +206,9 @@ body.view #palette,body.view #props,body.view .ed{display:none!important}
   <section id="stage"><div id="hint"></div><svg id="plan" xmlns="http://www.w3.org/2000/svg"></svg><div class="zbar" id="zbar"><button data-z="out" title="Zoom out">−</button><button data-z="in" title="Zoom in">+</button><button data-z="fit" title="Show the whole floor">Fit</button></div>
     <div id="v3" hidden><div id="v3err" hidden>The 3D engine could not load. Check your internet connection and reload the page.</div>
       <div class="v3bar" id="v3bar"><button data-v3="floor">This floor</button><button data-v3="all">Whole house</button><button data-v3="full">Full-height walls</button><button data-v3="explode">↕ Explode</button><button data-v3="night">🌙 Night</button><button data-v3="lights">💡 All lights</button><button data-v3="reset">Reset view</button></div></div>
+  <div id="wall" hidden><div class="wz" data-pos="tl"></div><div class="wz" data-pos="tc"></div><div class="wz" data-pos="tr"></div><div class="wz" data-pos="bl"></div><div class="wz" data-pos="bc"></div><div class="wz" data-pos="br"></div></div>
+    <div class="wbar off" id="wallBar" hidden><button data-w="view">2D / 3D</button><button data-w="all">🏠 Whole house</button><button data-w="night">🌙 Night</button><button data-w="lights">💡 All lights</button><button data-w="reset">⟲ View</button><button data-w="set">⚙ Wall settings</button><button data-w="exit">✕ Exit</button></div>
+    <div id="saver" hidden><div class="in"><div class="wtime" id="saverTime"></div><div class="wdate" id="saverDate"></div></div></div>
   </section>
   <aside id="props"></aside>
 </main>
@@ -182,6 +243,13 @@ body.view #palette,body.view #props,body.view .ed{display:none!important}
     </ol>
   </div>
 </dialog>
+<dialog id="wallSet">
+  <div class="dh"><h2>Wall display</h2><button id="wsClose">✕</button></div>
+  <div class="db"><div class="opts" id="wsForm"></div>
+    <p class="tip">Exit or open settings: tap the screen three times quickly to show the buttons. On a wall tablet, use the Home Assistant app and turn on its full-screen option, and set the tablet's Auto-Lock to Never (or use Guided Access) so the screen stays on.</p>
+  </div>
+</dialog>
+<dialog id="camPop"><div class="dh" style="background:#000;color:#fff;border-color:#222"><h2 id="cpTitle"></h2><button id="cpClose">✕</button></div><img id="cpImg" alt=""></dialog>
 <input type="file" id="fileIn" accept=".json,application/json" hidden>
 <datalist id="entList"></datalist>
 <datalist id="mdiList"></datalist>
@@ -982,6 +1050,7 @@ function haLabel(d){const s=haState(d);if(!s)return'not found in HA';const u=s.a
 function haSync(){ON.clear();for(const f of doc.floors)for(const d of f.devices){const s=haState(d),dom=DEV[d.kind].domain;if(s&&dom!=='sensor'&&dom!=='scene'&&!HA_OFF.has(s.state))ON.add(d.id)}}
 function haMore(id){haRoot().dispatchEvent(new CustomEvent('hass-more-info',{detail:{entityId:id},bubbles:true,composed:true}))}
 function haToggle(d){
+  if(wallOn()&&!W().control)return;
   if(!validEntity(d)){flash(`${d.name}: link it to a Home Assistant entity first`);return}
   if(DEV[d.kind].tap!=='toggle'){haMore(d.entity);return}
   const dom=d.entity.split('.')[0];
@@ -1172,7 +1241,7 @@ const svg=$('#plan');
 function renderPlan(){
   const fl=cur();
   const v=vb();svg.setAttribute('viewBox',`${n(v.x)} ${n(v.y)} ${n(v.w)} ${n(v.h)}`);
-  svg.innerHTML=renderInner(fl,curP(),{grid:!ui.preview,devices:true,interactive:!ui.preview,preview:ui.preview,sel:ui.preview?null:ui.sel,draft:ui.draft,idp:'d'});
+  svg.innerHTML=renderInner(fl,curP(),{grid:!ui.preview,devices:wallOn()?W().devices:true,area:wallOn()?W().area:true,interactive:!ui.preview,preview:ui.preview,sel:ui.preview?null:ui.sel,draft:ui.draft,idp:'d'});
   svg.classList.toggle('drawing',ui.tool==='draw');
   const is3=ui.view==='3d';svg.style.display=is3?'none':'';$('#zbar').style.display=is3?'none':'';$('#v3').hidden=!is3;
   let h;
@@ -1310,7 +1379,7 @@ function uniqueName(base){const names=new Set(cur().rooms.map(r=>r.name));if(!na
 /* ---------- pointer (2D) ---------- */
 function toWorld(e){const pt=svg.createSVGPoint();pt.x=e.clientX;pt.y=e.clientY;const p=pt.matrixTransform(svg.getScreenCTM().inverse());return{x:p.x/K,y:p.y/K}}
 function flash(msg){hintMsg=msg;clearTimeout(hintTimer);hintTimer=setTimeout(()=>{hintMsg=null;renderPlan()},2200);renderPlan()}
-function toggleDev(d){if(ha.on)return haToggle(d);const k=DEV[d.kind];if(k.tap!=='toggle'){flash(`${d.name}: ${k.asLabel?'shows its live value':'opens its details panel'} in Home Assistant`);return}ON.has(d.id)?ON.delete(d.id):ON.add(d.id);flash(`${d.name}: ${ON.has(d.id)?'on':'off'}`)}
+function toggleDev(d){if(wallOn()&&!W().control)return;if(ha.on)return haToggle(d);const k=DEV[d.kind];if(k.tap!=='toggle'){flash(`${d.name}: ${k.asLabel?'shows its live value':'opens its details panel'} in Home Assistant`);return}ON.has(d.id)?ON.delete(d.id):ON.add(d.id);flash(`${d.name}: ${ON.has(d.id)?'on':'off'}`)}
 svg.addEventListener('pointerdown',e=>{
   if(e.button===1||e.button===2){drag={k:'pan',sx:e.clientX,sy:e.clientY};svg.setPointerCapture(e.pointerId);return}
   if(e.button!==0)return;
@@ -1627,7 +1696,7 @@ function ensure3D(){
   V.r=new THREE.WebGLRenderer({antialias:true});V.r.setPixelRatio(Math.min(devicePixelRatio,1.5));V.r.shadowMap.autoUpdate=false;V.r.shadowMap.enabled=true;V.r.shadowMap.type=THREE.PCFSoftShadowMap;realR(V.r);
   $('#v3').prepend(V.r.domElement);
   V.scene=new THREE.Scene();V.cam=new THREE.PerspectiveCamera(40,1,.1,500);
-  V.ctl=new THREE.OrbitControls(V.cam,V.r.domElement);V.ctl.maxPolarAngle=Math.PI*.48;V.ctl.addEventListener('change',draw3D);
+  V.ctl=new THREE.OrbitControls(V.cam,V.r.domElement);V.ctl.maxPolarAngle=Math.PI*.48;V.ctl.addEventListener('change',draw3D);V.ctl.addEventListener('start',()=>{WALL.pause=Date.now()+20000});
   new ResizeObserver(size3D).observe($('#v3'));
   let down=null;const el=V.r.domElement;
   el.addEventListener('pointerdown',e=>{down={x:e.clientX,y:e.clientY}});
@@ -1658,7 +1727,7 @@ function render3DView(reset){
   V.scene.background=new THREE.Color(ui.night?'#070a10':P.bg);
   const idx=all?doc.floors.map((_,i)=>i):[ui.floor];
   V.root=new THREE.Group();
-  let elev=0;idx.forEach((fi,j)=>{const g=buildFloor(doc.floors[fi],P,{full,labels:true,area:true,devices:true,sel:fi===ui.floor?ui.sel:null,fromAbove:!idx.includes(fi+1)});g.position.y=elev+(ui.explode?j*2.6:0);elev+=lvlOf(doc.floors[fi]);g.userData.floor=fi;V.root.add(g)});
+  let elev=0;idx.forEach((fi,j)=>{const g=buildFloor(doc.floors[fi],P,{full,labels:wallOn()?W().labels:true,area:wallOn()?W().area:true,devices:wallOn()?W().devices:true,sel:fi===ui.floor?ui.sel:null,fromAbove:!idx.includes(fi+1)});g.position.y=elev+(ui.explode?j*2.6:0);elev+=lvlOf(doc.floors[fi]);g.userData.floor=fi;V.root.add(g)});
   V.scene.add(V.root);V.root.updateMatrixWorld(true);
   const box=new THREE.Box3().setFromObject(V.root);
   const below=!all&&belowOf(cur());if(below)withBelow(V.root,cur(),P);
@@ -1790,6 +1859,162 @@ $('#copyYaml').onclick=async()=>{const t=$('#yaml');try{await navigator.clipboar
 
 $('#mdiList').innerHTML=MDI.map(m=>`<option value="mdi:${m}">`).join('');
 try{const s=JSON.parse(localStorage.getItem(KEY+'-3d')||'{}');ui.v3all=!!s.all;ui.v3full=!!s.full;ui.night=!!s.night;ui.explode=!!s.explode}catch(e){}
+/* ---------- wall display ---------- */
+const WALL_DEF={view:'3d',all:true,full:false,clock:'digital',pos:'tl',size:'l',date:true,h24:true,secs:false,color:'auto',card:true,
+  info:'tr',weather:'',weatherStyle:'forecast',weatherPos:'tr',sensors:'',lights:true,
+  scenes:'',scenesPos:'bl',cams:'',camPos:'br',camSize:'m',camRefresh:5,
+  buttons:'tap',labels:false,area:false,devices:true,control:true,
+  rotate:'off',night:'auto',saver:0,saverStyle:'clock',wake:true};
+const W=()=>doc.wall=Object.assign({},WALL_DEF,doc.wall||{});
+const WALL={on:false,prev:null,pause:0,barT:null,taps:[],idle:Date.now(),wake:null,raf:0,tick:null};
+const wallOn=()=>WALL.on;
+function wallColor(){const w=W();return w.color==='auto'?(ui.night||curP()===PAL.dark?'#f2f5fa':'#1b2230'):w.color}
+function fmtTime(d,w){let h=d.getHours(),m=String(d.getMinutes()).padStart(2,'0'),ap='';if(!w.h24){ap=h<12?'AM':'PM';h=h%12||12}
+  return`${w.h24?String(h).padStart(2,'0'):h}:${m}${w.secs?`<small>${String(d.getSeconds()).padStart(2,'0')}</small>`:''}${ap?`<small>${ap}</small>`:''}`}
+const fmtDate=d=>d.toLocaleDateString(undefined,{weekday:'long',day:'numeric',month:'long'});
+function analog(d,px,col){const a=(v,max)=>v/max*Math.PI*2,hand=(ang,len,w)=>`<line x1="50" y1="50" x2="${n(50+Math.sin(ang)*len)}" y2="${n(50-Math.cos(ang)*len)}" stroke="${col}" stroke-width="${w}" stroke-linecap="round"/>`;
+  let t='';for(let i=0;i<12;i++){const g=a(i,12);t+=`<line x1="${n(50+Math.sin(g)*40)}" y1="${n(50-Math.cos(g)*40)}" x2="${n(50+Math.sin(g)*(i%3?44:46))}" y2="${n(50-Math.cos(g)*(i%3?44:46))}" stroke="${col}" stroke-width="${i%3?1.2:2.4}" opacity=".8"/>`}
+  return`<svg width="${px}" height="${px}" viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" fill="none" stroke="${col}" stroke-width="1.5" opacity=".5"/>${t}${hand(a(d.getHours()%12+d.getMinutes()/60,12),24,3.6)}${hand(a(d.getMinutes()+d.getSeconds()/60,60),35,2.4)}${W().secs?`<line x1="50" y1="50" x2="${n(50+Math.sin(a(d.getSeconds(),60))*38)}" y2="${n(50-Math.cos(a(d.getSeconds(),60))*38)}" stroke="#ef4444" stroke-width="1"/>`:''}<circle cx="50" cy="50" r="2.6" fill="${col}"/></svg>`}
+const WEATHER_EM={sunny:'☀️','clear-night':'🌙',partlycloudy:'⛅',cloudy:'☁️',rainy:'🌧️',pouring:'🌧️',lightning:'🌩️','lightning-rainy':'⛈️',snowy:'🌨️',fog:'🌫️',windy:'💨','windy-variant':'💨',hail:'🌨️',exceptional:'⚠️'};
+const wText=c=>({partlycloudy:'partly cloudy','clear-night':'clear','lightning-rainy':'thunderstorm','windy-variant':'windy',exceptional:'warning'}[c]||(c||'').replace(/-/g,' ')).replace(/^./,x=>x.toUpperCase());
+function stOf(id){const h=ha.on&&hass();return h&&h.states[id]}
+const wlines=t=>(t||'').split('\n').map(l=>l.split('|').map(x=>x.trim())).filter(a=>a[0]);
+function weatherId(){const w=W();return w.weather||(ha.on&&Object.keys(hass().states).find(k=>k.startsWith('weather.')))||''}
+function camSrc(id){const s=stOf(id),pic=s&&s.attributes&&s.attributes.entity_picture;if(!pic)return'';const base='';return base+pic+(pic.includes('?')?'&':'?')+'t='+Date.now()}
+function camLoad(img,id){const src=camSrc(id);if(!src)return;const pre=new Image();pre.onload=()=>{img.src=src;img.hidden=false;const ph=img.nextElementSibling;if(ph&&ph.tagName==='I')ph.hidden=true};pre.src=src}
+function camRefresh(){WALL.camT=Date.now();for(const img of document.querySelectorAll('#wall img[data-cam]'))camLoad(img,img.dataset.cam)}
+async function wallForecast(){const id=weatherId();WALL.fcT=Date.now();if(!ha.on||!id||W().weatherStyle!=='forecast')return;
+  for(const type of['daily','twice_daily','hourly']){try{const r=await hass().connection.sendMessagePromise({type:'call_service',domain:'weather',service:'get_forecasts',service_data:{type},target:{entity_id:id},return_response:true});
+    const f=r&&r.response&&r.response[id]&&r.response[id].forecast;if(f&&f.length){WALL.fc={type,list:f};wallRender();return}}catch(e){}}}
+function wallPatch(zones){for(const z of document.querySelectorAll('#wall .wz')){const want=zones[z.dataset.pos]||[];
+  for(const c of[...z.children])if(!want.some(x=>x.k===c.dataset.k))c.remove();
+  want.forEach((x,i)=>{let c=z.querySelector(`:scope>[data-k="${x.k}"]`);if(!c){c=document.createElement('div');c.dataset.k=x.k}
+    if(z.children[i]!==c)z.insertBefore(c,z.children[i]||null);
+    if(c._h!==x.html){c._h=x.html;c.innerHTML=x.html;if(x.k==='cams')for(const img of c.querySelectorAll('img[data-cam]'))camLoad(img,img.dataset.cam)}})}}
+function wallRender(){if(!WALL.on)return;const w=W(),d=new Date(),col=wallColor(),fs={s:44,m:68,l:104,xl:150}[w.size]||104,cls=`wcard${w.card?' glass':''}`;
+  $('#wall').style.setProperty('--wc',col);const zones={},add=(pos,k,html)=>{if(!pos||pos==='off'||!html)return;(zones[pos]=zones[pos]||[]).push({k,html})};
+  const cs=Math.max(15,Math.round(fs*.19));
+  if(w.clock!=='off'){let c;
+    if(w.clock==='analog')c=`<div class="${cls}" style="text-align:center">${analog(d,fs*1.6,col)}${w.date?`<div class="wdate" style="font-size:${Math.max(14,fs*.2)}px">${esc(fmtDate(d))}</div>`:''}</div>`;
+    else{const sz=w.clock==='minimal'?fs*.55:fs;c=`<div class="${cls}"><div class="wtime" style="font-size:${sz}px">${fmtTime(d,w)}</div>${w.date?`<div class="wdate" style="font-size:${Math.max(14,sz*.2)}px">${esc(fmtDate(d))}</div>`:''}</div>`}
+    add(w.pos,'clock',c)}
+  const wid=weatherId();
+  if(w.weatherStyle!=='off'&&wid){const s=stOf(wid),a=s?s.attributes||{}:{},u=a.temperature_unit||'°',deg=v=>v==null?'—':Math.round(v)+'°';
+    let h=`<div class="now"><span class="em">${s?WEATHER_EM[s.state]||'🌡️':'⛅'}</span><b>${s?deg(a.temperature):'—°'}</b><div><div>${s?esc(wText(s.state)):'Weather'}</div><div class="sub">${s?[a.humidity!=null?`💧 ${Math.round(a.humidity)}%`:'',a.wind_speed!=null?`💨 ${Math.round(a.wind_speed)} ${esc(a.wind_speed_unit||'')}`:''].filter(Boolean).join(' · '):'Connect to Home Assistant'}</div></div></div>`;
+    if(w.weatherStyle==='forecast'&&WALL.fc&&WALL.fc.list.length){const hourly=WALL.fc.type==='hourly',seen=new Set(),days=[];
+      for(const f of WALL.fc.list){const t=new Date(f.datetime),key=hourly?t.getHours():t.toDateString();if(t<d&&!hourly&&t.toDateString()!==d.toDateString())continue;if(seen.has(key)||(WALL.fc.type==='twice_daily'&&f.is_daytime===false))continue;seen.add(key);days.push(f);if(days.length>=5)break}
+      h+=`<div class="wfc">${days.map(f=>{const t=new Date(f.datetime);return`<div>${hourly?String(t.getHours()).padStart(2,'0')+':00':esc(t.toLocaleDateString(undefined,{weekday:'short'}))}<span class="em">${WEATHER_EM[f.condition]||'🌡️'}</span>${deg(f.temperature)}${f.templow!=null?` <s>${deg(f.templow)}</s>`:''}</div>`}).join('')}</div>`}
+    add(w.weatherPos,'weather',`<div class="${cls} wweather" style="font-size:${cs}px">${h}</div>`)}
+  const chips=[];
+  for(const[id,label]of wlines(w.sensors)){const s=stOf(id),a=s?s.attributes||{}:{};
+    const v=s?(isNaN(+s.state)?s.state:(+s.state).toFixed(Math.abs(+s.state)<10&&+s.state%1?1:0))+(a.unit_of_measurement?' '+a.unit_of_measurement:''):'—';
+    chips.push(`<div class="wchip"><span>${esc(label||a.friendly_name||id)}</span><b>${esc(v)}</b></div>`)}
+  if(w.lights){const ls=doc.floors.flatMap(f=>f.devices).filter(x=>DEV[x.kind].domain==='light'),k=ls.filter(x=>ON.has(x.id)).length;chips.push(`<div class="wchip"><span class="em">💡</span><b>${k}</b><span>${k===1?'light on':'lights on'}</span></div>`)}
+  if(chips.length)add(w.info,'info',`<div class="${cls}" style="--ws:${cs}px;display:flex;flex-direction:column;gap:6px">${chips.join('')}</div>`);
+  const sc=wlines(w.scenes);
+  if(sc.length)add(w.scenesPos,'scenes',`<div class="wscenes">${sc.map(([id,label,em])=>{const s=stOf(id);return`<button class="wscene" data-scene="${esc(id)}"><span class="em">${esc(em||(id.startsWith('script.')?'▶️':'🎬'))}</span>${esc(label||(s&&s.attributes.friendly_name)||id.split('.')[1].replace(/_/g,' '))}</button>`}).join('')}</div>`);
+  const cm=wlines(w.cams);
+  if(cm.length){const cw={s:200,m:290,l:420,xl:560}[w.camSize]||290,cc=cm.length>3&&w.camSize!=='l'&&w.camSize!=='xl'?2:1;
+    add(w.camPos,'cams',`<div class="wcams" style="--cw:${cw}px;--cc:${cc}">${cm.map(([id,label])=>{const s=stOf(id);return`<button class="wcam" data-campop="${esc(id)}"><img data-cam="${esc(id)}" alt="" hidden><i>${ha.on?(s?'Loading…':'Not found in HA'):'Camera picture appears when connected to HA'}</i><span>${esc(label||(s&&s.attributes.friendly_name)||id)}</span></button>`}).join('')}</div>`)}
+  wallPatch(zones);
+  if(!$('#saver').hidden){$('#saverTime').innerHTML=fmtTime(d,{...w,secs:false});$('#saverDate').textContent=w.date?fmtDate(d):''}}
+$('#wall').addEventListener('click',e=>{
+  const sb=e.target.closest('[data-scene]');
+  if(sb){const id=sb.dataset.scene,dom=id.split('.')[0];sb.classList.add('hit');setTimeout(()=>sb.classList.remove('hit'),900);
+    if(!ha.on){flash(`${sb.textContent.trim()}: runs when connected to Home Assistant`);return}
+    const svc={scene:'turn_on',script:'turn_on',button:'press',input_button:'press',automation:'trigger'}[dom]||'toggle';hass().callService(svc==='toggle'?'homeassistant':dom,svc,{entity_id:id});return}
+  const cb=e.target.closest('[data-campop]');
+  if(cb){const id=cb.dataset.campop;$('#cpTitle').textContent=cb.querySelector('span').textContent;$('#camPop').dataset.cam=id;camLoad($('#cpImg'),id);$('#camPop').showModal();
+    clearInterval(WALL.cpT);WALL.cpT=setInterval(()=>{if(!$('#camPop').open){clearInterval(WALL.cpT);return}camLoad($('#cpImg'),id)},1000)}});
+$('#cpClose').onclick=()=>$('#camPop').close();
+$('#camPop').addEventListener('click',e=>{if(e.target===$('#camPop')||e.target===$('#cpImg'))$('#camPop').close()});
+function wallBar(show){const w=W(),b=$('#wallBar');clearTimeout(WALL.barT);
+  if(w.buttons==='always'){b.classList.remove('off');return}
+  b.classList.toggle('off',!show);if(show)WALL.barT=setTimeout(()=>b.classList.add('off'),w.buttons==='never'?6000:5000)}
+function wallNight(){const w=W();let nt=w.night==='on';
+  if(w.night==='auto'){const sun=stOf('sun.sun');nt=sun?sun.state==='below_horizon':(h=>h>=19||h<6)(new Date().getHours())}
+  document.body.classList.toggle('wnight',nt);if(nt!==ui.night){ui.night=nt;return true}return false}
+function wallSpin(){cancelAnimationFrame(WALL.raf);if(!WALL.on||!V.ctl)return;const w=W();V.ctl.autoRotate=false;
+  if(w.rotate==='off'||ui.view!=='3d')return;
+  const loop=()=>{if(!WALL.on)return;const go=Date.now()>WALL.pause;V.ctl.autoRotate=go;V.ctl.autoRotateSpeed=w.rotate==='slow'?.25:.7;if(go)V.ctl.update();WALL.raf=requestAnimationFrame(loop)};loop()}
+async function wallWake(){if(!WALL.on||!W().wake||!navigator.wakeLock)return;try{WALL.wake=await navigator.wakeLock.request('screen')}catch(e){}}
+function wallApply(){const w=W();ui.view=w.view;ui.v3all=w.all;ui.v3full=w.full;ui.preview=true;ui.sel=null;ui.tool='select';ui.draft=null;wallNight();
+  $('#wallBar').querySelector('[data-w=night]').classList.toggle('on',ui.night);
+  renderAll();requestAnimationFrame(()=>{size3D();if(ui.view==='3d')render3DView(true);wallSpin()});wallRender();wallBar(w.buttons!=='never')}
+function setWall(on){if(on===WALL.on)return;WALL.on=on;document.body.classList.toggle('wall',on);$('#wall').hidden=!on;$('#wallBar').hidden=!on;
+  if(on){WALL.prev={view:ui.view,all:ui.v3all,full:ui.v3full,night:ui.night,preview:ui.preview};WALL.idle=Date.now();
+    WALL.view=isView();setViewMode(true,true);wallFrame(true);
+    const el=document.documentElement,fs=el.requestFullscreen||el.webkitRequestFullscreen;if(fs&&!document.fullscreenElement)try{const r=fs.call(el);if(r&&r.catch)r.catch(()=>{})}catch(e){}
+    wallWake();clearInterval(WALL.tick);WALL.tick=setInterval(wallTick,1000);wallApply()}
+  else{clearInterval(WALL.tick);cancelAnimationFrame(WALL.raf);if(V.ctl)V.ctl.autoRotate=false;$('#saver').hidden=true;document.body.classList.remove('wnight');
+    if(WALL.wake){WALL.wake.release().catch(()=>{});WALL.wake=null}
+    const x=document.exitFullscreen||document.webkitExitFullscreen;if(x&&(document.fullscreenElement||document.webkitFullscreenElement))try{const r=x.call(document);if(r&&r.catch)r.catch(()=>{})}catch(e){}
+    wallFrame(false);setViewMode(!!WALL.view,true);
+    const p=WALL.prev||{};ui.view=p.view||ui.view;ui.v3all=!!p.all;ui.v3full=!!p.full;ui.night=!!p.night;ui.preview=isView();renderAll();requestAnimationFrame(size3D)}}
+let lastMin=-1;
+function wallTick(){const w=W(),d=new Date();
+  if(wlines(w.cams).length&&Date.now()-(WALL.camT||0)>w.camRefresh*1000)camRefresh();
+  if(w.weatherStyle==='forecast'&&ha.on&&Date.now()-(WALL.fcT||0)>30*60000)wallForecast();
+  if(w.secs||w.clock==='analog'||d.getMinutes()!==lastMin||!$('#saver').hidden||(ha.on&&d.getSeconds()%2===0)){lastMin=d.getMinutes();wallRender()}
+  if(d.getSeconds()===0){if(wallNight()){$('#wallBar').querySelector('[data-w=night]').classList.toggle('on',ui.night);refreshViews()}
+    if(!$('#saver').hidden){const k=$('#saver .in');k.style.transform=`translate(${Math.round(Math.random()*16-8)}vw,${Math.round(Math.random()*16-8)}vh)`}}
+  if(w.saver&&$('#saver').hidden&&Date.now()-WALL.idle>w.saver*60000){$('#saver').hidden=false;$('#saver').classList.toggle('dim',w.saverStyle==='dim');$('#saver .in').style.display=w.saverStyle==='dim'?'none':'';wallRender()}}
+function wallTouch(){if(!WALL.on)return;WALL.idle=Date.now();
+  const now=Date.now();WALL.taps=WALL.taps.filter(t=>now-t<700);WALL.taps.push(now);
+  if(W().buttons==='tap'||WALL.taps.length>=3)wallBar(true)}
+document.addEventListener('pointerdown',e=>{if(!WALL.on)return;if(!$('#saver').hidden){$('#saver').hidden=true;WALL.idle=Date.now();e.stopPropagation();e.preventDefault();return}wallTouch()},true);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&WALL.on)wallWake()});
+$('#wallBtn').onclick=()=>setWall(true);
+$('#wallBar').addEventListener('click',e=>{const b=e.target.closest('[data-w]');if(!b)return;const a=b.dataset.w,w=doc.wall=W();wallBar(true);
+  if(a==='exit'){setWall(false);return}
+  if(a==='set'){wallForm();$('#wallSet').showModal();return}
+  if(a==='view'){w.view=ui.view==='3d'?'2d':'3d';save();wallApply();return}
+  if(a==='all'){w.all=!ui.v3all;if(ui.view!=='3d')w.view='3d';save();wallApply();return}
+  if(a==='night'){ui.night=!ui.night;b.classList.toggle('on',ui.night);document.body.classList.toggle('wnight',ui.night);refreshViews();wallRender();return}
+  if(a==='reset'){if(ui.view==='3d')render3DView(true);return}
+  if(a==='lights'){const ls=doc.floors.flatMap(f=>f.devices).filter(d=>DEV[d.kind].domain==='light');const anyOn=ls.some(d=>ON.has(d.id));
+    if(ha.on){haLights(ls,!anyOn);refreshViews();wallRender()}
+    else{for(const d of ls)anyOn?ON.delete(d.id):ON.add(d.id);refreshViews();wallRender()}}});
+const POS=[['tl','Top left'],['tc','Top centre'],['tr','Top right'],['bl','Bottom left'],['bc','Bottom centre'],['br','Bottom right'],['off','Hidden']];
+const WS_FIELDS=[['quick'],
+  ['sec','The house'],['view','View',[['3d','3D'],['2d','2D plan']]],['all','Show',[[true,'Whole house'],[false,'One floor']]],['full','Walls',[[false,'Cut-away (see inside)'],[true,'Full height']]],
+  ['rotate','Slowly turn the house',[['off','No'],['slow','Slowly'],['medium','Faster']]],['night','Night look',[['auto','Automatic (after sunset)'],['on','Always'],['off','Never']]],
+  ['labels','Room names',[[false,'Hide'],[true,'Show']]],['area','Room sizes (m²)',[[false,'Hide'],[true,'Show']]],['devices','Device buttons',[[true,'Show'],[false,'Hide']]],['control','Tapping a device',[[true,'Controls it'],[false,'Does nothing (view only)']]],
+  ['sec','Clock'],['clock','Clock style',[['digital','Digital'],['analog','Analog'],['minimal','Small'],['off','No clock']]],['pos','Clock position',POS],
+  ['size','Size (clock & text)',[['s','Small'],['m','Medium'],['l','Large'],['xl','Huge']]],['h24','Format',[[true,'24-hour'],[false,'12-hour (AM/PM)']]],['secs','Seconds',[[false,'Hide'],[true,'Show']]],['date','Date',[[true,'Show'],[false,'Hide']]],
+  ['color','Text colour','color'],['card','Background',[[true,'Frosted glass card'],[false,'None (text only)']]],
+  ['sec','Weather'],['weatherStyle','Weather',[['forecast','Now + next days'],['now','Now only'],['off','Hidden']]],['weatherPos','Weather position',POS],['weather','Weather entity (empty = first one in HA)','ent'],
+  ['sec','Info'],['info','Info position',POS],['lights','Lights-on counter',[[true,'Show'],[false,'Hide']]],['sensors','Values to show — one per line: entity | label','area','sensor.outside_temperature | Outside&#10;sensor.pool_temperature | Pool'],
+  ['sec','Scenes'],['scenesPos','Scene buttons position',POS],['scenes','Scene buttons — one per line: entity | label | emoji (scenes, scripts or buttons)','area','scene.movie_night | Movie | 🎬&#10;scene.good_night | Good night | 🌙&#10;script.pool_party | Pool party | 🏊','scenes'],
+  ['sec','Cameras'],['camPos','Cameras position',POS],['camSize','Camera size',[['s','Small'],['m','Medium'],['l','Large'],['xl','Huge']]],['camRefresh','Refresh picture every',[[2,'2 seconds'],[5,'5 seconds'],[10,'10 seconds'],[30,'30 seconds']]],
+  ['cams','Cameras — one per line: entity | label (tap a camera to see it big)','area','camera.front_door | Front door&#10;camera.pool | Pool','cams'],
+  ['sec','Buttons & screen'],['buttons','Buttons',[['tap','Show when I tap, then hide'],['never','Hidden (tap 3 times to show)'],['always','Always show']]],
+  ['saver','Screensaver',[[0,'Off'],[2,'After 2 min'],[5,'After 5 min'],[15,'After 15 min'],[30,'After 30 min']]],['saverStyle','Screensaver look',[['clock','Black with a clock'],['dim','Dim the house']]],['wake','Keep the screen on',[[true,'Yes (when the browser allows it)'],[false,'No']]]];
+function wallForm(){const w=W();$('#wsForm').innerHTML=WS_FIELDS.map(([k,l,c,ph,fill])=>{
+  if(k==='quick')return`<div class="wsq"><button data-wq="clean">🧹 House only — hide clock, weather & everything</button><button data-wq="all">✨ Show clock, weather & info</button></div>`;
+  if(k==='sec')return`<div class="seclbl">${l}</div>`;
+  if(c==='color')return`<label class="f"><span>${l}</span><select data-ws="color">${[['auto','Automatic'],['#ffffff','White'],['#1b2230','Black'],['#f5b400','Gold'],['#5b8cff','Blue']].map(([v,t])=>`<option value="${v}"${w.color===v?' selected':''}>${t}</option>`).join('')}${['auto','#ffffff','#1b2230','#f5b400','#5b8cff'].includes(w.color)?'':`<option value="${esc(w.color)}" selected>Custom</option>`}</select></label>`;
+  if(c==='ent')return`<label class="f"><span>${l}</span><input data-ws="${k}" list="entList" value="${esc(w[k])}" placeholder="weather.home" spellcheck="false" autocomplete="off"></label>`;
+  if(c==='area')return`<label class="f" style="grid-column:1/-1"><span>${l}</span><textarea data-ws="${k}" rows="3" placeholder="${ph}" spellcheck="false">${esc(w[k])}</textarea></label>`+(fill?`<div class="wsq"><button data-wq="${fill}">${fill==='scenes'?'＋ Add all my scenes & scripts from Home Assistant':'＋ Add all my cameras from Home Assistant'}</button></div>`:'');
+  return`<label class="f"><span>${l}</span><select data-ws="${k}">${c.map(([v,t])=>`<option value="${v}"${String(w[k])===String(v)?' selected':''}>${t}</option>`).join('')}</select></label>`}).join('')}
+$('#wsForm').addEventListener('click',e=>{const b=e.target.closest('[data-wq]');if(!b)return;e.preventDefault();const w=doc.wall=W(),q=b.dataset.wq;
+  if(q==='clean')Object.assign(w,{clock:'off',weatherStyle:'off',info:'off',scenesPos:'off',camPos:'off',labels:false,area:false,buttons:'never'});
+  else if(q==='all')Object.assign(w,{clock:w.clock==='off'?'digital':w.clock,pos:w.pos==='off'?'tl':w.pos,weatherStyle:w.weatherStyle==='off'?'forecast':w.weatherStyle,weatherPos:w.weatherPos==='off'?'tr':w.weatherPos,info:w.info==='off'?'tr':w.info,scenesPos:w.scenesPos==='off'?'bl':w.scenesPos,camPos:w.camPos==='off'?'br':w.camPos,buttons:w.buttons==='never'?'tap':w.buttons});
+  else if(q==='scenes'||q==='cams'){if(!ha.on){flash('Connect to Home Assistant first');return}
+    const doms=q==='scenes'?['scene','script']:['camera'],have=new Set(wlines(w[q]).map(a=>a[0])),st=hass().states;
+    const add=Object.keys(st).filter(id=>doms.includes(id.split('.')[0])&&!have.has(id)).sort().map(id=>`${id} | ${st[id].attributes.friendly_name||id}`);
+    w[q]=[w[q].trim(),...add].filter(Boolean).join('\n');if(q==='scenes'&&w.scenesPos==='off')w.scenesPos='bl';if(q==='cams'&&w.camPos==='off')w.camPos='br'}
+  save();wallForm();WALL.fcT=0;wallApply()});
+$('#wsForm').addEventListener('change',e=>{const t=e.target,k=t.dataset.ws;if(!k)return;const w=doc.wall=W();let v=t.value;
+  if(typeof WALL_DEF[k]==='boolean')v=v==='true';else if(typeof WALL_DEF[k]==='number')v=+v;w[k]=v;save();
+  if(k==='weather'||k==='weatherStyle'){WALL.fc=null;WALL.fcT=0}
+  if(['view','all','full','labels','area','devices','night'].includes(k))wallApply();else{wallSpin();wallRender();wallBar(true)}});
+$('#wsClose').onclick=()=>$('#wallSet').close();
+$('#wallSet').addEventListener('click',e=>{if(e.target===$('#wallSet'))$('#wallSet').close()});
+/* in Home Assistant the page sits in a card: in wall mode the card covers the whole HA window (sidebar and top bar) */
+function wallFrame(on){const fe=window.frameElement;if(!fe)return;
+  if(on){if(fe.dataset.h3dStyle==null)fe.dataset.h3dStyle=fe.getAttribute('style')||'';fe.style.cssText=fe.dataset.h3dStyle+';position:fixed;inset:0;width:100vw;height:100vh;height:100dvh;z-index:10000;background:#000'}
+  else if(fe.dataset.h3dStyle!=null){fe.setAttribute('style',fe.dataset.h3dStyle);delete fe.dataset.h3dStyle}}
 const hs=location.hash;
 if(/^#f\d/.test(hs))ui.floor=clamp(+hs[2]-1,0,doc.floors.length-1);
 if(hs.includes('3d'))ui.view='3d';if(hs.includes('all'))ui.v3all=true;if(hs.includes('full'))ui.v3full=true;if(hs.includes('night')){ui.night=true;for(const f of doc.floors)for(const d of f.devices)if(DEV[d.kind].domain==='light')ON.add(d.id)}
@@ -1798,6 +2023,7 @@ if(ha.on){ui.view='3d';$('#exportBtn').style.display='none'}
 {let v=null;try{v=localStorage.getItem(KEY+'-view')}catch(e){}setViewMode(hs.includes('edit')?false:v!=null?v==='1':ha.on,true)}
 renderAll();
 if(ha.on)haInit().catch(e=>flash('Could not reach Home Assistant: '+(e.message||e)));
+if(hs.includes('wall')||(window.HOME3D_CONFIG||{}).wall)setWall(true);
 if(hs==='#export')$('#exportBtn').click();
 </script>
 </body>

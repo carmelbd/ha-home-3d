@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.7.0 (2026-10-23): Wall display
+
+- **⛶ Wall** button: the house fills the whole screen for a tablet on the wall, covering Home Assistant's sidebar and top bar. Tap three times to show the buttons (2D / 3D, Whole house, Night, All lights, Reset view, Wall settings, Exit).
+- **Clock:** digital, analog or small, in any of 6 positions and 4 sizes, 24 or 12 hour, with seconds and date if you like, in any color, on a frosted-glass card or as plain text. Or no clock.
+- **Weather:** current conditions, humidity and wind, plus the next 5 days (it falls back to twice-daily or hourly forecasts when that's all the integration has).
+- **Scene buttons** for scenes, scripts, buttons and automations, with your own labels and emoji. One click adds all your scenes and scripts.
+- **Camera pictures** that refresh every 2–30 seconds, in 4 sizes. Tap one to see it big. One click adds all your cameras.
+- **Info:** any sensor values and a lights-on counter.
+- **🧹 House only** hides the clock, weather, info, scenes and cameras at once. Each one can also be hidden on its own.
+- **Screensaver** (black with a moving clock, or a dimmed house), **automatic night look** after sunset, **slow auto-rotate**, and it asks the browser to keep the screen on.
+- **Card option `wall: true`** opens the card straight into the wall display.
+- The wall settings are saved with your design in Home Assistant.
+
 ## 1.6.1 (2026-10-23): Walls around outdoor areas
 
 - Outdoor rooms (Garden / lawn, Outdoor paving, Gravel yard, Parking) get a **Walls around this area** option: None (open, the default), Walls (full height), Low wall (1.2 m) or Railing. The Top / Right / Bottom / Left ticks still remove single sides, for example where two yards meet.

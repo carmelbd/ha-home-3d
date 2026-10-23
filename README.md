@@ -8,6 +8,10 @@ Draw your home, walk around it in 3D, and control your real devices from the pla
 
 **Now on HACS!** [Install with HACS](#install-with-hacs-about-2-minutes) and future updates arrive as one click. **Already installed by hand?** See [Updating](#updating-to-a-new-version). Your design is kept.
 
+- **⛶ Wall display (1.7.0).** For a tablet on the wall: **⛶ Wall** fills the whole screen with just your house, covering Home Assistant's sidebar and top bar. Add a clock (digital, analog or small), weather with a 5-day forecast, scene buttons, live camera pictures and any sensor values, and put each one where you like. Buttons hide by themselves, and there's a screensaver and an automatic night look. **🧹 House only** hides everything except the house. [More below](#wall-display-tablet-on-the-wall).
+
+![Wall display with clock, weather and scene buttons](screenshots/wall.png)
+
 - **👆 View mode (1.5.0).** In Home Assistant it opens as just your house: rotate it and tap lights to switch them. **✏️ Edit** (top right) opens the designer.
 
 - **🏊 Pool with electric cover, and alarm (1.4.0).** A swimming pool whose electric cover or shade screen opens and closes with the real one, plus an Alarm button.
@@ -114,6 +118,31 @@ To update later, replace the file and raise `?v=1` to `?v=2` so browsers and the
 - Start from the example house with ⋯ → **Load example home**, or begin empty with ⋯ → **Start from empty floors**.
 - Pick a device and type its entity in **Entity ID**. Your entities show up as suggestions while you type.
 - Use **2D** to edit precisely and **3D** to look around. In 2D, **▶ Preview** lets you tap devices without moving them.
+
+## Wall display (tablet on the wall)
+
+Tap **⛶ Wall** (top right). The house fills the whole screen, covering Home Assistant's sidebar and top bar, and you can still rotate it and tap devices. Tap the screen three times to bring back the buttons, then **⚙ Wall settings** or **✕ Exit**.
+
+In **⚙ Wall settings** you can choose:
+
+- **The house:** 3D or 2D, whole house or one floor, cut-away or full-height walls. It can turn slowly by itself, and the night look can switch on after sunset. Room names and device buttons can be shown or hidden, and tapping a device can control it or do nothing (view only).
+- **Clock:** digital, analog, small or none. Choose the position, size, 24 or 12 hour, seconds, date, color, and a frosted-glass card or plain text.
+- **Weather:** now plus the next days, or now only, from your weather entity (the first one in Home Assistant if you leave it empty).
+- **Info:** any values (for example `sensor.pool_temperature | Pool`) and a lights-on counter.
+- **Scenes:** big buttons for scenes, scripts and buttons, one per line as `entity | label | emoji`. **＋ Add all my scenes & scripts** fills the list for you.
+- **Cameras:** pictures that refresh every 2–30 seconds, in 4 sizes. Tap one to see it big. **＋ Add all my cameras** fills the list for you.
+- **Positions:** every part has its own place (6 spots) or **Hidden**. **🧹 House only** hides everything at once, and **✨ Show clock, weather & info** brings it back.
+- **Buttons:** show when you tap and then hide, stay hidden (tap 3 times), or always show.
+- **Screensaver:** after 2–30 minutes, black with a slowly moving clock or a dimmed house. Tap to wake.
+
+To open straight into the wall display, give the card `wall: true`:
+
+```yaml
+type: custom:home-3d-card
+wall: true
+```
+
+**Tips for a wall tablet:** use the Home Assistant app and turn on its full-screen option, and set the tablet's Auto-Lock to **Never** (or use Guided Access on an iPad) so the screen stays on. Camera pictures are snapshots that refresh, not live video.
 
 ## Good to know
 

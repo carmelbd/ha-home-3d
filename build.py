@@ -27,7 +27,9 @@ class Home3DCard extends HTMLElement {{
     this._frame = root.querySelector("iframe");
     this._size();
     // srcdoc keeps the page on Home Assistant's origin, so it can use the live connection.
-    this._frame.srcdoc = HTML;
+    // Card options (for example `wall: true`) are handed to the page before it starts.
+    const cfg = JSON.stringify(this._config || {{}}).replace(/</g, "\\\\u003c");
+    this._frame.srcdoc = HTML.replace("<head>", `<head><script>window.HOME3D_CONFIG=${{cfg}};</script>`);
   }}
   _size() {{
     const h = (this._config && this._config.height) || "calc(100vh - var(--header-height, 56px))";
