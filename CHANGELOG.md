@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.7.3 (2026-10-23): Turn your cameras from the wall
+
+- **Camera arrows:** tap a camera in the wall display to see it big. Pan-and-tilt cameras from **Eufy Security** or **ONVIF** now show ◀ ▲ ▼ ▶ arrows to turn them, and ⟳ for a full turn (Eufy).
+- **Eufy cameras wake up by themselves:** when an Eufy camera has no picture yet, the card starts its live stream so a picture appears.
+
 ## 1.7.2 (2026-10-23): A better-looking weather card
 
 - **New weather card design:** a big temperature with the town name, today's high and low and "feels like", drawn weather icons that move gently (turning sun, falling rain, flashing lightning), one row per day with a temperature range bar (and a dot for the temperature right now), and humidity, wind, sunrise and sunset at the bottom.

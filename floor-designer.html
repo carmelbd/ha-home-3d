@@ -198,6 +198,12 @@ body.wall.wnight #stage{background:#070a10}
 #camPop{width:min(1100px,calc(100vw - 24px));background:#000;border-color:#222}
 #camPop .dh button{background:#222;color:#fff;border-color:#444}
 #camPop img{width:100%;display:block;max-height:calc(100vh - 120px);object-fit:contain}
+#camPop .cpw{position:relative}
+.ptz{position:absolute;right:14px;bottom:14px;display:grid;grid-template-columns:repeat(3,54px);grid-template-rows:repeat(3,54px);gap:4px}
+.ptz[hidden]{display:none}
+.ptz button{border-radius:50%;background:rgba(0,0,0,.45);color:#fff;border:1px solid rgba(255,255,255,.35);font-size:20px;line-height:1;cursor:pointer;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);touch-action:manipulation}
+.ptz button:active{background:rgba(255,255,255,.35)}
+.ptz [data-ptz=up]{grid-area:1/2}.ptz [data-ptz=left]{grid-area:2/1}.ptz [data-ptz='360']{grid-area:2/2;font-size:24px}.ptz [data-ptz=right]{grid-area:2/3}.ptz [data-ptz=down]{grid-area:3/2}
 .wsq{grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap}
 #wallSet .seclbl{grid-column:1/-1;font-weight:600;font-size:13px;margin:10px 0 -4px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
 body.kiosk #palette,body.kiosk #props,body.kiosk .ed{display:none}
@@ -286,7 +292,7 @@ body.view #palette,body.view #props,body.view .ed{display:none!important}
     <p class="tip">Exit or open settings: tap the screen three times quickly to show the buttons. On a wall tablet, use the Home Assistant app and turn on its full-screen option, and set the tablet's Auto-Lock to Never (or use Guided Access) so the screen stays on.</p>
   </div>
 </dialog>
-<dialog id="camPop"><div class="dh" style="background:#000;color:#fff;border-color:#222"><h2 id="cpTitle"></h2><button id="cpClose">✕</button></div><img id="cpImg" alt=""></dialog>
+<dialog id="camPop"><div class="dh" style="background:#000;color:#fff;border-color:#222"><h2 id="cpTitle"></h2><button id="cpClose">✕</button></div><div class="cpw"><img id="cpImg" alt=""><div class="ptz" id="cpPtz" hidden><button data-ptz="up" title="Turn up">▲</button><button data-ptz="left" title="Turn left">◀</button><button data-ptz="360" title="Full turn">⟳</button><button data-ptz="right" title="Turn right">▶</button><button data-ptz="down" title="Turn down">▼</button></div></div></dialog>
 <input type="file" id="fileIn" accept=".json,application/json" hidden>
 <datalist id="entList"></datalist>
 <datalist id="mdiList"></datalist>
@@ -1976,7 +1982,18 @@ const wxClock=(t,h24)=>{if(!t)return'';const d=new Date(t);if(isNaN(d))return'';
 const wlines=t=>(t||'').split('\n').map(l=>l.split('|').map(x=>x.trim())).filter(a=>a[0]);
 function weatherId(){const w=W();return w.weather||(ha.on&&Object.keys(hass().states).find(k=>k.startsWith('weather.')))||''}
 function camSrc(id){const s=stOf(id),pic=s&&s.attributes&&s.attributes.entity_picture;if(!pic)return'';const base='';return base+pic+(pic.includes('?')?'&':'?')+'t='+Date.now()}
-function camLoad(img,id){const src=camSrc(id);if(!src)return;const pre=new Image();pre.onload=()=>{img.src=src;img.hidden=false;const ph=img.nextElementSibling;if(ph&&ph.tagName==='I')ph.hidden=true};pre.src=src}
+function camLoad(img,id){const src=camSrc(id);if(!src)return;const pre=new Image();pre.onload=()=>{img.src=src;img.hidden=false;const ph=img.nextElementSibling;if(ph&&ph.tagName==='I')ph.hidden=true};pre.onerror=()=>camWake(id);pre.src=src}
+/* camera pan/tilt (Eufy Security or ONVIF), found from the entity registry */
+const CAMP={},CAMW={};
+function camH(){return ha.on&&hass()}
+async function camPlatform(id){if(id in CAMP)return CAMP[id];const h=camH();let p=h&&h.entities&&h.entities[id]&&h.entities[id].platform;
+  if(!p&&h&&h.connection){try{const r=await h.connection.sendMessagePromise({type:'config/entity_registry/get',entity_id:id});p=r&&r.platform}catch(e){}}
+  return CAMP[id]=p||''}
+function camWake(id){camPlatform(id).then(p=>{if(p!=='eufy_security'||Date.now()-(CAMW[id]||0)<60000)return;CAMW[id]=Date.now();const h=camH();h&&h.callService('eufy_security','start_p2p_livestream',{entity_id:id}).catch(()=>{})})}
+function camPtz(id,dir){const h=camH();if(!h)return;const p=CAMP[id];let r;
+  if(p==='onvif'){if(dir==='360')return;r=h.callService('onvif','ptz',Object.assign({entity_id:id,move_mode:'ContinuousMove',continuous_duration:0.5},{up:{tilt:'UP'},down:{tilt:'DOWN'},left:{pan:'LEFT'},right:{pan:'RIGHT'}}[dir]))}
+  else r=h.callService('eufy_security',dir==='360'?'ptz_360':'ptz_'+dir,{entity_id:id});
+  Promise.resolve(r).catch(e=>flash('Camera: '+(e.message||'Home Assistant refused')));setTimeout(()=>camLoad($('#cpImg'),id),900)}
 function camRefresh(){WALL.camT=Date.now();for(const img of document.querySelectorAll('#wall img[data-cam]'))camLoad(img,img.dataset.cam)}
 async function wallForecast(){const id=weatherId();WALL.fcT=Date.now();if(!ha.on||!id||W().weatherStyle!=='forecast')return;
   for(const type of['daily','twice_daily','hourly']){try{const r=await hass().connection.sendMessagePromise({type:'call_service',domain:'weather',service:'get_forecasts',service_data:{type},target:{entity_id:id},return_response:true});
@@ -2032,9 +2049,10 @@ $('#wall').addEventListener('click',e=>{
     if(!ha.on){flash(`${sb.textContent.trim()}: runs when connected to Home Assistant`);return}
     const svc={scene:'turn_on',script:'turn_on',button:'press',input_button:'press',automation:'trigger'}[dom]||'toggle';hass().callService(svc==='toggle'?'homeassistant':dom,svc,{entity_id:id});return}
   const cb=e.target.closest('[data-campop]');
-  if(cb){const id=cb.dataset.campop;$('#cpTitle').textContent=cb.querySelector('span').textContent;$('#camPop').dataset.cam=id;camLoad($('#cpImg'),id);$('#camPop').showModal();
+  if(cb){const id=cb.dataset.campop;$('#cpTitle').textContent=cb.querySelector('span').textContent;$('#camPop').dataset.cam=id;camLoad($('#cpImg'),id);$('#cpPtz').hidden=true;camPlatform(id).then(p=>{if($('#camPop').dataset.cam===id)$('#cpPtz').hidden=!(p==='eufy_security'||p==='onvif')});$('#camPop').showModal();
     clearInterval(WALL.cpT);WALL.cpT=setInterval(()=>{if(!$('#camPop').open){clearInterval(WALL.cpT);return}camLoad($('#cpImg'),id)},1000)}});
 $('#cpClose').onclick=()=>$('#camPop').close();
+$('#cpPtz').addEventListener('click',e=>{const b=e.target.closest('[data-ptz]');if(!b)return;e.stopPropagation();camPtz($('#camPop').dataset.cam,b.dataset.ptz)});
 $('#camPop').addEventListener('click',e=>{if(e.target===$('#camPop')||e.target===$('#cpImg'))$('#camPop').close()});
 function wallBar(show){const w=W(),b=$('#wallBar');clearTimeout(WALL.barT);
   if(w.buttons==='always'){b.classList.remove('off');return}

@@ -132,7 +132,7 @@ In **⚙ Wall settings** you can choose:
 - **Weather:** a card with the temperature, today's high and low, "feels like", animated weather icons, a row per day with a temperature bar, and humidity, wind, sunrise and sunset. Choose **Colourful** (the background follows the weather and time of day) or **Like the clock card**, and now plus the next days, or now only. **Weather for:** where this tablet or phone is (its GPS when Home Assistant is opened over https, otherwise the location the Home Assistant app reports for you), your home, a chosen person or phone, or a Home Assistant weather entity. Location weather comes from [Open-Meteo](https://open-meteo.com), free and with no account; only a rounded location (about 1 km) is sent.
 - **Info:** any values (for example `sensor.pool_temperature | Pool`) and a lights-on counter.
 - **Scenes:** big buttons for scenes, scripts and buttons, one per line as `entity | label | emoji`. **＋ Add all my scenes & scripts** fills the list for you.
-- **Cameras:** pictures that refresh every 2–30 seconds, in 4 sizes. Tap one to see it big. **＋ Add all my cameras** fills the list for you.
+- **Cameras:** pictures that refresh every 2–30 seconds, in 4 sizes. Tap one to see it big. Pan-and-tilt cameras (Eufy Security or ONVIF) get ◀ ▲ ▼ ▶ arrows there to turn them. **＋ Add all my cameras** fills the list for you.
 - **Positions:** every part has its own place (6 spots) or **Hidden**. **🧹 House only** hides everything at once, and **✨ Show clock, weather & info** brings it back.
 - **Buttons:** show when you tap and then hide, stay hidden (tap 3 times), or always show.
 - **Screensaver:** after 2–30 minutes, black with a slowly moving clock or a dimmed house. Tap to wake.
