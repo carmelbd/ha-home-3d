@@ -8,6 +8,10 @@ Draw your home, walk around it in 3D, and control your real devices from the pla
 
 **Now on HACS!** [Install with HACS](#install-with-hacs-about-2-minutes) and future updates arrive as one click. **Already installed by hand?** See [Updating](#updating-to-a-new-version). Your design is kept.
 
+- **🌀 Ceiling fans, columns and lamps (1.8.0).** New items: a column with niche shelves (bottles or books), a ceiling fan, a wall AC unit, pendant lamps, ceiling lights (round, linear LED, spots, downlights) and a range hood. Walls you add now snap onto the house walls with clean joins. The dining table, dresser, TV unit and vanity get wood and color options.
+
+![Ceiling fan, column with a bottle niche and a round ceiling light](screenshots/new-items.jpg)
+
 - **📷 Cameras you can turn (1.7.3).** Tap a camera on the wall display to see it big. Pan-and-tilt cameras (Eufy Security or ONVIF) get ◀ ▲ ▼ ▶ arrows to turn them and ⟳ for a full turn. Eufy cameras with no picture yet start their live stream by themselves. New guide: [Cameras, including Eufy](#cameras-including-eufy).
 
 ![Wall display with two cameras next to the clock and weather](screenshots/wall-cameras.png)

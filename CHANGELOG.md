@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.8.0 (2026-11-10): Ceiling fans, columns, lamps, and walls that line up
+
+- **New items:**
+  - **Column with niche shelves:** a pillar with an open niche on any side, 2–5 wooden shelves, and bottles or books & plants on them. Also works as a built-in shelf unit next to a TV.
+  - **Ceiling fan:** 3, 4 or 5 blades, with or without a light. Good for Bond fans.
+  - **Wall AC unit:** a split unit on the wall, or a ducted AC grille.
+  - **Pendant lamp:** glass globe, dome or cone, hanging 50 cm to 1.1 m.
+  - **Ceiling light:** round flush, linear LED bar, spot / track or recessed downlight.
+  - **Range hood**, a steel chimney hood over the cooktop.
+  - Things on the ceiling show in 3D with **Full-height walls**. With cut walls they are hidden, so they don't float in the air.
+- **Walls you add line up by themselves.** Drag, stretch, rotate or add a **Wall** and it snaps onto the line of the house walls, and its ends run into the walls they meet, so the joins are clean in 2D and 3D. A free end stays where you put it.
+- **More colors:**
+  - **Dining table:** wood for the top, the legs (same as the top, black metal, white, steel or dark wood), the chair seat color and the chair legs color. You can also hide the chairs. The chairs are now real chairs in 3D with legs and a backrest.
+  - **Dresser** and **TV unit:** a wood finish (light oak, natural oak, honey oak, rattan, walnut, dark wood, espresso, white, black) or any color you pick.
+  - **Sink / vanity:** a cabinet color and a top color.
+
 ## 1.7.4 (2026-10-23): Scene buttons without a default icon
 
 - Scene buttons on the wall display no longer add 🎬 (or ▶️ for scripts) when you don't give an emoji. Write your own as `scene.good_night | Good night | 🌙`, or leave it out for a text-only button.
