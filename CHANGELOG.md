@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.9.0 (2026-11-16): Rooms dashboard
+
+- **New view: ▦ Rooms**, next to 2D and 3D. The whole house as a dashboard, without the 3D:
+  - A card for every room, grouped by floor, with the room's name, size and a button for each device in it.
+  - Buttons show live states from Home Assistant (on/off, brightness, AC mode and temperature, shutter position, what's playing). Tap a light, switch or plug to switch it, or tap an AC, TV, lock or camera to open its Home Assistant controls.
+  - **💡 2/3** on a room card switches all the lights in that room, and **💡 lights on · turn off** at the top switches off the whole house.
+  - Temperature and humidity sensors show at the top of their room's card.
+  - Works on phones, in dark mode and on the wall display (it keeps clear of the clock and weather).
+- Open the card straight into a view with `view: rooms`, `view: 3d` or `view: 2d`. The wall display's **🔁 View** button now switches between 3D, Rooms and 2D, and **Wall settings → View** has a Rooms option.
+- **Fix:** the wall display's view and **🏠 Whole house** buttons did nothing. They work again.
+
 ## 1.8.1 (2026-11-16): Wall view stays on when you touch it
 
 - **Wall view no longer closes by accident.** Moving or pinching with your fingers on a wall tablet could close wall view. Now only the **✕ Exit** button closes it, and it asks for a second tap ("Tap again to exit") so a stray touch can't close it.

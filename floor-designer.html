@@ -57,6 +57,35 @@ h4:first-child{margin-top:2px}
 #hint{position:absolute;top:10px;left:50%;transform:translateX(-50%);background:var(--panel);border:1px solid var(--border);border-radius:999px;padding:4px 14px;font-size:12.5px;color:var(--muted);pointer-events:none;max-width:calc(100% - 32px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;z-index:3}
 #v3{position:absolute;inset:0}
 #v3 canvas{display:block;width:100%;height:100%;touch-action:none}
+/* ---------- Rooms view: the whole house as a dashboard ---------- */
+#rv{position:absolute;inset:0;overflow:auto;padding:22px 24px 32px;background:var(--bg);z-index:2;-webkit-overflow-scrolling:touch}
+#hint{z-index:6}
+.rvhead{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 6px}
+.rvhead h1{font-size:24px;line-height:1.2;margin:0 auto 0 0;letter-spacing:-.01em}
+.rvchip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border);background:var(--panel);border-radius:999px;padding:7px 14px;font-weight:600;font-size:13.5px;color:var(--text)}
+button.rvchip{cursor:pointer}button.rvchip.on{background:#f5b400;border-color:#f5b400;color:#1d1a10}
+.rvfl>h2{font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:22px 2px 10px;font-weight:700}
+.rvgrid{columns:290px auto;column-gap:14px}.rvgrid>.rcard{break-inside:avoid;margin:0 0 14px}
+.rcard{--rc:var(--panel2);background:var(--panel);border:1px solid var(--border);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:12px;box-shadow:0 1px 2px rgba(0,0,0,.04),0 8px 24px -16px rgba(0,0,0,.18)}
+.rtop{display:flex;align-items:center;gap:11px;min-width:0}
+.rico{flex:none;width:44px;height:44px;border-radius:14px;background:var(--rc);display:grid;place-items:center;font-size:22px}
+.rname{min-width:0;flex:1}.rname b{display:block;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.rname small{color:var(--muted);font-size:12.5px}
+.rsens{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.rsens span{font-size:12.5px;background:var(--panel2);border-radius:999px;padding:4px 10px;font-weight:600;white-space:nowrap}
+.rlt{flex:none;display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border);background:var(--panel2);border-radius:999px;padding:6px 11px;font-size:12.5px;font-weight:700;cursor:pointer;color:var(--text)}
+.rlt.on{background:#f5b400;border-color:#f5b400;color:#1d1a10}
+.dgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(98px,1fr));gap:8px}
+.dt{--dc:var(--accent);display:flex;flex-direction:column;align-items:flex-start;gap:7px;padding:10px 10px 9px;border-radius:14px;background:var(--panel2);border:1px solid transparent;text-align:left;min-height:88px;cursor:pointer;font:inherit;color:inherit;transition:background .15s,border-color .15s}
+.dt:hover{border-color:var(--border)}.dt:active{transform:scale(.97)}
+.dt i{font-style:normal;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:var(--panel);font-size:18px;transition:background .15s}
+.dt b{font-size:13px;font-weight:600;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.dt small{font-size:11.5px;color:var(--muted);margin-top:auto}
+.dt.on{color:var(--text);background:color-mix(in srgb,var(--dc) 15%,var(--panel));border-color:color-mix(in srgb,var(--dc) 50%,transparent)}
+.dt.on i{background:var(--dc);box-shadow:0 0 0 4px color-mix(in srgb,var(--dc) 22%,transparent)}.dt.on small{color:var(--text);font-weight:600}
+.dt.bad small{color:var(--warn)}
+.rvmore{margin:12px 2px 0;color:var(--muted);font-size:13px}
+.rvnone{max-width:420px;margin:12vh auto;text-align:center;color:var(--muted)}
+body.wall #rv{padding:24px 28px 96px}
+@media (max-width:600px){#rv{padding:16px 14px 28px}.rvhead h1{font-size:20px;width:100%}}
 #v3err{position:absolute;inset:0;display:grid;place-items:center;color:var(--muted);padding:24px;text-align:center}
 .v3bar{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:4px;background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:4px;z-index:2;flex-wrap:wrap;justify-content:center;width:max-content;max-width:calc(100% - 24px)}
 .v3bar button{border-color:transparent;background:transparent;font-size:12.5px}
@@ -236,7 +265,7 @@ body.view #palette,body.view #props,body.view .ed{display:none!important}
     <button id="wallBtn" title="Full-screen wall display (for a tablet on the wall)">⛶ Wall</button>
     <button id="undoBtn" class="ed" title="Undo (Ctrl/⌘+Z)">↶</button>
     <button id="redoBtn" class="ed" title="Redo (Ctrl/⌘+Shift+Z)">↷</button>
-    <div class="seg"><button id="v2Btn" title="Edit the plan from above">2D</button><button id="v3Btn" title="Walk around your home in 3D">3D</button></div>
+    <div class="seg"><button id="v2Btn" title="Edit the plan from above">2D</button><button id="v3Btn" title="Walk around your home in 3D">3D</button><button id="vrBtn" title="Every room with its buttons, like a dashboard">▦ Rooms</button></div>
     <button id="previewBtn" class="ed" title="Try the plan like a dashboard">▶ Preview</button>
     <button id="exportBtn" class="primary ed">Export to HA</button>
     <details class="menu ed"><summary>⋯</summary><div>
@@ -252,8 +281,9 @@ body.view #palette,body.view #props,body.view .ed{display:none!important}
   <section id="stage"><div id="hint"></div><svg id="plan" xmlns="http://www.w3.org/2000/svg"></svg><div class="zbar" id="zbar"><button data-z="out" title="Zoom out">−</button><button data-z="in" title="Zoom in">+</button><button data-z="fit" title="Show the whole floor">Fit</button></div>
     <div id="v3" hidden><div id="v3err" hidden>The 3D engine could not load. Check your internet connection and reload the page.</div>
       <div class="v3bar" id="v3bar"><button data-v3="floor">This floor</button><button data-v3="all">Whole house</button><button data-v3="full">Full-height walls</button><button data-v3="explode">↕ Explode</button><button data-v3="night">🌙 Night</button><button data-v3="lights">💡 All lights</button><button data-v3="reset">Reset view</button></div></div>
+  <div id="rv" hidden></div>
   <div id="wall" hidden><div class="wz" data-pos="tl"></div><div class="wz" data-pos="tc"></div><div class="wz" data-pos="tr"></div><div class="wz" data-pos="bl"></div><div class="wz" data-pos="bc"></div><div class="wz" data-pos="br"></div></div>
-    <div class="wbar off" id="wallBar" hidden><button data-w="view">2D / 3D</button><button data-w="all">🏠 Whole house</button><button data-w="night">🌙 Night</button><button data-w="lights">💡 All lights</button><button data-w="reset">⟲ View</button><button data-w="set">⚙ Wall settings</button><button data-w="exit">✕ Exit</button></div>
+    <div class="wbar off" id="wallBar" hidden><button data-w="view">🔁 View</button><button data-w="all">🏠 Whole house</button><button data-w="night">🌙 Night</button><button data-w="lights">💡 All lights</button><button data-w="reset">⟲ View</button><button data-w="set">⚙ Wall settings</button><button data-w="exit">✕ Exit</button></div>
     <div id="saver" hidden><div class="in"><div class="wtime" id="saverTime"></div><div class="wdate" id="saverDate"></div></div></div>
   </section>
   <aside id="props"></aside>
@@ -1188,7 +1218,7 @@ function haSave(){$('#saved').textContent='Saving…';clearTimeout(ha.saveT);ha.
     await hass().connection.sendMessagePromise({type:'lovelace/config/save',url_path:ha.dash,config:ha.cfg});
     $('#saved').textContent='Saved to HA ✓';clearTimeout(saveTimer);saveTimer=setTimeout(()=>$('#saved').textContent='',1500)}
   catch(e){$('#saved').textContent='Not saved: '+(e.message||'HA error')}},600)}
-function haLive(){clearTimeout(ha.liveT);ha.liveT=setTimeout(()=>{haSync();renderPlan();if(ui.view==='3d')render3DView();
+function haLive(){clearTimeout(ha.liveT);ha.liveT=setTimeout(()=>{haSync();renderPlan();if(ui.view==='3d')render3DView();if(ui.view==='rooms')renderRooms();
   const s=ui.sel&&findObj(ui.sel),el=$('#liveSt');if(el&&s&&s.t==='devices')el.textContent=haLabel(s.o)},400)}
 async function haInit(){
   const h=hass(),conn=h.connection;
@@ -1365,7 +1395,7 @@ function renderPlan(){
   const v=vb();svg.setAttribute('viewBox',`${n(v.x)} ${n(v.y)} ${n(v.w)} ${n(v.h)}`);
   svg.innerHTML=renderInner(fl,curP(),{grid:!ui.preview,devices:wallOn()?W().devices:true,area:wallOn()?W().area:true,interactive:!ui.preview,preview:ui.preview,sel:ui.preview?null:ui.sel,draft:ui.draft,idp:'d'});
   svg.classList.toggle('drawing',ui.tool==='draw');
-  const is3=ui.view==='3d';svg.style.display=is3?'none':'';$('#zbar').style.display=is3?'none':'';$('#v3').hidden=!is3;
+  const is3=ui.view==='3d',isR=ui.view==='rooms';svg.style.display=is3||isR?'none':'';$('#zbar').style.display=is3||isR?'none':'';$('#v3').hidden=!is3;$('#rv').hidden=!isR;$('#hint').hidden=isR&&!hintMsg;
   let h;
   if(hintMsg)h=hintMsg;
   else if(is3)h='Drag to rotate · right-drag to pan · scroll to zoom · click a light to switch it';
@@ -1376,12 +1406,12 @@ function renderPlan(){
   else h='Pick a room type on the left, then drag on the plan to draw it · scroll to zoom · drag empty space to move around';
   $('#hint').textContent=h;
 }
-function refreshViews(){renderPlan();if(ui.view==='3d')render3DView()}
+function refreshViews(){renderPlan();if(ui.view==='3d')render3DView();if(ui.view==='rooms')renderRooms()}
 function renderTabs(){
   $('#tabs').innerHTML=doc.floors.map((f,i)=>`<button data-floor="${i}" class="${i===ui.floor?'active':''}" title="Double-click to rename">${esc(f.name)}</button>`).join('')+`<button data-floor="add" class="ed" title="Add a floor">＋ Floor</button>`;
   $('#undoBtn').disabled=!undoS.length;$('#redoBtn').disabled=!redoS.length;
-  $('#previewBtn').classList.toggle('on',ui.preview);$('#previewBtn').hidden=ui.view==='3d';
-  $('#v2Btn').classList.toggle('on',ui.view!=='3d');$('#v3Btn').classList.toggle('on',ui.view==='3d');
+  $('#previewBtn').classList.toggle('on',ui.preview);$('#previewBtn').hidden=ui.view!=='2d';
+  $('#v2Btn').classList.toggle('on',ui.view==='2d');$('#v3Btn').classList.toggle('on',ui.view==='3d');$('#vrBtn').classList.toggle('on',ui.view==='rooms');
   const st={floor:!ui.v3all,all:ui.v3all,full:ui.v3full,night:ui.night,explode:ui.explode};
   for(const b of document.querySelectorAll('#v3bar [data-v3]'))b.classList.toggle('on',!!st[b.dataset.v3]);
 }
@@ -1475,7 +1505,7 @@ function renderProps(){
   $('#props').innerHTML=h;
   $('#entList').innerHTML=doc.entities.map(e=>`<option value="${esc(e)}">`).join('');
 }
-function renderAll(){renderTabs();renderPalette();renderPlan();renderProps();if(ui.view==='3d')render3DView()}
+function renderAll(){renderTabs();renderPalette();renderPlan();renderProps();if(ui.view==='3d')render3DView();if(ui.view==='rooms')renderRooms()}
 
 /* ---------- edits ---------- */
 function freeSpot(c){const fl=cur();let p={...c},i=0;while(i++<12&&fl.devices.concat(fl.items).some(o=>{const q=center(o);return Math.hypot(q.x-p.x,q.y-p.y)<.45}))p.x+=.6;return p}
@@ -1570,7 +1600,7 @@ $('#zbar').addEventListener('click',e=>{const b=e.target.closest('[data-z]');if(
 $('#palette').addEventListener('click',e=>{
   const b=e.target.closest('button');if(!b)return;
   if(ui.preview){ui.preview=false;if(!ha.on)ON.clear()}
-  if(b.dataset.room){const t=b.dataset.room;ui.extend=null;if(ui.view==='3d')ui.view='2d';if(ui.tool==='draw'&&ui.drawType===t)ui.tool='select';else{ui.tool='draw';ui.drawType=t}renderAll()}
+  if(b.dataset.room){const t=b.dataset.room;ui.extend=null;if(ui.view!=='2d')ui.view='2d';if(ui.tool==='draw'&&ui.drawType===t)ui.tool='select';else{ui.tool='draw';ui.drawType=t}renderAll()}
   else if(b.dataset.item)addItem(b.dataset.item);
   else if(b.dataset.dev)addDevice(b.dataset.dev);
 });
@@ -1607,7 +1637,7 @@ $('#props').addEventListener('click',e=>{
   const b=e.target.closest('button');if(!b)return;
   if(b.dataset.pick){ui.sel=b.dataset.pick;renderAll();return}
   const a=b.dataset.act,s=ui.sel&&findObj(ui.sel);
-  if(a==='addSection'){ui.extend=s.o.id;ui.tool='draw';ui.drawType=s.o.type;if(ui.view==='3d')ui.view='2d';renderAll();return}
+  if(a==='addSection'){ui.extend=s.o.id;ui.tool='draw';ui.drawType=s.o.type;if(ui.view!=='2d')ui.view='2d';renderAll();return}
   if(a==='detach'){mutate(()=>{const g=groupOf(cur(),s.o);delete s.o.link;if(g.length===2)for(const x of g)delete x.link;s.o.name=uniqueName(s.o.name)});return}
   if(a==='zup'||a==='zdown'||a==='zsurf'||a==='zfloor'){mutate(()=>{const o=s.o;o.z=a==='zup'?n((o.z||0)+.1):a==='zdown'?n(Math.max(0,(o.z||0)-.1)):a==='zsurf'?surfaceBelow(cur(),o):0;if(a==='zsurf')flash(o.z?`Placed on top at ${o.z.toFixed(2)} m`:'Nothing to stand on here, so it stays on the floor')});return}
   if(a==='flipx'){mutate(()=>{s.o.fx=!s.o.fx});return}
@@ -1878,13 +1908,69 @@ function pick3D(e){
   renderAll();
 }
 function setView(v){ui.view=v;ui.tool='select';ui.draft=null;renderAll()}
-$('#v2Btn').onclick=()=>setView('2d');$('#v3Btn').onclick=()=>setView('3d');
+$('#v2Btn').onclick=()=>setView('2d');$('#v3Btn').onclick=()=>setView('3d');$('#vrBtn').onclick=()=>setView('rooms');
 $('#v3bar').addEventListener('click',e=>{const b=e.target.closest('[data-v3]');if(!b)return;const a=b.dataset.v3;
   if(a==='floor')ui.v3all=false;else if(a==='all')ui.v3all=true;else if(a==='full')ui.v3full=!ui.v3full;else if(a==='night')ui.night=!ui.night;else if(a==='explode'){ui.explode=!ui.explode;ui.v3all=true}
   else if(a==='lights'){const fls=ui.v3all?doc.floors:[cur()],ls=fls.flatMap(f=>f.devices.filter(d=>DEV[d.kind].domain==='light'));const anyOn=ls.some(d=>ON.has(d.id));
     if(ha.on)haLights(ls,!anyOn);else for(const d of ls)anyOn?ON.delete(d.id):ON.add(d.id)}
   try{localStorage.setItem(KEY+'-3d',JSON.stringify({all:ui.v3all,full:ui.v3full,night:ui.night,explode:ui.explode}))}catch(err){}
   if(a==='reset')render3DView(true);else renderAll()});
+
+/* ---------- Rooms view: every room as a card with its devices ---------- */
+const ROOM_EMOJI={living:'🛋️',dining:'🍽️',kitchen:'🍳',bedroom:'🛏️',kids:'🧸',office:'💻',bathroom:'🛁',toilet:'🚽',laundry:'🧺',hallway:'🚪',stairs:'🪜',storage:'📦',safe:'🛡️',balcony:'🌿',yard:'🌳',patio:'☀️',gravel:'🪨',parking:'🚗'};
+const capF=t=>t?t.charAt(0).toUpperCase()+t.slice(1):t;
+function devShort(d,room){let nm=(d.name||'').trim();const rn=room&&room.name;if(rn&&nm.toLowerCase().startsWith(rn.toLowerCase()))nm=nm.slice(rn.length).trim().replace(/^[-–:·,]\s*/,'');return capF(nm)||DEV[d.kind].label}
+function devState(d){const k=DEV[d.kind],dom=k.domain;
+  if(!ha.on){if(dom==='scene')return'Tap to run';if(k.tap==='toggle')return ON.has(d.id)?'On':'Off';return k.label}
+  if(!validEntity(d))return'Not linked';const s=haState(d);if(!s)return'Not in HA';const a=s.attributes||{},st=s.state;
+  if(st==='unavailable')return'Unavailable';
+  if(k.asLabel||dom==='sensor')return haLabel(d);
+  if(dom==='scene')return'Tap to run';
+  if(dom==='climate'){const t=a.current_temperature;return(st==='off'?'Off':capF(st.replace(/_/g,' ')))+(t!=null?` · ${t}°`:'')}
+  if(dom==='light'&&st==='on'&&a.brightness)return`On · ${Math.round(a.brightness/2.55)}%`;
+  if(dom==='cover'&&a.current_position!=null&&st!=='closed')return`${capF(st)} · ${a.current_position}%`;
+  if(dom==='media_player'&&st==='playing'&&a.media_title)return`▶ ${a.media_title}`;
+  return capF(st.replace(/_/g,' '))}
+const isLamp=d=>{const k=DEV[d.kind];return k.g==='light'&&k.domain!=='scene'};
+function roomsData(){return doc.floors.map((fl,fi)=>{
+  const mains=fl.rooms.filter(r=>mainOf(fl,r)===r).sort((a,b)=>(a.y-b.y)||(a.x-b.x)),by=new Map(mains.map(r=>[r.id,[]])),loose=[];
+  for(const d of fl.devices){const r=roomAt(fl,d.x,d.y),m=r&&mainOf(fl,r);(m&&by.has(m.id)?by.get(m.id):loose).push(d)}
+  return{fl,fi,rooms:mains.map(r=>({r,devs:by.get(r.id)})),loose}})}
+function renderRooms(){const el=$('#rv');if(!el||ui.view!=='rooms')return;const P=curP(),wall=wallOn(),data=roomsData();
+  const all=doc.floors.flatMap(f=>f.devices),lamps=all.filter(isLamp),lit=lamps.filter(d=>ON.has(d.id)).length,act=all.filter(d=>!isLamp(d)&&DEV[d.kind].tap==='toggle'&&ON.has(d.id)).length;
+  const multi=data.filter(x=>x.rooms.length||x.loose.length).length>1;
+  const tile=(d,room)=>{const k=DEV[d.kind],on=ON.has(d.id),st=devState(d),bad=ha.on&&/^(Not linked|Not in HA|Unavailable)$/.test(st);
+    return`<button class="dt${on?' on':''}${bad?' bad':''}" data-rd="${d.id}" style="--dc:${k.color}" title="${esc(d.name)}${d.entity?' — '+esc(d.entity):''}"><i>${k.emoji}</i><b>${esc(devShort(d,room))}</b><small>${esc(st)}</small></button>`};
+  let h=wall?'':`<div class="rvhead"><h1>${esc(doc.title||'My home')}</h1>`+
+    (lamps.length?`<button class="rvchip${lit?' on':''}" data-rl="all">💡 ${lit?`${lit} light${lit>1?'s':''} on · turn off`:'All lights off'}</button>`:'')+
+    (act?`<span class="rvchip">⚡ ${act} on</span>`:'')+`<span class="rvchip">${all.length} devices</span></div>`;
+  let any=false;
+  for(const {fl,fi,rooms,loose} of data){const withDev=rooms.filter(x=>x.devs.length),empty=rooms.filter(x=>!x.devs.length);if(!withDev.length&&!loose.length&&!empty.length)continue;any=true;
+    h+=`<section class="rvfl">${multi?`<h2>${esc(fl.name)}</h2>`:''}<div class="rvgrid">`;
+    for(const {r,devs} of withDev){const sens=ha.on?devs.filter(d=>d.kind==='temp'||d.kind==='humidity'):[],rest=devs.filter(d=>!sens.includes(d)),ls=devs.filter(isLamp),on=ls.filter(d=>ON.has(d.id)).length;
+      const sv=sens.map(d=>{const s=haState(d);return s&&s.state!=='unavailable'&&s.state!=='unknown'?`<span>${DEV[d.kind].emoji} ${esc(s.state)}${d.kind==='temp'?'°':'%'}</span>`:''}).join('');
+      h+=`<div class="rcard" style="--rc:${(P.rooms||{})[r.type]||'var(--panel2)'}"><div class="rtop"><div class="rico">${ROOM_EMOJI[r.type]||'🏠'}</div><div class="rname"><b>${esc(r.name)}</b><small>${groupArea(fl,r).toFixed(0)} m² · ${devs.length} device${devs.length>1?'s':''}</small></div>`+
+        (sv?`<div class="rsens">${sv}</div>`:'')+
+        (ls.length>1?`<button class="rlt${on?' on':''}" data-rl="${fi}:${r.id}" title="All lights in ${esc(r.name)}">💡 ${on}/${ls.length}</button>`:'')+
+        `</div>${rest.length?`<div class="dgrid">${rest.map(d=>tile(d,r)).join('')}</div>`:''}</div>`}
+    if(loose.length)h+=`<div class="rcard"><div class="rtop"><div class="rico">📍</div><div class="rname"><b>Other</b><small>Not inside a room</small></div></div><div class="dgrid">${loose.map(d=>tile(d,null)).join('')}</div></div>`;
+    h+=`</div>${empty.length&&!wall?`<p class="rvmore">No devices yet: ${empty.map(x=>esc(x.r.name)).join(' · ')}</p>`:''}</section>`}
+  if(!any)h+=`<div class="rvnone"><p style="font-size:40px;margin:0">🏠</p><p>No rooms yet. Draw your rooms in <b>2D</b> and add devices to them, and they show up here as a dashboard.</p></div>`;
+  const top=el.scrollTop;el.innerHTML=h;el.scrollTop=top;
+  if(wall)requestAnimationFrame(()=>{let t=0,bt=0;const H=el.getBoundingClientRect();
+    for(const z of document.querySelectorAll('#wall .wz')){if(!z.children.length)continue;const r=z.getBoundingClientRect();if(!r.height)continue;
+      if(z.dataset.pos[0]==='t')t=Math.max(t,r.bottom-H.top);else bt=Math.max(bt,H.bottom-r.top)}
+    el.style.paddingTop=Math.round(t+16)+'px';el.style.paddingBottom=Math.round(Math.max(bt,70)+16)+'px'});
+  else el.style.paddingTop=el.style.paddingBottom=''}
+function roomLights(ls){if(!ls.length||(wallOn()&&!W().control))return;const any=ls.some(d=>ON.has(d.id));
+  if(ha.on)haLights(ls,!any);else for(const d of ls)any?ON.delete(d.id):ON.add(d.id);
+  flash(any?'Lights off':'Lights on');renderRooms()}
+$('#rv').addEventListener('click',e=>{const t=e.target.closest('[data-rd]');
+  if(t){const d=doc.floors.flatMap(f=>f.devices).find(x=>x.id===t.dataset.rd);if(d){toggleDev(d);renderRooms()}return}
+  const l=e.target.closest('[data-rl]');if(!l)return;const v=l.dataset.rl;
+  if(v==='all'){const ls=doc.floors.flatMap(f=>f.devices).filter(isLamp),on=ls.filter(d=>ON.has(d.id));roomLights(on.length?on:ls);return}
+  const[fi,rid]=v.split(':'),fl=doc.floors[+fi];if(!fl)return;const room=fl.rooms.find(r=>r.id===rid);if(!room)return;
+  roomLights(fl.devices.filter(d=>{const r=roomAt(fl,d.x,d.y);return r&&mainOf(fl,r)===room&&isLamp(d)}))});
 
 /* ---------- export ---------- */
 function svgFile(fl,P,ex){return`<svg xmlns="http://www.w3.org/2000/svg" width="${fl.w*K}" height="${fl.h*K}" viewBox="0 0 ${fl.w*K} ${fl.h*K}">${renderInner(fl,P,{grid:false,devices:false,area:ex.area,idp:'x'})}</svg>\n`}
@@ -2172,11 +2258,11 @@ function wallTouch(){if(!WALL.on)return;WALL.idle=Date.now();
 document.addEventListener('pointerdown',e=>{if(!WALL.on)return;if(!$('#saver').hidden){$('#saver').hidden=true;WALL.idle=Date.now();e.stopPropagation();e.preventDefault();return}wallTouch()},true);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&WALL.on)wallWake()});
 $('#wallBtn').onclick=()=>setWall(true);
-$('#wallBar').addEventListener('click',e=>{const b=e.target.closest('[data-w]');if(!b)return;const a=b.dataset.w,w=doc.wall=W();wallBar(true);
+$('#wallBar').addEventListener('click',e=>{const b=e.target.closest('[data-w]');if(!b)return;const a=b.dataset.w;wallBar(true);const w=doc.wall=W();
   if(a==='exit'){if(b.classList.contains('confirm')){setWall(false);return}
     b.classList.add('confirm');b.textContent='✕ Tap again to exit';clearTimeout(WALL.exitT);WALL.exitT=setTimeout(()=>{b.classList.remove('confirm');b.textContent='✕ Exit'},3000);return}
   if(a==='set'){wallForm();$('#wallSet').showModal();return}
-  if(a==='view'){w.view=ui.view==='3d'?'2d':'3d';save();wallApply();return}
+  if(a==='view'){w.view={'2d':'3d','3d':'rooms',rooms:'2d'}[ui.view]||'3d';save();wallApply();return}
   if(a==='all'){w.all=!ui.v3all;if(ui.view!=='3d')w.view='3d';save();wallApply();return}
   if(a==='night'){ui.night=!ui.night;b.classList.toggle('on',ui.night);document.body.classList.toggle('wnight',ui.night);refreshViews();wallRender();return}
   if(a==='reset'){if(ui.view==='3d')render3DView(true);return}
@@ -2185,7 +2271,7 @@ $('#wallBar').addEventListener('click',e=>{const b=e.target.closest('[data-w]');
     else{for(const d of ls)anyOn?ON.delete(d.id):ON.add(d.id);refreshViews();wallRender()}}});
 const POS=[['tl','Top left'],['tc','Top centre'],['tr','Top right'],['bl','Bottom left'],['bc','Bottom centre'],['br','Bottom right'],['off','Hidden']];
 const WS_FIELDS=[['quick'],
-  ['sec','The house'],['view','View',[['3d','3D'],['2d','2D plan']]],['all','Show',[[true,'Whole house'],[false,'One floor']]],['full','Walls',[[false,'Cut-away (see inside)'],[true,'Full height']]],
+  ['sec','The house'],['view','View',[['3d','3D'],['2d','2D plan'],['rooms','Rooms dashboard']]],['all','Show',[[true,'Whole house'],[false,'One floor']]],['full','Walls',[[false,'Cut-away (see inside)'],[true,'Full height']]],
   ['rotate','Slowly turn the house',[['off','No'],['slow','Slowly'],['medium','Faster']]],['night','Night look',[['auto','Automatic (after sunset)'],['on','Always'],['off','Never']]],
   ['labels','Room names',[[false,'Hide'],[true,'Show']]],['area','Room sizes (m²)',[[false,'Hide'],[true,'Show']]],['devices','Device buttons',[[true,'Show'],[false,'Hide']]],['control','Tapping a device',[[true,'Controls it'],[false,'Does nothing (view only)']]],
   ['sec','Clock'],['clock','Clock style',[['digital','Digital'],['analog','Analog'],['minimal','Small'],['off','No clock']]],['pos','Clock position',POS],
@@ -2225,7 +2311,7 @@ function wallFrame(on){const fe=window.frameElement;if(!fe)return;
   else if(fe.dataset.h3dStyle!=null){fe.setAttribute('style',fe.dataset.h3dStyle);delete fe.dataset.h3dStyle}}
 const hs=location.hash;
 if(/^#f\d/.test(hs))ui.floor=clamp(+hs[2]-1,0,doc.floors.length-1);
-if(hs.includes('3d'))ui.view='3d';if(hs.includes('all'))ui.v3all=true;if(hs.includes('full'))ui.v3full=true;if(hs.includes('night')){ui.night=true;for(const f of doc.floors)for(const d of f.devices)if(DEV[d.kind].domain==='light')ON.add(d.id)}
+if(hs.includes('3d'))ui.view='3d';if(hs.includes('rooms'))ui.view='rooms';{const cv=(window.HOME3D_CONFIG||{}).view;if(['2d','3d','rooms'].includes(cv))ui.view=cv}if(hs.includes('all'))ui.v3all=true;if(hs.includes('full'))ui.v3full=true;if(hs.includes('night')){ui.night=true;for(const f of doc.floors)for(const d of f.devices)if(DEV[d.kind].domain==='light')ON.add(d.id)}
 if(hs.includes('sel')){const d=cur().devices[0];if(d)ui.sel=d.id}
 if(ha.on){ui.view='3d';$('#exportBtn').style.display='none'}
 {let v=null;try{v=localStorage.getItem(KEY+'-view')}catch(e){}setViewMode(hs.includes('edit')?false:v!=null?v==='1':ha.on,true)}

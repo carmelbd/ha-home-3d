@@ -8,6 +8,10 @@ Draw your home, walk around it in 3D, and control your real devices from the pla
 
 **Now on HACS!** [Install with HACS](#install-with-hacs-about-2-minutes) and future updates arrive as one click. **Already installed by hand?** See [Updating](#updating-to-a-new-version). Your design is kept.
 
+- **▦ Rooms dashboard (1.9.0).** A new **Rooms** button next to 2D and 3D shows the whole house as a dashboard: a card for every room with its name, size and a button for each device, live from Home Assistant. Tap a light to switch it, tap an AC, TV or lock to open its controls, and use **💡 2/3** on a card to switch all the lights in that room. Temperature and humidity show at the top of each card. It also works on the wall display, and you can open the card straight into it with `view: rooms`.
+
+![The Rooms dashboard: a card for each room with its devices](screenshots/rooms-view.jpg)
+
 - **🌀 Ceiling fans, columns and lamps (1.8.0).** New items: a column with niche shelves (bottles or books), a ceiling fan, a wall AC unit, pendant lamps, ceiling lights (round, linear LED, spots, downlights) and a range hood. Walls you add now snap onto the house walls with clean joins. The dining table, dresser, TV unit and vanity get wood and color options.
 
 ![Ceiling fan, column with a bottle niche and a round ceiling light](screenshots/new-items.jpg)
@@ -153,6 +157,8 @@ To open straight into the wall display, give the card `wall: true`:
 type: custom:home-3d-card
 wall: true
 ```
+
+To open the card straight into a view, add `view: rooms` (the Rooms dashboard), `view: 3d` or `view: 2d`. On the wall display, **🔁 View** switches between 3D, Rooms and 2D, and **⚙ Wall settings → View** picks the one it starts with.
 
 **Tips for a wall tablet:** use the Home Assistant app and turn on its full-screen option, and set the tablet's Auto-Lock to **Never** (or use Guided Access on an iPad) so the screen stays on. Camera pictures are snapshots that refresh, not smooth video. See [Cameras, including Eufy](#cameras-including-eufy).
 
