@@ -58,7 +58,10 @@ h4:first-child{margin-top:2px}
 #v3{position:absolute;inset:0}
 #v3 canvas{display:block;width:100%;height:100%;touch-action:none}
 /* ---------- Rooms view: the whole house as a dashboard ---------- */
-#rv{position:absolute;inset:0;overflow:auto;padding:22px 24px 32px;background:var(--bg);z-index:2;-webkit-overflow-scrolling:touch}
+#rv{position:absolute;inset:0;overflow:hidden;background:var(--bg);z-index:2;color:var(--text)}
+#rvsc{position:absolute;inset:0;overflow:auto;padding:22px 24px 32px;-webkit-overflow-scrolling:touch}
+.rvsky{position:absolute;inset:0;overflow:hidden;pointer-events:none;display:none}#rv[data-th] .rvsky{display:block}
+.rvsky i{position:absolute;border-radius:50%;will-change:transform}
 #hint{z-index:6}
 .rvhead{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 6px}
 .rvhead h1{font-size:24px;line-height:1.2;margin:0 auto 0 0;letter-spacing:-.01em}
@@ -92,8 +95,88 @@ button.rvchip{cursor:pointer}button.rvchip.on{background:#f5b400;border-color:#f
 .rvtip{margin:0 2px 10px;color:var(--muted);font-size:13.5px}
 .rvopts{display:flex;flex-wrap:wrap;gap:8px 18px;margin:0 2px 6px;padding:12px 14px;background:var(--panel);border:1px solid var(--border);border-radius:14px}.rvopts label{display:inline-flex;align-items:center;gap:7px;font-size:14px;cursor:pointer}
 .rvnone{max-width:420px;margin:12vh auto;text-align:center;color:var(--muted)}
-body.wall #rv{padding:24px 28px 96px}
-@media (max-width:600px){#rv{padding:16px 14px 28px}.rvhead h1{font-size:20px;width:100%}}
+/* ---------- Rooms dashboard styles (🎨 in ✏️ Customize, or card option rooms_theme:) ---------- */
+.rvthemes{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:10px 2px 8px}.rvthemes>b{font-size:14px;margin-right:4px}
+.rvth{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:5px 13px 5px 5px;background:var(--panel);border:1px solid var(--border);color:var(--text);font-weight:600;font-size:13px}
+.rvth i{width:26px;height:26px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(127,127,127,.25)}.rvth.on{outline:2px solid var(--accent);outline-offset:1px}
+@media (prefers-reduced-motion:reduce){.rvsky i{animation:none!important}}
+/* Northern lights */
+#rv[data-th=aurora]{--bg:#040912;--panel:rgba(12,22,38,.55);--panel2:rgba(255,255,255,.06);--border:rgba(140,255,215,.14);--text:#eafff7;--muted:#8db5ad;--accent:#3ef0b0;color-scheme:dark;background:radial-gradient(120% 80% at 50% 120%,#0b2a3a 0%,#040912 62%)}
+#rv[data-th=aurora] .rvsky i{filter:blur(50px);mix-blend-mode:screen}
+#rv[data-th=aurora] .rvsky i:nth-child(1){width:75%;height:55%;left:-12%;top:-22%;background:radial-gradient(closest-side,rgba(46,255,170,.6),transparent);animation:rvA1 19s ease-in-out infinite alternate}
+#rv[data-th=aurora] .rvsky i:nth-child(2){width:65%;height:50%;right:-15%;top:-12%;background:radial-gradient(closest-side,rgba(150,90,255,.5),transparent);animation:rvA2 23s ease-in-out infinite alternate}
+#rv[data-th=aurora] .rvsky i:nth-child(3){width:60%;height:38%;left:25%;top:6%;background:radial-gradient(closest-side,rgba(30,200,255,.38),transparent);animation:rvA3 27s ease-in-out infinite alternate}
+#rv[data-th=aurora] .rvsky i:nth-child(4){width:2px;height:2px;left:0;top:0;border-radius:0;box-shadow:12vw 8vh #fff,31vw 22vh rgba(255,255,255,.7),47vw 5vh #fff,63vw 18vh rgba(255,255,255,.6),82vw 9vh #fff,91vw 30vh rgba(255,255,255,.7),7vw 40vh rgba(255,255,255,.5),71vw 44vh rgba(255,255,255,.5),24vw 60vh rgba(255,255,255,.4),55vw 70vh rgba(255,255,255,.4),88vw 66vh rgba(255,255,255,.5),40vw 35vh rgba(255,255,255,.6)}
+@keyframes rvA1{to{transform:translate(20%,12%) rotate(10deg) scaleX(1.25)}}
+@keyframes rvA2{to{transform:translate(-18%,16%) rotate(-12deg) scale(1.15)}}
+@keyframes rvA3{to{transform:translate(-12%,-8%) scaleX(1.4)}}
+#rv[data-th=aurora] .rcard,#rv[data-th=aurora] .rvchip,#rv[data-th=aurora] .rvopts{-webkit-backdrop-filter:blur(16px) saturate(140%);backdrop-filter:blur(16px) saturate(140%)}
+#rv[data-th=aurora] .rcard{border-radius:22px;box-shadow:0 14px 44px -22px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,255,255,.07)}
+#rv[data-th=aurora] .rvhead h1{font-size:30px;background:linear-gradient(90deg,#7dffcf,#8fd3ff 50%,#c3a6ff);-webkit-background-clip:text;background-clip:text;color:transparent}
+#rv[data-th=aurora] .rvfl>h2{color:#7dffcf}
+#rv[data-th=aurora] .rico{background:color-mix(in srgb,var(--rc) 20%,rgba(255,255,255,.05));box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
+#rv[data-th=aurora] .dt i{background:rgba(255,255,255,.08)}
+#rv[data-th=aurora] .dt.on{background:color-mix(in srgb,var(--dc) 20%,transparent);border-color:color-mix(in srgb,var(--dc) 65%,transparent);box-shadow:0 0 24px -6px var(--dc)}
+/* Apple */
+#rv[data-th=apple]{--bg:#f2f2f7;--panel:#fff;--panel2:#f2f2f7;--border:transparent;--text:#1c1c1e;--muted:#8e8e93;--accent:#007aff;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",system-ui,sans-serif;background:linear-gradient(170deg,#e3ecf7 0%,#f2f2f7 45%,#f7f1ea 100%)}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]) #rv[data-th=apple]{--bg:#000;--panel:#1c1c1e;--panel2:#2c2c2e;--text:#f2f2f7;background:linear-gradient(170deg,#0d1420 0%,#000 50%,#120d0a 100%)}}
+:root[data-theme=dark] #rv[data-th=apple]{--bg:#000;--panel:#1c1c1e;--panel2:#2c2c2e;--text:#f2f2f7;background:linear-gradient(170deg,#0d1420 0%,#000 50%,#120d0a 100%)}
+#rv[data-th=apple] .rvhead h1{font-size:32px;font-weight:700;letter-spacing:-.025em}
+#rv[data-th=apple] .rvfl>h2{text-transform:none;letter-spacing:-.01em;font-size:21px;color:var(--text);margin-top:26px}
+#rv[data-th=apple] .rcard{border:0;border-radius:26px;box-shadow:0 2px 14px -6px rgba(0,0,0,.12)}
+#rv[data-th=apple] .rvchip,#rv[data-th=apple] .rlt{border:0;background:rgba(118,118,128,.14)}#rv[data-th=apple] .rvchip.on,#rv[data-th=apple] .rlt.on{background:#ffcc00;color:#1c1c1e}
+#rv[data-th=apple] .rico{border-radius:50%;width:42px;height:42px}
+#rv[data-th=apple] .dt{border-radius:18px;min-height:94px;border:0}
+#rv[data-th=apple] .dt.on{background:#fff;color:#1c1c1e;box-shadow:0 6px 18px -8px rgba(0,0,0,.35)}#rv[data-th=apple] .dt.on small{color:#1c1c1e}
+#rv[data-th=apple] .dt.on i{background:var(--dc);box-shadow:none}
+/* Liquid glass */
+#rv[data-th=glass]{--bg:#3b2a7a;--panel:rgba(255,255,255,.13);--panel2:rgba(255,255,255,.12);--border:rgba(255,255,255,.34);--text:#fff;--muted:rgba(255,255,255,.75);--accent:#fff;color-scheme:dark;background:linear-gradient(135deg,#ff7eb3 0%,#7a5cff 38%,#2bc0e4 72%,#f9d976 100%)}
+#rv[data-th=glass] .rvsky i{filter:blur(40px);opacity:.85}
+#rv[data-th=glass] .rvsky i:nth-child(1){width:46%;height:46%;left:-8%;top:8%;background:radial-gradient(closest-side,#ff4ecd,transparent);animation:rvG1 21s ease-in-out infinite alternate}
+#rv[data-th=glass] .rvsky i:nth-child(2){width:50%;height:50%;right:-10%;top:35%;background:radial-gradient(closest-side,#36e3ff,transparent);animation:rvG2 25s ease-in-out infinite alternate}
+#rv[data-th=glass] .rvsky i:nth-child(3){width:38%;height:38%;left:30%;bottom:-12%;background:radial-gradient(closest-side,#ffd24e,transparent);animation:rvG1 29s ease-in-out infinite alternate-reverse}
+@keyframes rvG1{to{transform:translate(30%,-18%) scale(1.2)}}@keyframes rvG2{to{transform:translate(-26%,-22%) scale(.85)}}
+#rv[data-th=glass] .rcard,#rv[data-th=glass] .rvchip,#rv[data-th=glass] .rvopts,#rv[data-th=glass] .rvth,#rv[data-th=glass] .rvcam{-webkit-backdrop-filter:blur(26px) saturate(180%);backdrop-filter:blur(26px) saturate(180%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.7),inset 0 -1px 0 rgba(255,255,255,.18),inset 1px 0 0 rgba(255,255,255,.22),0 14px 40px -16px rgba(30,10,70,.5)}
+#rv[data-th=glass] .rcard{position:relative;border-radius:30px}
+#rv[data-th=glass] .rcard::before{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(135deg,rgba(255,255,255,.38),rgba(255,255,255,0) 36%,rgba(255,255,255,0) 72%,rgba(255,255,255,.14))}
+#rv[data-th=glass] .rvhead h1,#rv[data-th=glass] .rname b,#rv[data-th=glass] .rvfl>h2{text-shadow:0 1px 14px rgba(40,0,90,.4)}
+#rv[data-th=glass] .rvhead h1{font-size:32px;font-weight:700;letter-spacing:-.02em}#rv[data-th=glass] .rvfl>h2{color:#fff}
+#rv[data-th=glass] .rico{background:rgba(255,255,255,.24);box-shadow:inset 0 1px 0 rgba(255,255,255,.6);border-radius:16px}
+#rv[data-th=glass] .dt{border-radius:22px;border:1px solid rgba(255,255,255,.22);box-shadow:inset 0 1px 0 rgba(255,255,255,.4)}
+#rv[data-th=glass] .dt i{background:rgba(255,255,255,.2)}
+#rv[data-th=glass] .dt.on{background:rgba(255,255,255,.85);color:#1b1530;border-color:#fff}#rv[data-th=glass] .dt.on small{color:#1b1530}
+#rv[data-th=glass] .rlt{background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.35)}
+/* Midnight gold */
+#rv[data-th=midnight]{--bg:#0a0a0c;--panel:#131316;--panel2:#1b1b1f;--border:rgba(212,175,55,.17);--text:#f3eee2;--muted:#9a937f;--accent:#d4af37;color-scheme:dark;
+  background:radial-gradient(90% 60% at 85% -10%,rgba(212,175,55,.14),transparent 60%),radial-gradient(70% 50% at 0% 110%,rgba(140,100,40,.12),transparent 70%),#0a0a0c}
+#rv[data-th=midnight] .rvhead h1{font-family:Didot,"Bodoni 72","Playfair Display",Georgia,serif;font-weight:500;font-size:34px;letter-spacing:.01em;background:linear-gradient(180deg,#f6e7b0,#c9a23a);-webkit-background-clip:text;background-clip:text;color:transparent}
+#rv[data-th=midnight] .rvfl>h2{color:#d4af37;letter-spacing:.22em}
+#rv[data-th=midnight] .rcard{border-radius:18px;box-shadow:0 24px 50px -30px #000,inset 0 1px 0 rgba(255,255,255,.04)}
+#rv[data-th=midnight] .rico{background:rgba(212,175,55,.08);border:1px solid rgba(212,175,55,.28)}
+#rv[data-th=midnight] .dt.on{background:linear-gradient(160deg,rgba(212,175,55,.24),rgba(212,175,55,.05));border-color:rgba(212,175,55,.55)}
+#rv[data-th=midnight] .dt.on i{background:#d4af37;box-shadow:0 0 0 4px rgba(212,175,55,.18)}
+#rv[data-th=midnight] .rvchip.on,#rv[data-th=midnight] .rlt.on{background:#d4af37;border-color:#d4af37;color:#17130a}
+/* Neon */
+#rv[data-th=neon]{--bg:#07060f;--panel:rgba(16,12,34,.88);--panel2:rgba(255,255,255,.04);--border:rgba(0,240,255,.26);--text:#ecebff;--muted:#8f8abb;--accent:#00f0ff;color-scheme:dark;
+  background:linear-gradient(rgba(0,240,255,.07) 1px,transparent 1px) 0 0/44px 44px,linear-gradient(90deg,rgba(255,0,200,.06) 1px,transparent 1px) 0 0/44px 44px,radial-gradient(80% 60% at 50% 0%,#1d0b44,#07060f 70%)}
+#rv[data-th=neon] .rvhead h1{font-family:ui-monospace,"SF Mono",Menlo,monospace;text-transform:uppercase;letter-spacing:.14em;color:#00f0ff;text-shadow:0 0 14px rgba(0,240,255,.75)}
+#rv[data-th=neon] .rvfl>h2{color:#ff3ec8;text-shadow:0 0 10px rgba(255,62,200,.65)}
+#rv[data-th=neon] .rcard{border-radius:14px;box-shadow:0 0 0 1px rgba(255,0,200,.08),0 0 34px -14px rgba(0,240,255,.55)}
+#rv[data-th=neon] .rico{background:transparent;border:1px solid var(--border);box-shadow:inset 0 0 14px -4px rgba(0,240,255,.55)}
+#rv[data-th=neon] .dt{border-radius:10px;border:1px solid rgba(255,255,255,.07)}#rv[data-th=neon] .dt small{font-family:ui-monospace,Menlo,monospace}
+#rv[data-th=neon] .dt.on{background:color-mix(in srgb,var(--dc) 14%,transparent);border-color:var(--dc);box-shadow:0 0 18px -4px var(--dc),inset 0 0 14px -6px var(--dc)}
+#rv[data-th=neon] .rvchip.on,#rv[data-th=neon] .rlt.on{background:#ff3ec8;border-color:#ff3ec8;color:#fff;box-shadow:0 0 16px rgba(255,62,200,.6)}
+/* Nordic */
+#rv[data-th=nordic]{--bg:#f3eee6;--panel:#fbf8f3;--panel2:#f1ebe1;--border:#e4dacb;--text:#3b3128;--muted:#8d7f6e;--accent:#b8643a;color-scheme:light;background:#f3eee6}
+#rv[data-th=nordic] .rvhead h1{font-family:"Iowan Old Style",Palatino,Georgia,serif;font-weight:600;font-size:32px}
+#rv[data-th=nordic] .rvfl>h2{color:#b8643a}
+#rv[data-th=nordic] .rcard{border-radius:22px;box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 12px 30px -24px rgba(80,50,20,.45)}
+#rv[data-th=nordic] .rico{background:color-mix(in srgb,var(--rc) 55%,#f1ebe1)}
+#rv[data-th=nordic] .dt.on{background:#fff;border-color:color-mix(in srgb,var(--dc) 45%,transparent)}#rv[data-th=nordic] .dt.on small{color:#3b3128}
+#rv[data-th=nordic] .rvchip.on,#rv[data-th=nordic] .rlt.on{background:#b8643a;border-color:#b8643a;color:#fff}
+body.wall #rvsc{padding:24px 28px 96px}
+@media (max-width:600px){#rvsc{padding:16px 14px 28px}.rvhead h1{font-size:20px;width:100%}}
 #v3err{position:absolute;inset:0;display:grid;place-items:center;color:var(--muted);padding:24px;text-align:center}
 .v3bar{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:4px;background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:4px;z-index:2;flex-wrap:wrap;justify-content:center;width:max-content;max-width:calc(100% - 24px)}
 .v3bar button{border-color:transparent;background:transparent;font-size:12.5px}
@@ -1179,6 +1262,26 @@ Object.assign(FURN,{
     draw:(w,h,P)=>C(w/2,h/2,Math.min(w,h)*.48,P,{fill:'#2a2c30'})+C(w/2,h/2,Math.min(w,h)*.28,P,{fill:'#8a2b2b'}),
     d3:(b,w,d)=>{const r=Math.min(w,d);b.cyl(w/2,d/2,r*.48,0,.3,'#2a2c30',{rough:.7});b.cyl(w/2,d/2,.05,.3,.15,'#2a2c30');b.cyl(w/2,d/2,r*.28,.45,1.15,'#8a2b2b',{rough:.55})}},
 
+  bench_adj:{label:'Adjustable bench (incline)',group:'gym',kw:'fitness bench incline decline adjustable weight bench press workout',w:.5,h:1.35,
+    draw:(w,h,P)=>R(.05,h*.42,w-.1,h*.58,P,{fill:'#1c1d20',rx:.04})+R(.05,0,w-.1,h*.4,P,{fill:'#2a2c30',rx:.04})+L(w/2,h*.4,w/2,h,P,{stroke:'#555',sw:.02}),
+    d3:(b,w,d)=>{const fr='#24262a',m={rough:.35,metal:.5},pad='#1c1d20',a=.55,L=d*.52,zh=d*.44,yh=.46;
+      b.box(w*.4,0,w*.2,d,0,.06,fr,m);for(const z of[0,d-.06])b.box(0,z,w,.06,0,.05,fr,m);b.box(w*.4,d*.62,w*.2,.06,0,.42,fr,m);
+      b.box(.05,zh,w-.1,d-zh-.02,.42,.08,pad,{rough:.9});
+      const bk=b.box(.05,zh-Math.cos(a)*L/2-L/2,w-.1,L,yh+Math.sin(a)*L/2-.04,.08,pad,{rough:.9});bk.rotation.x=a;
+      const st=b.box(w*.42,zh-.32,w*.16,.05,.05,.5,fr,m);st.rotation.x=-.5;
+      for(const s of[-1,1]){const r=b.cyl(w/2+s*w*.32,d-.08,.05,0,.12,pad,{rough:.9});r.rotation.z=Math.PI/2;r.position.y=.3}}},
+  dumbbells:{label:'Dumbbells (pair)',group:'gym',kw:'weights dumbbell free weights hand weights',w:.4,h:.35,opts:[O.sel('size','Weight',[['s','Light'],['m','Medium'],['l','Heavy']],'m')],
+    draw:(w,h,P)=>[.25,.75].map(f=>R(.04,h*f-.04,w-.08,.08,P,{fill:'#1c1d20',rx:.03})).join(''),
+    d3:(b,w,d,H,o)=>{const r={s:.04,m:.055,l:.075}[o.size]||.055;for(const f of[.25,.75]){const z=d*f;
+      const hd=b.cyl(w/2,z,.015,0,w*.7,C3.steel,CHROME);hd.rotation.z=Math.PI/2;hd.position.y=r;
+      for(const s of[-1,1]){const k=b.cyl(w/2+s*w*.32,z,r,0,.08,'#1c1d20',{rough:.6});k.rotation.z=Math.PI/2;k.position.y=r}}}},
+  plate_tree:{label:'Weight plate tree',group:'gym',kw:'weights plates olympic plate stand storage barbell',w:.6,h:.6,
+    draw:(w,h,P)=>R(0,0,w,h,P,{fill:'#2a2c30',rx:.05})+C(w/2,h/2,.04,P,{fill:'#555'})+[[.5,.12],[.5,.88],[.12,.5],[.88,.5]].map(([x,y])=>C(w*x,h*y,.05,P,{fill:'#1c1d20'})).join(''),
+    d3:(b,w,d)=>{const fr='#24262a',m={rough:.35,metal:.5};b.box(0,0,w,d,0,.04,fr,m);b.box(w/2-.03,d/2-.03,.06,.06,.04,1.1,fr,m);
+      const sizes=[[.225,.04],[.17,.035],[.13,.03],[.1,.025]];
+      [[0,-1,.35],[0,1,.35],[-1,0,.7],[1,0,.7]].forEach(([sx,sz,y],i)=>{const peg=b.cyl(w/2+sx*.1,d/2+sz*.1,.02,0,.2,C3.steel,CHROME);peg.rotation[sx?'z':'x']=Math.PI/2;peg.position.y=y;
+        const [r,t]=sizes[i],pl=b.cyl(w/2+sx*.13,d/2+sz*.13,r,0,t,'#1c1d20',{rough:.6});pl.rotation[sx?'z':'x']=Math.PI/2;pl.position.y=Math.max(y,r+.04)})}},
+
   dog_bed:{label:'Pet bed',group:'green',w:.8,h:.6,opts:[O.color('#9b6b43','Color'),O.color('#efe6d6','Cushion','cushion')],
     draw:(w,h,P,o)=>E(w/2,h/2,w*.48,h*.48,P,{fill:o.color})+E(w/2,h/2,w*.34,h*.32,P,{fill:o.cushion}),
     d3:(b,w,d,H,o)=>{const c=b.cyl(w/2,d/2,.5,0,.09,o.cushion,{rough:1});c.scale.set(w*.85,1,d*.85);torusD(b,w,d,.1,o.color)}},
@@ -1283,7 +1386,7 @@ const curP=()=>{const t=document.documentElement.dataset.theme;return PAL[t?t:(m
 function load(){try{const s=localStorage.getItem(KEY);if(s){const d=JSON.parse(s);if(d&&Array.isArray(d.floors)&&d.floors.length)return normalize(d)}}catch(e){}return null}
 function normalize(d){d.title=d.title||'My Home';d.entities=Array.isArray(d.entities)?d.entities:[];d.look=Object.assign({wall:''},d.look||{});
   d.hd=Object.assign({allow:true,button:true},d.hd||{});
-  d.rooms=Object.assign({hide:[],hideRooms:[],lights:true,count:true,empty:true,cams:true},d.rooms||{});
+  d.rooms=Object.assign({hide:[],hideRooms:[],lights:true,count:true,empty:true,cams:true,theme:''},d.rooms||{});
   d.export=Object.assign({mode:'3d',theme:'dark',walls:'cut',angle:'front',btn:'builtin',prefix:'/local/floorplan/',area:true},d.export||{});
   for(const f of d.floors){f.id=f.id||uid();f.rooms=f.rooms||[];f.items=(f.items||[]).filter(i=>FURN[i.kind]);f.devices=(f.devices||[]).filter(x=>DEV[x.kind]);f.w=+f.w||16;f.h=+f.h||11;f.ch=+f.ch||2.7}return d}
 let saveTimer;
@@ -2018,6 +2121,7 @@ $('#v3bar').addEventListener('click',e=>{const b=e.target.closest('[data-v3]');i
   if(a==='reset')render3DView(true);else renderAll()});
 
 /* ---------- Rooms view: every room as a card with its devices ---------- */
+const RV_THEMES=[['','Classic','linear-gradient(135deg,#eef1f5,#fff)'],['aurora','Northern lights','linear-gradient(135deg,#040912 25%,#2effaa 62%,#965aff)'],['apple','Apple','linear-gradient(135deg,#dfe9f6,#fff 60%,#f7efe6)'],['glass','Liquid glass','linear-gradient(135deg,#ff7eb3,#7a5cff 45%,#2bc0e4)'],['midnight','Midnight gold','linear-gradient(135deg,#0a0a0c 40%,#d4af37)'],['neon','Neon','linear-gradient(135deg,#07060f 30%,#00f0ff 65%,#ff3ec8)'],['nordic','Nordic','linear-gradient(135deg,#f3eee6,#e4dacb 55%,#b8643a)']];
 const ROOM_EMOJI={living:'🛋️',dining:'🍽️',kitchen:'🍳',bedroom:'🛏️',kids:'🧸',office:'💻',bathroom:'🛁',toilet:'🚽',laundry:'🧺',hallway:'🚪',stairs:'🪜',storage:'📦',safe:'🛡️',balcony:'🌿',yard:'🌳',patio:'☀️',gravel:'🪨',parking:'🚗'};
 const capF=t=>t?t.charAt(0).toUpperCase()+t.slice(1):t;
 function devShort(d,room){let nm=(d.name||'').trim();const rn=room&&room.name;if(rn&&nm.toLowerCase().startsWith(rn.toLowerCase()))nm=nm.slice(rn.length).trim().replace(/^[-–:·,]\s*/,'');return capF(nm)||DEV[d.kind].label}
@@ -2033,7 +2137,7 @@ function devState(d){const k=DEV[d.kind],dom=k.domain;
   if(dom==='media_player'&&st==='playing'&&a.media_title)return`▶ ${a.media_title}`;
   return capF(st.replace(/_/g,' '))}
 const isLamp=d=>{const k=DEV[d.kind];return k.g==='light'&&k.domain!=='scene'};
-const RV=()=>doc.rooms=Object.assign({hide:[],hideRooms:[],lights:true,count:true,empty:true,cams:true},doc.rooms||{});
+const RV=()=>doc.rooms=Object.assign({hide:[],hideRooms:[],lights:true,count:true,empty:true,cams:true,theme:''},doc.rooms||{});
 /* cameras for the Rooms dashboard: camera / doorbell devices on the plan, plus the wall display's camera list */
 function rvCams(hd){const out=[],seen=new Set(),add=(id,label)=>{if(!id||seen.has(id)||!/^camera\.[a-z0-9_]+$/.test(id))return;seen.add(id);out.push([id,label])};
   for(const f of doc.floors)for(const d of f.devices)if((d.kind==='camera'||d.kind==='doorbell')&&!hd.has(d.id)){const r=roomAt(f,d.x,d.y),m=r&&mainOf(f,r);add(d.entity,d.name&&!/^(camera|doorbell)$/i.test(d.name)?d.name:(m&&(m.name||ROOM_LABEL[m.type]))||d.name)}
@@ -2051,7 +2155,8 @@ function renderRooms(){const el=$('#rv');if(!el||ui.view!=='rooms')return;const 
   const canEd=!wall;document.body.classList.toggle('rvediting',ed&&wall);
   let h=ed?`<div class="rvhead rvedit"><h1>✏️ Customize the dashboard</h1><button class="rvchip on" data-rv="done">✓ Done</button></div>`+
       `<p class="rvtip">Tap a device or a room's 👁 to hide or show it. Hidden ones are faded here and left out of the dashboard.</p>`+
-      `<div class="rvopts"><label><input type="checkbox" data-rvo="lights"${cfg.lights?' checked':''}> 💡 "Lights on" button at the top</label><label><input type="checkbox" data-rvo="count"${cfg.count?' checked':''}> Number of devices</label><label><input type="checkbox" data-rvo="empty"${cfg.empty?' checked':''}> List of rooms without devices</label><label><input type="checkbox" data-rvo="cams"${cfg.cams?' checked':''}> 📷 Cameras</label></div>`
+      `<div class="rvopts"><label><input type="checkbox" data-rvo="lights"${cfg.lights?' checked':''}> 💡 "Lights on" button at the top</label><label><input type="checkbox" data-rvo="count"${cfg.count?' checked':''}> Number of devices</label><label><input type="checkbox" data-rvo="empty"${cfg.empty?' checked':''}> List of rooms without devices</label><label><input type="checkbox" data-rvo="cams"${cfg.cams?' checked':''}> 📷 Cameras</label></div>`+
+      `<div class="rvthemes"><b>🎨 Style</b>${RV_THEMES.map(([k,l,g])=>`<button class="rvth${(cfg.theme||'')===k?' on':''}" data-rvt="${k}"><i style="background:${g}"></i>${l}</button>`).join('')}</div>`
     :wall?'':`<div class="rvhead"><h1>${esc(doc.title||'My home')}</h1>`+
     (lamps.length&&cfg.lights?`<button class="rvchip${lit?' on':''}" data-rl="all">💡 ${lit?`${lit} light${lit>1?'s':''} on · turn off`:'All lights off'}</button>`:'')+
     (act?`<span class="rvchip">⚡ ${act} on</span>`:'')+(cfg.count?`<span class="rvchip">${all.length} devices</span>`:'')+(canEd?`<button class="rvchip" data-rv="edit" title="Choose which rooms and devices show here">✏️ Customize</button>`:'')+`</div>`;
@@ -2067,17 +2172,19 @@ function renderRooms(){const el=$('#rv');if(!el||ui.view!=='rooms')return;const 
     if(loose.length)h+=`<div class="rcard"><div class="rtop"><div class="rico">📍</div><div class="rname"><b>Other</b><small>Not inside a room</small></div></div><div class="dgrid">${loose.map(d=>tile(d,null)).join('')}</div></div>`;
     h+=`</div>${empty.length&&!wall&&cfg.empty?`<p class="rvmore">No devices yet: ${empty.map(x=>esc(x.r.name||ROOM_LABEL[x.r.type])).join(' · ')}</p>`:''}</section>`}
   if(!any)h+=`<div class="rvnone"><p style="font-size:40px;margin:0">🏠</p><p>No rooms yet. Draw your rooms in <b>2D</b> and add devices to them, and they show up here as a dashboard.</p></div>`;
-  const top=el.scrollTop;if(!el.querySelector('#rvbody'))el.innerHTML='<div id="rvtop"></div><div id="rvcams"></div><div id="rvbody"></div>';
+  if(!el.querySelector('#rvbody'))el.innerHTML='<div class="rvsky"><i></i><i></i><i></i><i></i></div><div id="rvsc"><div id="rvtop"></div><div id="rvcams"></div><div id="rvbody"></div></div>';
+  const th=String((window.HOME3D_CONFIG||{}).rooms_theme||cfg.theme||'').toLowerCase().replace(/[^a-z]/g,'');if(th)el.dataset.th=th;else delete el.dataset.th;
+  const sc=$('#rvsc'),top=sc.scrollTop;
   const cut=h.indexOf('<section class="rvfl">'),head=cut<0?(any?h:''):h.slice(0,cut),body=cut<0?(any?'':h):h.slice(cut);
   $('#rvtop').innerHTML=head;$('#rvbody').innerHTML=body;
   const cams=cfg.cams&&!ed?rvCams(hd):[],sig=JSON.stringify(cams)+ha.on,cz=$('#rvcams');
   if(cz.dataset.sig!==sig){cz.dataset.sig=sig;cz.innerHTML=cams.length?`<section class="rvfl"><h2>📷 Cameras</h2><div class="rvcamg">${cams.map(([id,l])=>`<button class="rvcam" data-rcam="${esc(id)}"><img data-cam="${esc(id)}" alt="" hidden><i>${ha.on?'Loading…':'The picture shows in Home Assistant'}</i><span>${esc(l)}</span></button>`).join('')}</div></section>`:'';rvCamTick(true)}
-  el.scrollTop=top;
+  sc.scrollTop=top;
   if(wall&&!ed)requestAnimationFrame(()=>{let t=0,bt=0;const H=el.getBoundingClientRect();
     for(const z of document.querySelectorAll('#wall .wz')){if(!z.children.length)continue;const r=z.getBoundingClientRect();if(!r.height)continue;
       if(z.dataset.pos[0]==='t')t=Math.max(t,r.bottom-H.top);else bt=Math.max(bt,H.bottom-r.top)}
-    el.style.paddingTop=Math.round(t+16)+'px';el.style.paddingBottom=Math.round(Math.max(bt,70)+16)+'px'});
-  else el.style.paddingTop=el.style.paddingBottom=''}
+    sc.style.paddingTop=Math.round(t+16)+'px';sc.style.paddingBottom=Math.round(Math.max(bt,70)+16)+'px'});
+  else sc.style.paddingTop=sc.style.paddingBottom=''}
 let rvCamT=0;function rvCamTick(now){if(ui.view!=='rooms'||!ha.on||document.hidden)return;const every=(+W().camRefresh||5)*1000;
   if(!now&&Date.now()-rvCamT<every)return;rvCamT=Date.now();for(const img of document.querySelectorAll('#rvcams img[data-cam]'))camLoad(img,img.dataset.cam)}
 setInterval(()=>rvCamTick(false),1000);
@@ -2088,6 +2195,7 @@ function rvFlip(list,id){const c=RV(),s=new Set(c[list]);s.has(id)?s.delete(id):
 $('#rv').addEventListener('change',e=>{const o=e.target.dataset.rvo;if(!o)return;RV()[o]=e.target.checked;save();renderRooms()});
 $('#rv').addEventListener('click',e=>{
   const m=e.target.closest('[data-rv]');if(m){ui.rvEdit=m.dataset.rv==='edit';renderRooms();return}
+  const tb=e.target.closest('[data-rvt]');if(tb){RV().theme=tb.dataset.rvt;save();renderRooms();return}
   const rh=e.target.closest('[data-rh]');if(rh){rvFlip('hideRooms',rh.dataset.rh);return}
   const t=e.target.closest('[data-rd]');
   const rc=e.target.closest('[data-rcam]');if(rc){if(ha.on)camOpen(rc.dataset.rcam,rc.querySelector('span').textContent);return}

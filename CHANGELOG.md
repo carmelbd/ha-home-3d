@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.14.0 (2026-11-17): Dashboard styles
+
+- **🎨 Styles for the Rooms dashboard.** Rooms → ✏️ Customize → 🎨 Style:
+  - **Northern lights:** a night sky with slowly moving green and violet aurora, glowing tiles.
+  - **Apple:** clean and calm like the Home app, white tiles when on, follows light/dark mode.
+  - **Liquid glass:** frosted, see-through glass cards with light edges over moving color.
+  - **Midnight gold:** black and gold, elegant serif title.
+  - **Neon:** dark grid, cyan and pink glow.
+  - **Nordic:** warm beige and terracotta, soft and quiet.
+  - **Classic:** the original look.
+- The style is saved with the design. Card option **`rooms_theme:`** gives one card its own style, for example a wall tablet with `rooms_theme: aurora`.
+- Moving backgrounds stop when the device asks for reduced motion.
+- **🏋️ Gym & fitness:** adjustable incline bench, dumbbells (pair, light/medium/heavy) and a weight plate tree.
+
+**To get it:** HACS → Home 3D → Update, then reload the dashboard (Ctrl/Cmd+Shift+R). In the phone app: Settings → Companion App → Debugging → Reset frontend cache, then reopen the app. Your design is not touched.
+
 ## 1.13.0 (2026-11-17): Gym & fitness
 
 - **🏋️ New palette group: Gym & fitness.** Pull-up & dip station (power tower), parallel bars for dips, multi-gym cable trainer with weight stack, squat rack with barbell and plates, dumbbell rack with 10 dumbbells, weight bench, exercise bike, rowing machine, kettlebells, standing punching bag and yoga mat. The treadmill moved here too.
