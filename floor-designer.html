@@ -83,6 +83,11 @@ button.rvchip{cursor:pointer}button.rvchip.on{background:#f5b400;border-color:#f
 .dt.on i{background:var(--dc);box-shadow:0 0 0 4px color-mix(in srgb,var(--dc) 22%,transparent)}.dt.on small{color:var(--text);font-weight:600}
 .dt.bad small{color:var(--warn)}
 .rvmore{margin:12px 2px 0;color:var(--muted);font-size:13px}
+.rvcamg{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:12px}
+.rvcam{position:relative;padding:0;border:1px solid var(--border);border-radius:16px;overflow:hidden;background:#0b0e13;aspect-ratio:16/9;cursor:pointer}
+.rvcam img{width:100%;height:100%;object-fit:cover;display:block}
+.rvcam i{position:absolute;inset:0;display:grid;place-items:center;color:#8a94a6;font-style:normal;font-size:13px}
+.rvcam span{position:absolute;left:10px;bottom:8px;color:#fff;font-size:14px;font-weight:600;text-shadow:0 1px 3px #000;background:rgba(0,0,0,.35);padding:2px 9px;border-radius:999px}
 .rcard.hid,.dt.hid{opacity:.4}body.rvediting #wall{display:none}.dt.hid{border:1px dashed var(--border)}
 .rvtip{margin:0 2px 10px;color:var(--muted);font-size:13.5px}
 .rvopts{display:flex;flex-wrap:wrap;gap:8px 18px;margin:0 2px 6px;padding:12px 14px;background:var(--panel);border:1px solid var(--border);border-radius:14px}.rvopts label{display:inline-flex;align-items:center;gap:7px;font-size:14px;cursor:pointer}
@@ -1191,7 +1196,7 @@ const curP=()=>{const t=document.documentElement.dataset.theme;return PAL[t?t:(m
 
 function load(){try{const s=localStorage.getItem(KEY);if(s){const d=JSON.parse(s);if(d&&Array.isArray(d.floors)&&d.floors.length)return normalize(d)}}catch(e){}return null}
 function normalize(d){d.title=d.title||'My Home';d.entities=Array.isArray(d.entities)?d.entities:[];d.look=Object.assign({wall:''},d.look||{});
-  d.rooms=Object.assign({hide:[],hideRooms:[],lights:true,count:true,empty:true},d.rooms||{});
+  d.rooms=Object.assign({hide:[],hideRooms:[],lights:true,count:true,empty:true,cams:true},d.rooms||{});
   d.export=Object.assign({mode:'3d',theme:'dark',walls:'cut',angle:'front',btn:'builtin',prefix:'/local/floorplan/',area:true},d.export||{});
   for(const f of d.floors){f.id=f.id||uid();f.rooms=f.rooms||[];f.items=(f.items||[]).filter(i=>FURN[i.kind]);f.devices=(f.devices||[]).filter(x=>DEV[x.kind]);f.w=+f.w||16;f.h=+f.h||11;f.ch=+f.ch||2.7}return d}
 let saveTimer;
@@ -1939,7 +1944,11 @@ function devState(d){const k=DEV[d.kind],dom=k.domain;
   if(dom==='media_player'&&st==='playing'&&a.media_title)return`▶ ${a.media_title}`;
   return capF(st.replace(/_/g,' '))}
 const isLamp=d=>{const k=DEV[d.kind];return k.g==='light'&&k.domain!=='scene'};
-const RV=()=>doc.rooms=Object.assign({hide:[],hideRooms:[],lights:true,count:true,empty:true},doc.rooms||{});
+const RV=()=>doc.rooms=Object.assign({hide:[],hideRooms:[],lights:true,count:true,empty:true,cams:true},doc.rooms||{});
+/* cameras for the Rooms dashboard: camera / doorbell devices on the plan, plus the wall display's camera list */
+function rvCams(hd){const out=[],seen=new Set(),add=(id,label)=>{if(!id||seen.has(id)||!/^camera\.[a-z0-9_]+$/.test(id))return;seen.add(id);out.push([id,label])};
+  for(const f of doc.floors)for(const d of f.devices)if((d.kind==='camera'||d.kind==='doorbell')&&!hd.has(d.id)){const r=roomAt(f,d.x,d.y),m=r&&mainOf(f,r);add(d.entity,d.name&&!/^(camera|doorbell)$/i.test(d.name)?d.name:(m&&(m.name||ROOM_LABEL[m.type]))||d.name)}
+  for(const[id,label]of wlines(W().cams))add(id,label||id);return out.filter(([id])=>!ha.on||stOf(id))}
 function roomsData(){return doc.floors.map((fl,fi)=>{
   const mains=fl.rooms.filter(r=>mainOf(fl,r)===r).sort((a,b)=>(a.y-b.y)||(a.x-b.x)),by=new Map(mains.map(r=>[r.id,[]])),loose=[];
   for(const d of fl.devices){const r=roomAt(fl,d.x,d.y),m=r&&mainOf(fl,r);(m&&by.has(m.id)?by.get(m.id):loose).push(d)}
@@ -1953,7 +1962,7 @@ function renderRooms(){const el=$('#rv');if(!el||ui.view!=='rooms')return;const 
   const canEd=!wall;document.body.classList.toggle('rvediting',ed&&wall);
   let h=ed?`<div class="rvhead rvedit"><h1>✏️ Customize the dashboard</h1><button class="rvchip on" data-rv="done">✓ Done</button></div>`+
       `<p class="rvtip">Tap a device or a room's 👁 to hide or show it. Hidden ones are faded here and left out of the dashboard.</p>`+
-      `<div class="rvopts"><label><input type="checkbox" data-rvo="lights"${cfg.lights?' checked':''}> 💡 "Lights on" button at the top</label><label><input type="checkbox" data-rvo="count"${cfg.count?' checked':''}> Number of devices</label><label><input type="checkbox" data-rvo="empty"${cfg.empty?' checked':''}> List of rooms without devices</label></div>`
+      `<div class="rvopts"><label><input type="checkbox" data-rvo="lights"${cfg.lights?' checked':''}> 💡 "Lights on" button at the top</label><label><input type="checkbox" data-rvo="count"${cfg.count?' checked':''}> Number of devices</label><label><input type="checkbox" data-rvo="empty"${cfg.empty?' checked':''}> List of rooms without devices</label><label><input type="checkbox" data-rvo="cams"${cfg.cams?' checked':''}> 📷 Cameras</label></div>`
     :wall?'':`<div class="rvhead"><h1>${esc(doc.title||'My home')}</h1>`+
     (lamps.length&&cfg.lights?`<button class="rvchip${lit?' on':''}" data-rl="all">💡 ${lit?`${lit} light${lit>1?'s':''} on · turn off`:'All lights off'}</button>`:'')+
     (act?`<span class="rvchip">⚡ ${act} on</span>`:'')+(cfg.count?`<span class="rvchip">${all.length} devices</span>`:'')+(canEd?`<button class="rvchip" data-rv="edit" title="Choose which rooms and devices show here">✏️ Customize</button>`:'')+`</div>`;
@@ -1962,19 +1971,27 @@ function renderRooms(){const el=$('#rv');if(!el||ui.view!=='rooms')return;const 
     h+=`<section class="rvfl">${multi?`<h2>${esc(fl.name)}</h2>`:''}<div class="rvgrid">`;
     for(const {r,devs} of withDev){const sens=ha.on?devs.filter(d=>d.kind==='temp'||d.kind==='humidity'):[],rest=devs.filter(d=>!sens.includes(d)),ls=devs.filter(isLamp),on=ls.filter(d=>ON.has(d.id)).length;
       const sv=sens.map(d=>{const s=haState(d);return s&&s.state!=='unavailable'&&s.state!=='unknown'?`<span>${DEV[d.kind].emoji} ${esc(s.state)}${d.kind==='temp'?'°':'%'}</span>`:''}).join('');
-      h+=`<div class="rcard${hr.has(r.id)?' hid':''}" style="--rc:${(P.rooms||{})[r.type]||'var(--panel2)'}"><div class="rtop"><div class="rico">${ROOM_EMOJI[r.type]||'🏠'}</div><div class="rname"><b>${esc(r.name)}</b><small>${groupArea(fl,r).toFixed(0)} m² · ${devs.length} device${devs.length>1?'s':''}</small></div>`+
+      h+=`<div class="rcard${hr.has(r.id)?' hid':''}" style="--rc:${(P.rooms||{})[r.type]||'var(--panel2)'}"><div class="rtop"><div class="rico">${ROOM_EMOJI[r.type]||'🏠'}</div><div class="rname"><b>${esc(r.name||ROOM_LABEL[r.type]||'Room')}</b><small>${groupArea(fl,r).toFixed(0)} m² · ${devs.length} device${devs.length>1?'s':''}</small></div>`+
         (sv?`<div class="rsens">${sv}</div>`:'')+
         (ed?`<button class="rlt" data-rh="${r.id}">${hr.has(r.id)?'🚫 Hidden':'👁 Shown'}</button>`:ls.length>1?`<button class="rlt${on?' on':''}" data-rl="${fi}:${r.id}" title="All lights in ${esc(r.name)}">💡 ${on}/${ls.length}</button>`:'')+
         `</div>${rest.length?`<div class="dgrid">${rest.map(d=>tile(d,r)).join('')}</div>`:''}</div>`}
     if(loose.length)h+=`<div class="rcard"><div class="rtop"><div class="rico">📍</div><div class="rname"><b>Other</b><small>Not inside a room</small></div></div><div class="dgrid">${loose.map(d=>tile(d,null)).join('')}</div></div>`;
-    h+=`</div>${empty.length&&!wall&&cfg.empty?`<p class="rvmore">No devices yet: ${empty.map(x=>esc(x.r.name)).join(' · ')}</p>`:''}</section>`}
+    h+=`</div>${empty.length&&!wall&&cfg.empty?`<p class="rvmore">No devices yet: ${empty.map(x=>esc(x.r.name||ROOM_LABEL[x.r.type])).join(' · ')}</p>`:''}</section>`}
   if(!any)h+=`<div class="rvnone"><p style="font-size:40px;margin:0">🏠</p><p>No rooms yet. Draw your rooms in <b>2D</b> and add devices to them, and they show up here as a dashboard.</p></div>`;
-  const top=el.scrollTop;el.innerHTML=h;el.scrollTop=top;
+  const top=el.scrollTop;if(!el.querySelector('#rvbody'))el.innerHTML='<div id="rvtop"></div><div id="rvcams"></div><div id="rvbody"></div>';
+  const cut=h.indexOf('<section class="rvfl">'),head=cut<0?(any?h:''):h.slice(0,cut),body=cut<0?(any?'':h):h.slice(cut);
+  $('#rvtop').innerHTML=head;$('#rvbody').innerHTML=body;
+  const cams=cfg.cams&&!ed?rvCams(hd):[],sig=JSON.stringify(cams)+ha.on,cz=$('#rvcams');
+  if(cz.dataset.sig!==sig){cz.dataset.sig=sig;cz.innerHTML=cams.length?`<section class="rvfl"><h2>📷 Cameras</h2><div class="rvcamg">${cams.map(([id,l])=>`<button class="rvcam" data-rcam="${esc(id)}"><img data-cam="${esc(id)}" alt="" hidden><i>${ha.on?'Loading…':'The picture shows in Home Assistant'}</i><span>${esc(l)}</span></button>`).join('')}</div></section>`:'';rvCamTick(true)}
+  el.scrollTop=top;
   if(wall&&!ed)requestAnimationFrame(()=>{let t=0,bt=0;const H=el.getBoundingClientRect();
     for(const z of document.querySelectorAll('#wall .wz')){if(!z.children.length)continue;const r=z.getBoundingClientRect();if(!r.height)continue;
       if(z.dataset.pos[0]==='t')t=Math.max(t,r.bottom-H.top);else bt=Math.max(bt,H.bottom-r.top)}
     el.style.paddingTop=Math.round(t+16)+'px';el.style.paddingBottom=Math.round(Math.max(bt,70)+16)+'px'});
   else el.style.paddingTop=el.style.paddingBottom=''}
+let rvCamT=0;function rvCamTick(now){if(ui.view!=='rooms'||!ha.on||document.hidden)return;const every=(+W().camRefresh||5)*1000;
+  if(!now&&Date.now()-rvCamT<every)return;rvCamT=Date.now();for(const img of document.querySelectorAll('#rvcams img[data-cam]'))camLoad(img,img.dataset.cam)}
+setInterval(()=>rvCamTick(false),1000);
 function roomLights(ls){if(!ls.length||(wallOn()&&!W().control))return;const any=ls.some(d=>ON.has(d.id));
   if(ha.on)haLights(ls,!any);else for(const d of ls)any?ON.delete(d.id):ON.add(d.id);
   flash(any?'Lights off':'Lights on');renderRooms()}
@@ -1984,7 +2001,9 @@ $('#rv').addEventListener('click',e=>{
   const m=e.target.closest('[data-rv]');if(m){ui.rvEdit=m.dataset.rv==='edit';renderRooms();return}
   const rh=e.target.closest('[data-rh]');if(rh){rvFlip('hideRooms',rh.dataset.rh);return}
   const t=e.target.closest('[data-rd]');
-  if(t){if(ui.rvEdit){rvFlip('hide',t.dataset.rd);return}const d=doc.floors.flatMap(f=>f.devices).find(x=>x.id===t.dataset.rd);if(d){toggleDev(d);renderRooms()}return}
+  const rc=e.target.closest('[data-rcam]');if(rc){if(ha.on)camOpen(rc.dataset.rcam,rc.querySelector('span').textContent);return}
+  if(t){if(ui.rvEdit){rvFlip('hide',t.dataset.rd);return}const d=doc.floors.flatMap(f=>f.devices).find(x=>x.id===t.dataset.rd);if(!d)return;
+    if(ha.on&&(d.kind==='camera'||d.kind==='doorbell')&&stOf(d.entity)){camOpen(d.entity,d.name);return}toggleDev(d);renderRooms();return}
   const l=e.target.closest('[data-rl]');if(!l)return;const v=l.dataset.rl;
   if(v==='all'){const ls=doc.floors.flatMap(f=>f.devices).filter(isLamp),on=ls.filter(d=>ON.has(d.id));roomLights(on.length?on:ls);return}
   const[fi,rid]=v.split(':'),fl=doc.floors[+fi];if(!fl)return;const room=fl.rooms.find(r=>r.id===rid);if(!room)return;
@@ -2235,8 +2254,9 @@ $('#wall').addEventListener('click',e=>{
     if(!ha.on){flash(`${sb.textContent.trim()}: runs when connected to Home Assistant`);return}
     const svc={scene:'turn_on',script:'turn_on',button:'press',input_button:'press',automation:'trigger'}[dom]||'toggle';hass().callService(svc==='toggle'?'homeassistant':dom,svc,{entity_id:id});return}
   const cb=e.target.closest('[data-campop]');
-  if(cb){const id=cb.dataset.campop;$('#cpTitle').textContent=cb.querySelector('span').textContent;$('#camPop').dataset.cam=id;camLoad($('#cpImg'),id);$('#cpPtz').hidden=true;camPlatform(id).then(p=>{if($('#camPop').dataset.cam===id)$('#cpPtz').hidden=!(p==='eufy_security'||p==='onvif')});$('#camPop').showModal();
-    clearInterval(WALL.cpT);WALL.cpT=setInterval(()=>{if(!$('#camPop').open){clearInterval(WALL.cpT);return}camLoad($('#cpImg'),id)},1000)}});
+  if(cb)camOpen(cb.dataset.campop,cb.querySelector('span').textContent)});
+function camOpen(id,label){$('#cpTitle').textContent=label;$('#camPop').dataset.cam=id;$('#cpImg').hidden=true;camLoad($('#cpImg'),id);$('#cpPtz').hidden=true;camPlatform(id).then(p=>{if($('#camPop').dataset.cam===id)$('#cpPtz').hidden=!(p==='eufy_security'||p==='onvif')});$('#camPop').showModal();
+  clearInterval(WALL.cpT);WALL.cpT=setInterval(()=>{if(!$('#camPop').open){clearInterval(WALL.cpT);return}camLoad($('#cpImg'),id)},1000)}
 $('#cpClose').onclick=()=>$('#camPop').close();
 $('#cpPtz').addEventListener('click',e=>{const b=e.target.closest('[data-ptz]');if(!b)return;e.stopPropagation();camPtz($('#camPop').dataset.cam,b.dataset.ptz)});
 $('#camPop').addEventListener('click',e=>{if(e.target===$('#camPop')||e.target===$('#cpImg'))$('#camPop').close()});

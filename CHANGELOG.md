@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.11.0 (2026-11-16): Cameras on the Rooms dashboard
+
+- **📷 Cameras on the Rooms dashboard.** Live camera pictures at the top of the Rooms view, refreshing like on the wall display (every 5 seconds by default, set in Wall settings). Tap one to see it big, with the pan-and-tilt arrows for Eufy and ONVIF cameras. The cameras come from the camera and doorbell devices on your plan and from the wall display's camera list.
+- Tapping a camera button inside a room card also opens it big.
+- **✏️ Customize** has a **📷 Cameras** switch, and hiding a camera device hides its picture too.
+- Rooms without a name show their type (for example "Balcony / patio") instead of a blank title.
+
 ## 1.10.1 (2026-11-16): The Rooms dashboard on any dashboard
 
 - New card option **`dashboard:`**. A Home 3D card on another dashboard (for example your main Overview) can now show your house: point it at your Home 3D dashboard, for example `dashboard: dashboard-home`, and add `view: rooms` for the Rooms dashboard. Before, such a card started empty.
