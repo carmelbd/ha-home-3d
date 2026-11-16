@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.10.0 (2026-11-16): Choose what the dashboard shows
+
+- **✏️ Customize the Rooms dashboard.** Tap **✏️ Customize** at the top of the Rooms view, then tap any device or a room's 👁 to hide or show it. You can also turn off the "lights on" button, the device count and the list of rooms without devices. Your choices are saved with the design.
+- **Wall display buttons:**
+  - The bar now has direct **2D**, **3D** and **▦ Rooms** buttons, instead of one button that cycled through them.
+  - Pick which buttons appear in **⚙ Settings → Buttons on the bar**, for example to remove **💡 All lights**. **⚙ Settings** and **✕ Exit** always stay.
+  - **⚙ Settings → ✏️ Choose rooms & devices** opens the Rooms customizing straight from the wall display.
+
 ## 1.9.0 (2026-11-16): Rooms dashboard
 
 - **New view: ▦ Rooms**, next to 2D and 3D. The whole house as a dashboard, without the 3D:

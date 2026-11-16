@@ -8,7 +8,7 @@ Draw your home, walk around it in 3D, and control your real devices from the pla
 
 **Now on HACS!** [Install with HACS](#install-with-hacs-about-2-minutes) and future updates arrive as one click. **Already installed by hand?** See [Updating](#updating-to-a-new-version). Your design is kept.
 
-- **▦ Rooms dashboard (1.9.0).** A new **Rooms** button next to 2D and 3D shows the whole house as a dashboard: a card for every room with its name, size and a button for each device, live from Home Assistant. Tap a light to switch it, tap an AC, TV or lock to open its controls, and use **💡 2/3** on a card to switch all the lights in that room. Temperature and humidity show at the top of each card. It also works on the wall display, and you can open the card straight into it with `view: rooms`.
+- **▦ Rooms dashboard (1.9.0).** A new **Rooms** button next to 2D and 3D shows the whole house as a dashboard: a card for every room with its name, size and a button for each device, live from Home Assistant. Tap a light to switch it, tap an AC, TV or lock to open its controls, and use **💡 2/3** on a card to switch all the lights in that room. Temperature and humidity show at the top of each card. It also works on the wall display, and you can open the card straight into it with `view: rooms`. Tap **✏️ Customize** to hide rooms or devices you don't need there (1.10.0).
 
 ![The Rooms dashboard: a card for each room with its devices](screenshots/rooms-view.jpg)
 
@@ -158,7 +158,7 @@ type: custom:home-3d-card
 wall: true
 ```
 
-To open the card straight into a view, add `view: rooms` (the Rooms dashboard), `view: 3d` or `view: 2d`. On the wall display, **🔁 View** switches between 3D, Rooms and 2D, and **⚙ Wall settings → View** picks the one it starts with.
+To open the card straight into a view, add `view: rooms` (the Rooms dashboard), `view: 3d` or `view: 2d`. On the wall display, the **2D**, **3D** and **▦ Rooms** buttons switch views, and **⚙ Settings → View** picks the one it starts with. **⚙ Settings → Buttons on the bar** chooses which buttons the bar shows.
 
 **Tips for a wall tablet:** use the Home Assistant app and turn on its full-screen option, and set the tablet's Auto-Lock to **Never** (or use Guided Access on an iPad) so the screen stays on. Camera pictures are snapshots that refresh, not smooth video. See [Cameras, including Eufy](#cameras-including-eufy).
 

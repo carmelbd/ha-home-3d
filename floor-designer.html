@@ -83,6 +83,9 @@ button.rvchip{cursor:pointer}button.rvchip.on{background:#f5b400;border-color:#f
 .dt.on i{background:var(--dc);box-shadow:0 0 0 4px color-mix(in srgb,var(--dc) 22%,transparent)}.dt.on small{color:var(--text);font-weight:600}
 .dt.bad small{color:var(--warn)}
 .rvmore{margin:12px 2px 0;color:var(--muted);font-size:13px}
+.rcard.hid,.dt.hid{opacity:.4}body.rvediting #wall{display:none}.dt.hid{border:1px dashed var(--border)}
+.rvtip{margin:0 2px 10px;color:var(--muted);font-size:13.5px}
+.rvopts{display:flex;flex-wrap:wrap;gap:8px 18px;margin:0 2px 6px;padding:12px 14px;background:var(--panel);border:1px solid var(--border);border-radius:14px}.rvopts label{display:inline-flex;align-items:center;gap:7px;font-size:14px;cursor:pointer}
 .rvnone{max-width:420px;margin:12vh auto;text-align:center;color:var(--muted)}
 body.wall #rv{padding:24px 28px 96px}
 @media (max-width:600px){#rv{padding:16px 14px 28px}.rvhead h1{font-size:20px;width:100%}}
@@ -237,6 +240,7 @@ body.wall #stage,body.wall #stage *{touch-action:none}
 .ptz button:active{background:rgba(255,255,255,.35)}
 .ptz [data-ptz=up]{grid-area:1/2}.ptz [data-ptz=left]{grid-area:2/1}.ptz [data-ptz='360']{grid-area:2/2;font-size:24px}.ptz [data-ptz=right]{grid-area:2/3}.ptz [data-ptz=down]{grid-area:3/2}
 .wsq{grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap}
+.wsck{display:flex;flex-wrap:wrap;gap:6px 14px}.wsck label{display:inline-flex;align-items:center;gap:6px;font-size:14px;cursor:pointer}
 #wallSet .seclbl{grid-column:1/-1;font-weight:600;font-size:13px;margin:10px 0 -4px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
 body.kiosk #palette,body.kiosk #props,body.kiosk .ed{display:none}
 #haLive{font-size:12px;padding:3px 8px;border-radius:999px;background:var(--accent-soft);color:var(--accent);white-space:nowrap}
@@ -283,7 +287,7 @@ body.view #palette,body.view #props,body.view .ed{display:none!important}
       <div class="v3bar" id="v3bar"><button data-v3="floor">This floor</button><button data-v3="all">Whole house</button><button data-v3="full">Full-height walls</button><button data-v3="explode">↕ Explode</button><button data-v3="night">🌙 Night</button><button data-v3="lights">💡 All lights</button><button data-v3="reset">Reset view</button></div></div>
   <div id="rv" hidden></div>
   <div id="wall" hidden><div class="wz" data-pos="tl"></div><div class="wz" data-pos="tc"></div><div class="wz" data-pos="tr"></div><div class="wz" data-pos="bl"></div><div class="wz" data-pos="bc"></div><div class="wz" data-pos="br"></div></div>
-    <div class="wbar off" id="wallBar" hidden><button data-w="view">🔁 View</button><button data-w="all">🏠 Whole house</button><button data-w="night">🌙 Night</button><button data-w="lights">💡 All lights</button><button data-w="reset">⟲ View</button><button data-w="set">⚙ Wall settings</button><button data-w="exit">✕ Exit</button></div>
+    <div class="wbar off" id="wallBar" hidden><button data-w="v2d">2D</button><button data-w="v3d">3D</button><button data-w="vrooms">▦ Rooms</button><button data-w="all">🏠 Whole house</button><button data-w="night">🌙 Night</button><button data-w="lights">💡 All lights</button><button data-w="reset">⟲ Reset view</button><button data-w="set">⚙ Settings</button><button data-w="exit">✕ Exit</button></div>
     <div id="saver" hidden><div class="in"><div class="wtime" id="saverTime"></div><div class="wdate" id="saverDate"></div></div></div>
   </section>
   <aside id="props"></aside>
@@ -1187,6 +1191,7 @@ const curP=()=>{const t=document.documentElement.dataset.theme;return PAL[t?t:(m
 
 function load(){try{const s=localStorage.getItem(KEY);if(s){const d=JSON.parse(s);if(d&&Array.isArray(d.floors)&&d.floors.length)return normalize(d)}}catch(e){}return null}
 function normalize(d){d.title=d.title||'My Home';d.entities=Array.isArray(d.entities)?d.entities:[];d.look=Object.assign({wall:''},d.look||{});
+  d.rooms=Object.assign({hide:[],hideRooms:[],lights:true,count:true,empty:true},d.rooms||{});
   d.export=Object.assign({mode:'3d',theme:'dark',walls:'cut',angle:'front',btn:'builtin',prefix:'/local/floorplan/',area:true},d.export||{});
   for(const f of d.floors){f.id=f.id||uid();f.rooms=f.rooms||[];f.items=(f.items||[]).filter(i=>FURN[i.kind]);f.devices=(f.devices||[]).filter(x=>DEV[x.kind]);f.w=+f.w||16;f.h=+f.h||11;f.ch=+f.ch||2.7}return d}
 let saveTimer;
@@ -1907,7 +1912,7 @@ function pick3D(e){
   else if(d&&DEV[d.kind].tap==='toggle'){ON.has(d.id)?ON.delete(d.id):ON.add(d.id);hintMsg=`${d.name}: ${ON.has(d.id)?'on':'off'}`;clearTimeout(hintTimer);hintTimer=setTimeout(()=>{hintMsg=null;renderPlan()},2200)}
   renderAll();
 }
-function setView(v){ui.view=v;ui.tool='select';ui.draft=null;renderAll()}
+function setView(v){ui.view=v;ui.rvEdit=false;ui.tool='select';ui.draft=null;renderAll()}
 $('#v2Btn').onclick=()=>setView('2d');$('#v3Btn').onclick=()=>setView('3d');$('#vrBtn').onclick=()=>setView('rooms');
 $('#v3bar').addEventListener('click',e=>{const b=e.target.closest('[data-v3]');if(!b)return;const a=b.dataset.v3;
   if(a==='floor')ui.v3all=false;else if(a==='all')ui.v3all=true;else if(a==='full')ui.v3full=!ui.v3full;else if(a==='night')ui.night=!ui.night;else if(a==='explode'){ui.explode=!ui.explode;ui.v3all=true}
@@ -1932,32 +1937,38 @@ function devState(d){const k=DEV[d.kind],dom=k.domain;
   if(dom==='media_player'&&st==='playing'&&a.media_title)return`▶ ${a.media_title}`;
   return capF(st.replace(/_/g,' '))}
 const isLamp=d=>{const k=DEV[d.kind];return k.g==='light'&&k.domain!=='scene'};
+const RV=()=>doc.rooms=Object.assign({hide:[],hideRooms:[],lights:true,count:true,empty:true},doc.rooms||{});
 function roomsData(){return doc.floors.map((fl,fi)=>{
   const mains=fl.rooms.filter(r=>mainOf(fl,r)===r).sort((a,b)=>(a.y-b.y)||(a.x-b.x)),by=new Map(mains.map(r=>[r.id,[]])),loose=[];
   for(const d of fl.devices){const r=roomAt(fl,d.x,d.y),m=r&&mainOf(fl,r);(m&&by.has(m.id)?by.get(m.id):loose).push(d)}
   return{fl,fi,rooms:mains.map(r=>({r,devs:by.get(r.id)})),loose}})}
-function renderRooms(){const el=$('#rv');if(!el||ui.view!=='rooms')return;const P=curP(),wall=wallOn(),data=roomsData();
-  const all=doc.floors.flatMap(f=>f.devices),lamps=all.filter(isLamp),lit=lamps.filter(d=>ON.has(d.id)).length,act=all.filter(d=>!isLamp(d)&&DEV[d.kind].tap==='toggle'&&ON.has(d.id)).length;
+function renderRooms(){const el=$('#rv');if(!el||ui.view!=='rooms')return;const P=curP(),wall=wallOn(),ed=!!ui.rvEdit,cfg=RV(),hd=new Set(cfg.hide),hr=new Set(cfg.hideRooms),
+    data=roomsData().map(x=>({...x,rooms:x.rooms.filter(o=>ed||!hr.has(o.r.id)).map(o=>({r:o.r,devs:ed?o.devs:o.devs.filter(d=>!hd.has(d.id))})),loose:ed?x.loose:x.loose.filter(d=>!hd.has(d.id))}));
+  const all=doc.floors.flatMap(f=>f.devices).filter(d=>!hd.has(d.id)),lamps=all.filter(isLamp),lit=lamps.filter(d=>ON.has(d.id)).length,act=all.filter(d=>!isLamp(d)&&DEV[d.kind].tap==='toggle'&&ON.has(d.id)).length;
   const multi=data.filter(x=>x.rooms.length||x.loose.length).length>1;
   const tile=(d,room)=>{const k=DEV[d.kind],on=ON.has(d.id),st=devState(d),bad=ha.on&&/^(Not linked|Not in HA|Unavailable)$/.test(st);
-    return`<button class="dt${on?' on':''}${bad?' bad':''}" data-rd="${d.id}" style="--dc:${k.color}" title="${esc(d.name)}${d.entity?' — '+esc(d.entity):''}"><i>${k.emoji}</i><b>${esc(devShort(d,room))}</b><small>${esc(st)}</small></button>`};
-  let h=wall?'':`<div class="rvhead"><h1>${esc(doc.title||'My home')}</h1>`+
-    (lamps.length?`<button class="rvchip${lit?' on':''}" data-rl="all">💡 ${lit?`${lit} light${lit>1?'s':''} on · turn off`:'All lights off'}</button>`:'')+
-    (act?`<span class="rvchip">⚡ ${act} on</span>`:'')+`<span class="rvchip">${all.length} devices</span></div>`;
+    const hid=hd.has(d.id);return`<button class="dt${on&&!ed?' on':''}${bad?' bad':''}${hid?' hid':''}" data-rd="${d.id}" style="--dc:${k.color}" title="${esc(d.name)}${d.entity?' — '+esc(d.entity):''}"><i>${k.emoji}</i><b>${esc(devShort(d,room))}</b><small>${ed?(hid?'🚫 Hidden':'👁 Shown'):esc(st)}</small></button>`};
+  const canEd=!wall;document.body.classList.toggle('rvediting',ed&&wall);
+  let h=ed?`<div class="rvhead rvedit"><h1>✏️ Customize the dashboard</h1><button class="rvchip on" data-rv="done">✓ Done</button></div>`+
+      `<p class="rvtip">Tap a device or a room's 👁 to hide or show it. Hidden ones are faded here and left out of the dashboard.</p>`+
+      `<div class="rvopts"><label><input type="checkbox" data-rvo="lights"${cfg.lights?' checked':''}> 💡 "Lights on" button at the top</label><label><input type="checkbox" data-rvo="count"${cfg.count?' checked':''}> Number of devices</label><label><input type="checkbox" data-rvo="empty"${cfg.empty?' checked':''}> List of rooms without devices</label></div>`
+    :wall?'':`<div class="rvhead"><h1>${esc(doc.title||'My home')}</h1>`+
+    (lamps.length&&cfg.lights?`<button class="rvchip${lit?' on':''}" data-rl="all">💡 ${lit?`${lit} light${lit>1?'s':''} on · turn off`:'All lights off'}</button>`:'')+
+    (act?`<span class="rvchip">⚡ ${act} on</span>`:'')+(cfg.count?`<span class="rvchip">${all.length} devices</span>`:'')+(canEd?`<button class="rvchip" data-rv="edit" title="Choose which rooms and devices show here">✏️ Customize</button>`:'')+`</div>`;
   let any=false;
   for(const {fl,fi,rooms,loose} of data){const withDev=rooms.filter(x=>x.devs.length),empty=rooms.filter(x=>!x.devs.length);if(!withDev.length&&!loose.length&&!empty.length)continue;any=true;
     h+=`<section class="rvfl">${multi?`<h2>${esc(fl.name)}</h2>`:''}<div class="rvgrid">`;
     for(const {r,devs} of withDev){const sens=ha.on?devs.filter(d=>d.kind==='temp'||d.kind==='humidity'):[],rest=devs.filter(d=>!sens.includes(d)),ls=devs.filter(isLamp),on=ls.filter(d=>ON.has(d.id)).length;
       const sv=sens.map(d=>{const s=haState(d);return s&&s.state!=='unavailable'&&s.state!=='unknown'?`<span>${DEV[d.kind].emoji} ${esc(s.state)}${d.kind==='temp'?'°':'%'}</span>`:''}).join('');
-      h+=`<div class="rcard" style="--rc:${(P.rooms||{})[r.type]||'var(--panel2)'}"><div class="rtop"><div class="rico">${ROOM_EMOJI[r.type]||'🏠'}</div><div class="rname"><b>${esc(r.name)}</b><small>${groupArea(fl,r).toFixed(0)} m² · ${devs.length} device${devs.length>1?'s':''}</small></div>`+
+      h+=`<div class="rcard${hr.has(r.id)?' hid':''}" style="--rc:${(P.rooms||{})[r.type]||'var(--panel2)'}"><div class="rtop"><div class="rico">${ROOM_EMOJI[r.type]||'🏠'}</div><div class="rname"><b>${esc(r.name)}</b><small>${groupArea(fl,r).toFixed(0)} m² · ${devs.length} device${devs.length>1?'s':''}</small></div>`+
         (sv?`<div class="rsens">${sv}</div>`:'')+
-        (ls.length>1?`<button class="rlt${on?' on':''}" data-rl="${fi}:${r.id}" title="All lights in ${esc(r.name)}">💡 ${on}/${ls.length}</button>`:'')+
+        (ed?`<button class="rlt" data-rh="${r.id}">${hr.has(r.id)?'🚫 Hidden':'👁 Shown'}</button>`:ls.length>1?`<button class="rlt${on?' on':''}" data-rl="${fi}:${r.id}" title="All lights in ${esc(r.name)}">💡 ${on}/${ls.length}</button>`:'')+
         `</div>${rest.length?`<div class="dgrid">${rest.map(d=>tile(d,r)).join('')}</div>`:''}</div>`}
     if(loose.length)h+=`<div class="rcard"><div class="rtop"><div class="rico">📍</div><div class="rname"><b>Other</b><small>Not inside a room</small></div></div><div class="dgrid">${loose.map(d=>tile(d,null)).join('')}</div></div>`;
-    h+=`</div>${empty.length&&!wall?`<p class="rvmore">No devices yet: ${empty.map(x=>esc(x.r.name)).join(' · ')}</p>`:''}</section>`}
+    h+=`</div>${empty.length&&!wall&&cfg.empty?`<p class="rvmore">No devices yet: ${empty.map(x=>esc(x.r.name)).join(' · ')}</p>`:''}</section>`}
   if(!any)h+=`<div class="rvnone"><p style="font-size:40px;margin:0">🏠</p><p>No rooms yet. Draw your rooms in <b>2D</b> and add devices to them, and they show up here as a dashboard.</p></div>`;
   const top=el.scrollTop;el.innerHTML=h;el.scrollTop=top;
-  if(wall)requestAnimationFrame(()=>{let t=0,bt=0;const H=el.getBoundingClientRect();
+  if(wall&&!ed)requestAnimationFrame(()=>{let t=0,bt=0;const H=el.getBoundingClientRect();
     for(const z of document.querySelectorAll('#wall .wz')){if(!z.children.length)continue;const r=z.getBoundingClientRect();if(!r.height)continue;
       if(z.dataset.pos[0]==='t')t=Math.max(t,r.bottom-H.top);else bt=Math.max(bt,H.bottom-r.top)}
     el.style.paddingTop=Math.round(t+16)+'px';el.style.paddingBottom=Math.round(Math.max(bt,70)+16)+'px'});
@@ -1965,8 +1976,13 @@ function renderRooms(){const el=$('#rv');if(!el||ui.view!=='rooms')return;const 
 function roomLights(ls){if(!ls.length||(wallOn()&&!W().control))return;const any=ls.some(d=>ON.has(d.id));
   if(ha.on)haLights(ls,!any);else for(const d of ls)any?ON.delete(d.id):ON.add(d.id);
   flash(any?'Lights off':'Lights on');renderRooms()}
-$('#rv').addEventListener('click',e=>{const t=e.target.closest('[data-rd]');
-  if(t){const d=doc.floors.flatMap(f=>f.devices).find(x=>x.id===t.dataset.rd);if(d){toggleDev(d);renderRooms()}return}
+function rvFlip(list,id){const c=RV(),s=new Set(c[list]);s.has(id)?s.delete(id):s.add(id);c[list]=[...s];save();renderRooms()}
+$('#rv').addEventListener('change',e=>{const o=e.target.dataset.rvo;if(!o)return;RV()[o]=e.target.checked;save();renderRooms()});
+$('#rv').addEventListener('click',e=>{
+  const m=e.target.closest('[data-rv]');if(m){ui.rvEdit=m.dataset.rv==='edit';renderRooms();return}
+  const rh=e.target.closest('[data-rh]');if(rh){rvFlip('hideRooms',rh.dataset.rh);return}
+  const t=e.target.closest('[data-rd]');
+  if(t){if(ui.rvEdit){rvFlip('hide',t.dataset.rd);return}const d=doc.floors.flatMap(f=>f.devices).find(x=>x.id===t.dataset.rd);if(d){toggleDev(d);renderRooms()}return}
   const l=e.target.closest('[data-rl]');if(!l)return;const v=l.dataset.rl;
   if(v==='all'){const ls=doc.floors.flatMap(f=>f.devices).filter(isLamp),on=ls.filter(d=>ON.has(d.id));roomLights(on.length?on:ls);return}
   const[fi,rid]=v.split(':'),fl=doc.floors[+fi];if(!fl)return;const room=fl.rooms.find(r=>r.id===rid);if(!room)return;
@@ -2072,7 +2088,10 @@ const WALL_DEF={view:'3d',all:true,full:false,clock:'digital',pos:'tl',size:'l',
   info:'tr',weather:'',weatherStyle:'forecast',weatherLook:'color',weatherPos:'tr',weatherSrc:'device',weatherTracker:'',sensors:'',lights:true,
   scenes:'',scenesPos:'bl',cams:'',camPos:'br',camSize:'m',camRefresh:5,
   buttons:'tap',labels:false,area:false,devices:true,control:true,
-  rotate:'off',night:'auto',saver:0,saverStyle:'clock',wake:true};
+  rotate:'off',night:'auto',saver:0,saverStyle:'clock',wake:true,bar:['v2d','v3d','vrooms','all','night','lights','reset']};
+const BAR_OPTS=[['v2d','2D'],['v3d','3D'],['vrooms','▦ Rooms'],['all','🏠 Whole house'],['night','🌙 Night'],['lights','💡 All lights'],['reset','⟲ Reset view']];
+function wallBarButtons(){const w=W(),on=Array.isArray(w.bar)?w.bar:WALL_DEF.bar;for(const[k]of BAR_OPTS){const b=$(`#wallBar [data-w=${k}]`);if(b)b.hidden=!on.includes(k)}
+  for(const[k,v]of[['v2d','2d'],['v3d','3d'],['vrooms','rooms']]){const b=$(`#wallBar [data-w=${k}]`);if(b)b.classList.toggle('on',ui.view===v)}}
 const W=()=>doc.wall=Object.assign({},WALL_DEF,doc.wall||{});
 const WALL={on:false,prev:null,pause:0,barT:null,taps:[],idle:Date.now(),wake:null,raf:0,tick:null};
 const wallOn=()=>WALL.on;
@@ -2229,7 +2248,7 @@ function wallSpin(){cancelAnimationFrame(WALL.raf);if(!WALL.on||!V.ctl)return;co
   if(w.rotate==='off'||ui.view!=='3d')return;
   const loop=()=>{if(!WALL.on)return;const go=Date.now()>WALL.pause;V.ctl.autoRotate=go;V.ctl.autoRotateSpeed=w.rotate==='slow'?.25:.7;if(go)V.ctl.update();WALL.raf=requestAnimationFrame(loop)};loop()}
 async function wallWake(){if(!WALL.on||!W().wake||!navigator.wakeLock)return;try{WALL.wake=await navigator.wakeLock.request('screen')}catch(e){}}
-function wallApply(){const w=W();ui.view=w.view;ui.v3all=w.all;ui.v3full=w.full;ui.preview=true;ui.sel=null;ui.tool='select';ui.draft=null;wallNight();
+function wallApply(){const w=W();ui.view=w.view;ui.v3all=w.all;ui.v3full=w.full;ui.preview=true;ui.sel=null;ui.tool='select';ui.draft=null;wallNight();wallBarButtons();
   $('#wallBar').querySelector('[data-w=night]').classList.toggle('on',ui.night);
   renderAll();requestAnimationFrame(()=>{size3D();if(ui.view==='3d')render3DView(true);wallSpin()});wallRender();wallBar(w.buttons!=='never')}
 function setWall(on){if(on===WALL.on)return;WALL.on=on;try{localStorage.setItem(KEY+'-wall',on?'1':'0')}catch(e){}
@@ -2263,6 +2282,7 @@ $('#wallBar').addEventListener('click',e=>{const b=e.target.closest('[data-w]');
     b.classList.add('confirm');b.textContent='✕ Tap again to exit';clearTimeout(WALL.exitT);WALL.exitT=setTimeout(()=>{b.classList.remove('confirm');b.textContent='✕ Exit'},3000);return}
   if(a==='set'){wallForm();$('#wallSet').showModal();return}
   if(a==='view'){w.view={'2d':'3d','3d':'rooms',rooms:'2d'}[ui.view]||'3d';save();wallApply();return}
+  if(a==='v2d'||a==='v3d'||a==='vrooms'){w.view={v2d:'2d',v3d:'3d',vrooms:'rooms'}[a];save();wallApply();return}
   if(a==='all'){w.all=!ui.v3all;if(ui.view!=='3d')w.view='3d';save();wallApply();return}
   if(a==='night'){ui.night=!ui.night;b.classList.toggle('on',ui.night);document.body.classList.toggle('wnight',ui.night);refreshViews();wallRender();return}
   if(a==='reset'){if(ui.view==='3d')render3DView(true);return}
@@ -2282,16 +2302,19 @@ const WS_FIELDS=[['quick'],
   ['sec','Scenes'],['scenesPos','Scene buttons position',POS],['scenes','Scene buttons — one per line: entity | label | emoji (scenes, scripts or buttons)','area','scene.movie_night | Movie | 🎬&#10;scene.good_night | Good night | 🌙&#10;script.pool_party | Pool party | 🏊','scenes'],
   ['sec','Cameras'],['camPos','Cameras position',POS],['camSize','Camera size',[['s','Small'],['m','Medium'],['l','Large'],['xl','Huge']]],['camRefresh','Refresh picture every',[[2,'2 seconds'],[5,'5 seconds'],[10,'10 seconds'],[30,'30 seconds']]],
   ['cams','Cameras — one per line: entity | label (tap a camera to see it big)','area','camera.front_door | Front door&#10;camera.pool | Pool','cams'],
-  ['sec','Buttons & screen'],['buttons','Buttons',[['tap','Show when I tap, then hide'],['never','Hidden (tap 3 times to show)'],['always','Always show']]],
+  ['sec','Buttons & screen'],['bar','Buttons on the bar (⚙ Settings and ✕ Exit are always there)','checks'],['roomsEdit'],['buttons','Buttons',[['tap','Show when I tap, then hide'],['never','Hidden (tap 3 times to show)'],['always','Always show']]],
   ['saver','Screensaver',[[0,'Off'],[2,'After 2 min'],[5,'After 5 min'],[15,'After 15 min'],[30,'After 30 min']]],['saverStyle','Screensaver look',[['clock','Black with a clock'],['dim','Dim the house']]],['wake','Keep the screen on',[[true,'Yes (when the browser allows it)'],[false,'No']]]];
 function wallForm(){const w=W();$('#wsForm').innerHTML=WS_FIELDS.map(([k,l,c,ph,fill])=>{
   if(k==='quick')return`<div class="wsq"><button data-wq="clean">🧹 House only — hide clock, weather & everything</button><button data-wq="all">✨ Show clock, weather & info</button></div>`;
   if(k==='sec')return`<div class="seclbl">${l}</div>`;
+  if(k==='roomsEdit')return`<div class="wsq"><button data-wq="rooms">✏️ Choose rooms & devices on the Rooms dashboard</button></div>`;
+  if(c==='checks'){const on=Array.isArray(w.bar)?w.bar:WALL_DEF.bar;return`<div class="f" style="grid-column:1/-1"><span>${l}</span><div class="wsck">${BAR_OPTS.map(([v,t])=>`<label><input type="checkbox" data-wsb="${v}"${on.includes(v)?' checked':''}> ${t}</label>`).join('')}</div></div>`}
   if(c==='color')return`<label class="f"><span>${l}</span><select data-ws="color">${[['auto','Automatic'],['#ffffff','White'],['#1b2230','Black'],['#f5b400','Gold'],['#5b8cff','Blue']].map(([v,t])=>`<option value="${v}"${w.color===v?' selected':''}>${t}</option>`).join('')}${['auto','#ffffff','#1b2230','#f5b400','#5b8cff'].includes(w.color)?'':`<option value="${esc(w.color)}" selected>Custom</option>`}</select></label>`;
   if(c==='ent')return`<label class="f"><span>${l}</span><input data-ws="${k}" list="entList" value="${esc(w[k])}" placeholder="${ph||''}" spellcheck="false" autocomplete="off"></label>`;
   if(c==='area')return`<label class="f" style="grid-column:1/-1"><span>${l}</span><textarea data-ws="${k}" rows="3" placeholder="${ph}" spellcheck="false">${esc(w[k])}</textarea></label>`+(fill?`<div class="wsq"><button data-wq="${fill}">${fill==='scenes'?'＋ Add all my scenes & scripts from Home Assistant':'＋ Add all my cameras from Home Assistant'}</button></div>`:'');
   return`<label class="f"><span>${l}</span><select data-ws="${k}">${c.map(([v,t])=>`<option value="${v}"${String(w[k])===String(v)?' selected':''}>${t}</option>`).join('')}</select></label>`}).join('')}
 $('#wsForm').addEventListener('click',e=>{const b=e.target.closest('[data-wq]');if(!b)return;e.preventDefault();const w=doc.wall=W(),q=b.dataset.wq;
+  if(q==='rooms'){w.view='rooms';save();$('#wallSet').close();wallApply();ui.rvEdit=true;renderRooms();return}
   if(q==='clean')Object.assign(w,{clock:'off',weatherStyle:'off',info:'off',scenesPos:'off',camPos:'off',labels:false,area:false,buttons:'never'});
   else if(q==='all')Object.assign(w,{clock:w.clock==='off'?'digital':w.clock,pos:w.pos==='off'?'tl':w.pos,weatherStyle:w.weatherStyle==='off'?'forecast':w.weatherStyle,weatherPos:w.weatherPos==='off'?'tr':w.weatherPos,info:w.info==='off'?'tr':w.info,scenesPos:w.scenesPos==='off'?'bl':w.scenesPos,camPos:w.camPos==='off'?'br':w.camPos,buttons:w.buttons==='never'?'tap':w.buttons});
   else if(q==='scenes'||q==='cams'){if(!ha.on){flash('Connect to Home Assistant first');return}
@@ -2299,7 +2322,9 @@ $('#wsForm').addEventListener('click',e=>{const b=e.target.closest('[data-wq]');
     const add=Object.keys(st).filter(id=>doms.includes(id.split('.')[0])&&!have.has(id)).sort().map(id=>`${id} | ${st[id].attributes.friendly_name||id}`);
     w[q]=[w[q].trim(),...add].filter(Boolean).join('\n');if(q==='scenes'&&w.scenesPos==='off')w.scenesPos='bl';if(q==='cams'&&w.camPos==='off')w.camPos='br'}
   save();wallForm();WALL.fcT=0;wallApply()});
-$('#wsForm').addEventListener('change',e=>{const t=e.target,k=t.dataset.ws;if(!k)return;const w=doc.wall=W();let v=t.value;
+$('#wsForm').addEventListener('change',e=>{const t=e.target;
+  if(t.dataset.wsb){const w=doc.wall=W(),cur=new Set(Array.isArray(w.bar)?w.bar:WALL_DEF.bar);t.checked?cur.add(t.dataset.wsb):cur.delete(t.dataset.wsb);w.bar=BAR_OPTS.map(x=>x[0]).filter(x=>cur.has(x));save();wallBarButtons();wallBar(true);return}
+  const k=t.dataset.ws;if(!k)return;const w=doc.wall=W();let v=t.value;
   if(typeof WALL_DEF[k]==='boolean')v=v==='true';else if(typeof WALL_DEF[k]==='number')v=+v;w[k]=v;save();
   if(/^weather/.test(k)){WALL.fc=null;WALL.fcT=0;WALL.wx=null;WALL.wxT=0}
   if(['view','all','full','labels','area','devices','night'].includes(k))wallApply();else{wallSpin();wallRender();wallBar(true)}});
