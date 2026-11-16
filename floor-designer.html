@@ -114,6 +114,9 @@ body.wall header,body.wall #palette,body.wall #props,body.wall #hint,body.wall #
 body.wall main{grid-template-columns:minmax(0,1fr)}
 body.wall #stage{padding:0;height:100vh;height:100dvh}
 body.wall.wnight #stage{background:#070a10}
+html:has(body.wall),body.wall{overscroll-behavior:none;touch-action:none}
+body.wall #stage,body.wall #stage *{touch-action:none}
+.wbar button.confirm{background:var(--danger);color:#fff}
 #wall{position:absolute;inset:0;pointer-events:none;z-index:3;padding:max(18px,env(safe-area-inset-top)) max(22px,env(safe-area-inset-right)) max(18px,env(safe-area-inset-bottom)) max(22px,env(safe-area-inset-left));--wc:var(--text)}
 .wz{position:absolute;display:flex;flex-direction:column;gap:10px;max-width:46%}
 .wz[data-pos=tl]{top:inherit;left:inherit;top:max(18px,env(safe-area-inset-top));left:max(22px,env(safe-area-inset-left))}
@@ -2143,7 +2146,8 @@ async function wallWake(){if(!WALL.on||!W().wake||!navigator.wakeLock)return;try
 function wallApply(){const w=W();ui.view=w.view;ui.v3all=w.all;ui.v3full=w.full;ui.preview=true;ui.sel=null;ui.tool='select';ui.draft=null;wallNight();
   $('#wallBar').querySelector('[data-w=night]').classList.toggle('on',ui.night);
   renderAll();requestAnimationFrame(()=>{size3D();if(ui.view==='3d')render3DView(true);wallSpin()});wallRender();wallBar(w.buttons!=='never')}
-function setWall(on){if(on===WALL.on)return;WALL.on=on;document.body.classList.toggle('wall',on);$('#wall').hidden=!on;$('#wallBar').hidden=!on;
+function setWall(on){if(on===WALL.on)return;WALL.on=on;try{localStorage.setItem(KEY+'-wall',on?'1':'0')}catch(e){}
+  {const x=$('#wallBar [data-w=exit]');if(x){clearTimeout(WALL.exitT);x.classList.remove('confirm');x.textContent='✕ Exit'}}document.body.classList.toggle('wall',on);$('#wall').hidden=!on;$('#wallBar').hidden=!on;
   if(on){WALL.prev={view:ui.view,all:ui.v3all,full:ui.v3full,night:ui.night,preview:ui.preview};WALL.idle=Date.now();
     WALL.view=isView();setViewMode(true,true);wallFrame(true);
     const el=document.documentElement,fs=el.requestFullscreen||el.webkitRequestFullscreen;if(fs&&!document.fullscreenElement)try{const r=fs.call(el);if(r&&r.catch)r.catch(()=>{})}catch(e){}
@@ -2169,7 +2173,8 @@ document.addEventListener('pointerdown',e=>{if(!WALL.on)return;if(!$('#saver').h
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&WALL.on)wallWake()});
 $('#wallBtn').onclick=()=>setWall(true);
 $('#wallBar').addEventListener('click',e=>{const b=e.target.closest('[data-w]');if(!b)return;const a=b.dataset.w,w=doc.wall=W();wallBar(true);
-  if(a==='exit'){setWall(false);return}
+  if(a==='exit'){if(b.classList.contains('confirm')){setWall(false);return}
+    b.classList.add('confirm');b.textContent='✕ Tap again to exit';clearTimeout(WALL.exitT);WALL.exitT=setTimeout(()=>{b.classList.remove('confirm');b.textContent='✕ Exit'},3000);return}
   if(a==='set'){wallForm();$('#wallSet').showModal();return}
   if(a==='view'){w.view=ui.view==='3d'?'2d':'3d';save();wallApply();return}
   if(a==='all'){w.all=!ui.v3all;if(ui.view!=='3d')w.view='3d';save();wallApply();return}
@@ -2226,7 +2231,7 @@ if(ha.on){ui.view='3d';$('#exportBtn').style.display='none'}
 {let v=null;try{v=localStorage.getItem(KEY+'-view')}catch(e){}setViewMode(hs.includes('edit')?false:v!=null?v==='1':ha.on,true)}
 renderAll();
 if(ha.on)haInit().catch(e=>flash('Could not reach Home Assistant: '+(e.message||e)));
-if(hs.includes('wall')||(window.HOME3D_CONFIG||{}).wall)setWall(true);
+if(hs.includes('wall')||(window.HOME3D_CONFIG||{}).wall||(()=>{try{return localStorage.getItem(KEY+'-wall')==='1'}catch(e){return false}})())setWall(true);
 if(hs==='#export')$('#exportBtn').click();
 </script>
 </body>

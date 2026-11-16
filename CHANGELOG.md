@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.8.1 (2026-11-16): Wall view stays on when you touch it
+
+- **Wall view no longer closes by accident.** Moving or pinching with your fingers on a wall tablet could close wall view. Now only the **✕ Exit** button closes it, and it asks for a second tap ("Tap again to exit") so a stray touch can't close it.
+- Touch gestures in wall view no longer pull-to-refresh, swipe back or zoom the Home Assistant app.
+- Wall view is remembered on each device: if the dashboard reloads, the tablet comes back to wall view by itself.
+
 ## 1.8.0 (2026-11-10): Ceiling fans, columns, lamps, and walls that line up
 
 - **New items:**
