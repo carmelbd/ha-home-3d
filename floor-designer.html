@@ -397,8 +397,8 @@ const PAL={
 const ROOM_TYPES=[['living','Living room'],['dining','Dining room'],['kitchen','Kitchen'],['bedroom','Bedroom'],['kids','Kids room'],['office','Office'],['bathroom','Bathroom'],['toilet','Toilet'],['laundry','Laundry'],['hallway','Hallway'],['stairs','Stairs'],['storage','Storage / closet'],['safe','Safe room'],['balcony','Balcony / patio'],['yard','Garden / lawn'],['patio','Outdoor paving'],['gravel','Gravel yard'],['parking','Parking']];
 const OUTDOOR=new Set(['yard','patio','gravel','parking']);
 const ROOM_LABEL=Object.fromEntries(ROOM_TYPES);
-const FLOOR_MATS=[['auto','Automatic'],['wood','Light wood planks'],['wood_dark','Dark wood planks'],['herringbone','Herringbone parquet'],['tile','Tiles 30 cm'],['big_tile','Large tiles 60 cm'],['marble','Marble'],['terrazzo','Terrazzo'],['carpet','Carpet'],['concrete','Concrete'],['deck','Wood deck'],['deck_grey','Grey composite deck'],['pavers','Stone pavers'],['porcelain','Outdoor grey porcelain 80 cm'],['pebbles','Pebbles'],['grass','Grass']];
-const FLOOR_COL={wood:'#bea68c',wood_dark:'#7d5d43',tile:'#d6dbe0',marble:'#ece9e4',carpet:'#9aa3b5',concrete:'#b8b3ab',deck:'#97806a',grass:'#6f9e5a',porcelain:'#bdbcb8',pebbles:'#a8a194',pavers:'#b5ab9b',big_tile:'#d8d3cb'};
+const FLOOR_MATS=[['auto','Automatic'],['wood','Light wood planks'],['wood_dark','Dark wood planks'],['herringbone','Herringbone parquet'],['tile','Tiles 30 cm'],['big_tile','Large tiles 60 cm'],['marble','Marble'],['terrazzo','Terrazzo'],['carpet','Carpet'],['concrete','Concrete'],['deck','Wood deck'],['deck_grey','Grey composite deck'],['pavers','Stone pavers'],['porcelain','Outdoor grey porcelain 80 cm'],['pebbles','Pebbles'],['grass','Grass'],['rubber','Rubber gym floor']];
+const FLOOR_COL={wood:'#bea68c',wood_dark:'#7d5d43',tile:'#d6dbe0',marble:'#ece9e4',carpet:'#9aa3b5',concrete:'#b8b3ab',deck:'#97806a',grass:'#6f9e5a',porcelain:'#bdbcb8',pebbles:'#a8a194',pavers:'#b5ab9b',big_tile:'#d8d3cb',rubber:'#34373b'};
 const AUTO_FLOOR={living:'wood',dining:'wood',bedroom:'wood',kids:'wood',office:'wood',hallway:'wood',stairs:'wood',kitchen:'tile',bathroom:'tile',toilet:'tile',laundry:'tile',storage:'concrete',safe:'concrete',balcony:'deck',yard:'grass',patio:'porcelain',gravel:'pebbles',parking:'concrete'};
 const floorColor=r=>FLOOR_COL[r.floor&&r.floor!=='auto'?r.floor:AUTO_FLOOR[r.type]||'wood'];
 
@@ -634,6 +634,7 @@ function floorTexture(k){
       for(let r=0;r<5;r++){let px=-(r%2)*rw*.5;while(px<512){const len=rw*(.8+rnd()*.7);x.fillStyle=cols[Math.floor(rnd()*cols.length)];const X=px+3,Y=r*rw+3,W=len-6,Hh=rw-6;x.beginPath();x.moveTo(X+6,Y);x.arcTo(X+W,Y,X+W,Y+Hh,6);x.arcTo(X+W,Y+Hh,X,Y+Hh,6);x.arcTo(X,Y+Hh,X,Y,6);x.arcTo(X,Y,X+W,Y,6);x.fill();px+=len}}break}
     case'porcelain':S=tiles('#c4c3bf',2,'#9d9c98',1.6);break;
     case'concrete':speck('#b9b5ae',5000,['#a7a39c','#c9c5be','#8f8b84'],2);break;
+    case'rubber':{S=1;speck('#2e3134',7000,['#3f4246','#25282b','#4a4e53','#3a5f8f'],2.5);x.fillStyle='rgba(0,0,0,.55)';x.fillRect(0,0,512,3);x.fillRect(0,0,3,512);break}
     case'carpet':S=1;speck('#9aa3b5',9000,['#8a93a5','#aab3c5','#7f889a'],2);break;
     case'grass':{S=1;x.fillStyle='#5a8c44';x.fillRect(0,0,512,512);for(let i=0;i<9000;i++){x.strokeStyle=['#6fa352','#4c7a38','#7db35f','#3f6a2e'][i%4];x.globalAlpha=.7;x.lineWidth=1.4;const X=rnd()*512,Y=rnd()*512;x.beginPath();x.moveTo(X,Y);x.lineTo(X+(rnd()-.5)*5,Y-4-rnd()*7);x.stroke()}x.globalAlpha=1;break}
     case'pebbles':{S=.8;x.fillStyle='#7f786d';x.fillRect(0,0,512,512);for(let i=0;i<900;i++){x.fillStyle=['#a8a194','#c2bbae','#8e877b','#d3cdc2','#9a9387'][i%5];x.beginPath();x.ellipse(rnd()*512,rnd()*512,5+rnd()*9,4+rnd()*6,rnd()*3,0,7);x.fill()}break}
@@ -641,7 +642,7 @@ function floorTexture(k){
     default:S=planks('#c4a17a',.2,2,'#8a6a4a');
   }
   const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.anisotropy=HQ?16:8;const ft=floorTexture.c[k]={t,S};
-  if(PHOTO[k])photoTex(k,ft);else if(k!=='hay')ft.n=bumpOf(c,k==='carpet'||k==='terrazzo'||k==='concrete'?1.5:4);
+  if(PHOTO[k])photoTex(k,ft);else if(k!=='hay')ft.n=bumpOf(c,k==='carpet'||k==='terrazzo'||k==='concrete'||k==='rubber'?1.5:4);
   return ft;
 }
 floorTexture.c={};
@@ -1093,9 +1094,90 @@ Object.assign(FURN,{
       for(let i=0;i<4;i++){const k=b.cyl(.12+i*(w-.24)/3,d,.018,0,.025,C3.dark);k.rotation.x=Math.PI/2;k.position.y=.76}}},
   dishwasher:{label:'Dishwasher',group:'wet',w:.6,h:.6,surf:.86,draw:(w,h,P)=>R(0,0,w,h,P)+L(0,h*.85,w,h*.85,P)+L(w*.25,h*.92,w*.75,h*.92,P,{sw:.04}),
     d3:(b,w,d)=>{b.box(0,0,w,d,0,.82,C3.white,{rough:.4});b.box(.01,d,w-.02,.008,.04,.7,shade(C3.white,-.05),{rough:.4});b.box(w*.2,d+.008,w*.6,.02,.72,.025,C3.steel,CHROME);b.box(w*.75,d+.004,.05,.004,.77,.02,'#4aa3ff',{emis:'#3b8cff',ei:.8})}},
-  treadmill:{label:'Treadmill',group:'fun',w:.8,h:1.8,draw:(w,h,P)=>R(0,0,w,h,P,{rx:.06})+R(.1,.32,w-.2,h-.42,P,{fill:P.furS})+R(.04,.04,w-.08,.2,P,{fill:P.fur2}),
+  treadmill:{label:'Treadmill',group:'gym',kw:'running cardio fitness gym',w:.8,h:1.8,draw:(w,h,P)=>R(0,0,w,h,P,{rx:.06})+R(.1,.32,w-.2,h-.42,P,{fill:P.furS})+R(.04,.04,w-.08,.2,P,{fill:P.fur2}),
     d3:(b,w,d)=>{b.box(0,.22,w,d-.22,0,.15,C3.dark);b.box(.1,.26,w-.2,d-.34,.15,.01,'#3a3d44');for(const x of[.03,w-.08])b.box(x,.12,.05,.05,0,1.3,C3.dark);
       b.box(.03,.02,w-.06,.24,1.25,.08,C3.dark);b.box(w*.3,.05,w*.4,.12,1.331,.005,'#4aa3ff',{emis:'#3b8cff',ei:.5});for(const x of[.02,w-.06])b.box(x,.12,.04,.55,1.02,.04,C3.steel,CHROME)}},
+
+  /* ---------- gym & fitness ---------- */
+  gym_mat:{label:'Gym floor mats',group:'gym',kw:'foam rubber puzzle tiles eva floor protection workout balcony',w:2,h:2,
+    opts:[O.sel('color','Color',[['#2b2d31','Black'],['#5b6169','Grey'],['#2f5d8a','Blue'],['#3f7a4a','Green'],['#8a3b3b','Red']],'#2b2d31'),O.sel('tile','Tile size',[['.5','50 cm'],['.6','60 cm'],['1','1 m']],'.5')],
+    draw:(w,h,P,o)=>{const t=+o.tile||.5;let s=R(0,0,w,h,P,{fill:o.color});for(let x=t;x<w-.01;x+=t)s+=L(x,0,x,h,P,{stroke:'#000',sw:.012});for(let y=t;y<h-.01;y+=t)s+=L(0,y,w,y,P,{stroke:'#000',sw:.012});return s},
+    d3:(b,w,d,H,o)=>{const t=+o.tile||.5,c=o.color;b.box(0,0,w,d,0,.02,c,{rough:1});const gr=shade(c,-.45);
+      for(let x=t;x<w-.01;x+=t)b.box(x-.003,0,.006,d,.02,.002,gr,{rough:1});for(let z=t;z<d-.01;z+=t)b.box(0,z-.003,w,.006,.02,.002,gr,{rough:1})}},
+  yoga_mat:{label:'Yoga mat',group:'gym',kw:'exercise pilates stretching fitness',w:.61,h:1.83,opts:[O.color('#6aa6a0')],
+    draw:(w,h,P,o)=>R(0,0,w,h,P,{fill:o.color,rx:.03}),d3:(b,w,d,H,o)=>{b.box(0,0,w,d,0,.006,o.color,{rough:1})}},
+  dumbbell_rack:{label:'Dumbbell rack',group:'gym',kw:'weights dumbbells stand free weights gym',w:1.2,h:.45,
+    draw:(w,h,P)=>{let s=R(0,0,w,h,P,{fill:P.fur2});for(let i=0;i<5;i++){const x=.12+i*(w-.24)/4;s+=R(x-.04,.05,.08,h-.1,P,{fill:'#2a2c30'})}return s},
+    d3:(b,w,d)=>{const fr='#25272b',m={rough:.4,metal:.5};
+      for(const x of[0,w-.05]){b.box(x,0,.05,d,0,.04,fr,m);b.box(x,d*.15,.05,.05,0,.8,fr,m);b.box(x,d*.75,.05,.05,0,.55,fr,m)}
+      for(const[y,z0]of[[.5,d*.62],[.78,d*.28]])b.box(0,z0-.12,w,.24,y,.03,fr,m);
+      const bell=(x,y,z,r)=>{const hd=b.cyl(x,z,.014,0,.13,C3.steel,CHROME);hd.rotation.x=Math.PI/2;hd.position.y=y;
+        for(const s of[-1,1]){const k=b.cyl(x,z+s*.09,r,0,.06,'#1c1d20',{rough:.6});k.rotation.x=Math.PI/2;k.position.y=y}};
+      for(let i=0;i<5;i++){const x=.12+i*(w-.24)/4;bell(x,.53+.035+i*.006,d*.62,.035+i*.006);bell(x,.81+.03,d*.28,.03+i*.004)}}},
+  pullup_dip:{label:'Pull-up & dip station',group:'gym',kw:'power tower pull up bar chin up parallel bars dips knee raise calisthenics balcony',w:1.1,h:1.2,
+    draw:(w,h,P)=>R(0,0,w,h,P,{fill:'none'})+R(.04,0,.07,h,P,{fill:'#2a2c30'})+R(w-.11,0,.07,h,P,{fill:'#2a2c30'})+R(.18,h*.15,.05,h*.55,P,{fill:P.fur2})+R(w-.23,h*.15,.05,h*.55,P,{fill:P.fur2})+L(0,h*.92,w,h*.92,P,{sw:.04}),
+    d3:(b,w,d)=>{const fr='#24262a',m={rough:.35,metal:.5},pad='#1c1d20';
+      for(const x of[.04,w-.11]){b.box(x,0,.07,d,0,.05,fr,m);b.box(x,d*.7,.06,.06,0,2.2,fr,m)}
+      b.box(.04,d*.7,w-.08,.05,1.0,.05,fr,m);b.box(.04,d*.7,w-.08,.05,2.15,.05,fr,m);
+      for(const x of[.04,w-.1])b.box(x,d*.7,.06,d*.3-.02,2.15,.05,fr,m);
+      const bar=b.cyl(w/2,d*.97,.016,0,w,C3.steel,CHROME);bar.rotation.z=Math.PI/2;bar.position.y=2.2;
+      for(const x of[.2,w-.2]){const dp=b.cyl(x,d*.43,.02,0,d*.55,C3.steel,CHROME);dp.rotation.x=Math.PI/2;dp.position.y=1.25;b.box(x-.05,d*.55,.1,.12,1.27,.04,pad,{rough:.9})}
+      for(const x of[.2,w-.2])b.box(x-.02,d*.66,.04,.04,1.0,.27,fr,m);
+      b.box(w*.32,d*.66,w*.36,.06,.85,.55,pad,{rough:.9})}},
+  parallel_bars:{label:'Parallel bars (dips)',group:'gym',kw:'dip bars parallettes calisthenics outdoor street workout balcony',w:.7,h:1.4,
+    draw:(w,h,P)=>R(.04,0,.06,h,P,{fill:'#2a2c30'})+R(w-.1,0,.06,h,P,{fill:'#2a2c30'}),
+    d3:(b,w,d)=>{const fr='#24262a',m={rough:.35,metal:.5};
+      for(const x of[.07,w-.07]){const r=b.cyl(x,d/2,.022,0,d,C3.steel,CHROME);r.rotation.x=Math.PI/2;r.position.y=1.1;
+        for(const z of[.12,d-.12]){b.box(x-.03,z-.03,.06,.06,0,1.1,fr,m);b.box(x-.06,z-.15,.12,.3,0,.03,fr,m)}}}},
+  multi_trainer:{label:'Multi-gym (cable trainer)',group:'gym',kw:'home gym multi station cable machine weight stack lat pulldown pec deck leg press crossover',w:1.7,h:1.8,
+    draw:(w,h,P)=>R(0,0,w,h,P,{fill:'none'})+R(0,0,w*.32,h*.25,P,{fill:'#2a2c30'})+R(w*.38,h*.35,w*.3,h*.35,P,{fill:P.fur2,rx:.04})+L(w*.15,h*.25,w*.15,h,P,{sw:.05})+L(w-.06,0,w-.06,h,P,{sw:.05}),
+    d3:(b,w,d)=>{const fr='#24262a',m={rough:.35,metal:.5},pad='#1c1d20',sx=w*.04,sw=w*.28;
+      b.box(0,0,w,.07,0,.05,fr,m);b.box(w*.15-.03,0,.06,d,0,.05,fr,m);b.box(w-.08,0,.06,d,0,.05,fr,m);
+      for(const x of[sx,sx+sw-.06])b.box(x,.04,.06,.06,0,2.1,fr,m);b.box(w-.08,.04,.06,.06,0,2.1,fr,m);
+      b.box(sx,.04,w-.12-sx+.06,.06,2.1,.07,fr,m);b.box(w-.08,.04,.06,d*.55,2.1,.07,fr,m);
+      for(let i=0;i<16;i++)b.box(sx+.08,.08,sw-.22,.16,.12+i*.034,.03,i%2?'#2c2f33':'#202226',{rough:.5,metal:.3});
+      for(const x of[sx+.1,sx+sw-.16])b.cyl(x,.16,.008,.1,1.9,C3.steel,CHROME);
+      for(const[x,z]of[[w*.5,.07],[w-.05,d*.55],[sx+sw/2,.07]]){const pl=b.cyl(x,z,.05,0,.03,'#3a3d42',m);pl.rotation.x=Math.PI/2;pl.position.y=2.05}
+      b.box(w*.5-.004,.07,.008,.008,.6,1.45,'#111');
+      b.box(w*.38,d*.42,w*.3,.36,.5,.09,pad,{rough:.9});b.box(w*.53-.03,d*.42+.15,.06,.06,0,.5,fr,m);
+      b.box(w*.38,d*.38,w*.3,.07,.6,.75,pad,{rough:.9});b.box(w*.52,d*.3,.05,.1,.05,1.4,fr,m);
+      const lb=b.cyl(w*.53,d*.36,.015,0,w*.6,C3.steel,CHROME);lb.rotation.z=Math.PI/2;lb.position.y=1.55;
+      for(const s of[-1,1]){const arm=b.box(w*.53+s*w*.17-.025,d*.35,.05,.05,1.0,.5,fr,m);arm.rotation.z=s*.2;b.box(w*.53+s*w*.2-.06,d*.32,.12,.1,1.15,.18,pad,{rough:.9})}
+      for(const z of[d*.72,d*.84]){const r=b.cyl(w*.53,z,.06,0,w*.3,pad,{rough:.9});r.rotation.z=Math.PI/2;r.position.y=z<d*.8?.48:.25}
+      b.box(w*.53-.03,d*.42+.3,.06,d*.25,.2,.05,fr,m)}},
+  squat_rack:{label:'Squat rack & barbell',group:'gym',kw:'power rack cage barbell plates bench press deadlift weights',w:1.3,h:1.3,
+    draw:(w,h,P)=>{let s=R(0,0,w,h,P,{fill:'none'});for(const[x,y]of[[0,0],[w-.07,0],[0,h-.07],[w-.07,h-.07]])s+=R(x,y,.07,.07,P,{fill:'#2a2c30'});return s+L(-.4,h*.5,w+.4,h*.5,P,{sw:.04})+R(-.35,h*.5-.2,.08,.4,P,{fill:'#1c1d20'})+R(w+.27,h*.5-.2,.08,.4,P,{fill:'#1c1d20'})},
+    d3:(b,w,d)=>{const fr='#24262a',m={rough:.35,metal:.5};
+      for(const[x,z]of[[0,0],[w-.07,0],[0,d-.07],[w-.07,d-.07]])b.box(x,z,.07,.07,0,2.25,fr,m);
+      for(const z of[0,d-.07])b.box(0,z,w,.07,2.18,.07,fr,m);for(const x of[0,w-.07]){b.box(x,0,.07,d,2.18,.07,fr,m);b.box(x,0,.07,d,0,.05,fr,m)}
+      const y=1.35,bar=b.cyl(w/2,d/2,.014,0,2.2,C3.steel,CHROME);bar.rotation.z=Math.PI/2;bar.position.y=y;
+      for(const s of[-1,1])for(const[o,r]of[[.0,.225],[.05,.17]]){const pl=b.cyl(w/2+s*(w/2+.25+o),d/2,r,0,.04,'#1c1d20',{rough:.6});pl.rotation.z=Math.PI/2;pl.position.y=y}
+      for(const x of[0,w-.07])b.box(x-.02,d/2-.04,.11,.08,y-.07,.05,fr,m)}},
+  weight_bench:{label:'Weight bench',group:'gym',kw:'flat bench press workout',w:.5,h:1.3,
+    draw:(w,h,P)=>R(.05,0,w-.1,h,P,{fill:'#1c1d20',rx:.04})+L(.05,h*.55,w-.05,h*.55,P,{stroke:'#555',sw:.02}),
+    d3:(b,w,d)=>{const fr='#24262a',m={rough:.35,metal:.5},pad='#1c1d20';
+      b.box(w*.4,0,w*.2,d,0,.06,fr,m);for(const z of[0,d-.06])b.box(0,z,w,.06,0,.05,fr,m);b.box(w*.4,d*.45,w*.2,.06,0,.4,fr,m);
+      b.box(.05,d*.53,w-.1,d*.45,.4,.07,pad,{rough:.9});b.box(.05,.02,w-.1,d*.5,.4,.07,pad,{rough:.9});b.box(w*.4,.02,w*.2,.06,0,.4,fr,m)}},
+  exercise_bike:{label:'Exercise bike',group:'gym',kw:'spin bike cycling cardio stationary',w:.55,h:1.2,
+    draw:(w,h,P)=>R(w*.3,0,w*.4,h,P,{fill:'#2a2c30',rx:.05})+R(0,h*.12,w,.06,P,{fill:P.fur2})+E(w/2,h*.75,w*.18,.12,P,{fill:'#1c1d20'}),
+    d3:(b,w,d)=>{const fr='#2a2c30',m={rough:.35,metal:.4};
+      for(const z of[.05,d-.1])b.box(0,z,w,.06,0,.05,fr,m);b.box(w/2-.03,.05,.06,d-.12,.05,.06,fr,m);
+      const fw=b.cyl(w/2,d*.3,.24,0,.05,'#3a3d42',{rough:.3,metal:.6});fw.rotation.z=Math.PI/2;fw.position.y=.36;
+      b.box(w/2-.03,d*.2,.06,.06,.1,1.0,fr,m);b.box(w*.15,d*.12,w*.7,.05,1.08,.04,C3.steel,CHROME);b.box(w*.35,d*.15,w*.3,.04,1.12,.14,'#1a1b1e');
+      b.box(w/2-.03,d*.68,.06,.06,.1,.8,fr,m);b.box(w/2-.08,d*.6,.16,.3,.9,.07,'#1c1d20',{rough:.9})}},
+  rower:{label:'Rowing machine',group:'gym',kw:'rower cardio row erg',w:.55,h:2.2,
+    draw:(w,h,P)=>R(w*.4,0,w*.2,h,P,{fill:'#2a2c30'})+C(w/2,h*.12,w*.3,P,{fill:'#1c1d20'})+R(w*.3,h*.55,w*.4,.3,P,{fill:P.fur2,rx:.04}),
+    d3:(b,w,d)=>{const fr='#2a2c30',m={rough:.35,metal:.4};
+      const rl=b.box(w*.42,.2,w*.16,d-.25,.12,.05,C3.steel,CHROME);b.box(w*.42,d-.08,w*.16,.06,0,.17,fr,m);
+      b.box(.05,.05,w-.1,.3,0,.05,fr,m);const fw=b.cyl(w/2,.2,.22,0,.12,'#1c1d20',{rough:.4});fw.rotation.z=Math.PI/2;fw.position.y=.38;
+      b.box(w*.3,d*.55,w*.4,.3,.18,.07,'#1c1d20',{rough:.9});for(const s of[-1,1])b.box(w/2+s*.1-.06,.5,.12,.22,.16,.04,'#3a3d42',m)}},
+  kettlebells:{label:'Kettlebells',group:'gym',kw:'kettlebell weights free weights',w:.7,h:.25,
+    draw:(w,h,P)=>[.15,.38,.6].map((x,i)=>C(x*w/.7,h/2,.07+i*.01,P,{fill:'#1c1d20'})).join(''),
+    d3:(b,w,d)=>{[.15,.38,.6].forEach((x,i)=>{const r=.07+i*.012,X=x*w/.7,c=['#1c1d20','#2f5d8a','#8a3b3b'][i];b.sph(X,d/2,r,r,c,{rough:.6});
+      const hd=new THREE.Mesh(new THREE.TorusGeometry(r*.6,.012,8,20,Math.PI),mat(c,{rough:.6}));b.add(hd,X,d/2,r*1.7)})}},
+  punching_bag:{label:'Punching bag (standing)',group:'gym',kw:'boxing bag kickboxing heavy bag',w:.6,h:.6,
+    draw:(w,h,P)=>C(w/2,h/2,Math.min(w,h)*.48,P,{fill:'#2a2c30'})+C(w/2,h/2,Math.min(w,h)*.28,P,{fill:'#8a2b2b'}),
+    d3:(b,w,d)=>{const r=Math.min(w,d);b.cyl(w/2,d/2,r*.48,0,.3,'#2a2c30',{rough:.7});b.cyl(w/2,d/2,.05,.3,.15,'#2a2c30');b.cyl(w/2,d/2,r*.28,.45,1.15,'#8a2b2b',{rough:.55})}},
 
   dog_bed:{label:'Pet bed',group:'green',w:.8,h:.6,opts:[O.color('#9b6b43','Color'),O.color('#efe6d6','Cushion','cushion')],
     draw:(w,h,P,o)=>E(w/2,h/2,w*.48,h*.48,P,{fill:o.color})+E(w/2,h/2,w*.34,h*.32,P,{fill:o.cushion}),
@@ -1169,7 +1251,7 @@ Object.assign(FURN,{
 });
 FURN.sink={...FURN.sink,opts:[O.color('#d9c7ad','Cabinet color'),O.sel('top','Top',[['#f3f4f6','White'],['#2a2e35','Black'],['#5b6068','Dark stone']],'#f3f4f6')],
   d3:(b,w,d,H,o)=>{b.box(0,0,w,d,0,.78,o.color);b.box(.02,d-.01,w-.04,.006,.42,.006,'#9aa1a9');b.box(0,0,w,d,.78,.08,o.top);b.box(w*.15,d*.3,w*.7,d*.55,.86,.006,'#cfd8df')}};
-const FURN_GROUPS=[['struct','Doors, windows & walls'],['living','Living & media'],['bed','Bedroom, closet & office'],['wet','Kitchen & bath'],['fun','Gaming, shelves & small things'],['green','Plants & pets'],['out','Balcony & outdoor'],['yard','Pool, pergola & yard']];
+const FURN_GROUPS=[['struct','Doors, windows & walls'],['living','Living & media'],['bed','Bedroom, closet & office'],['wet','Kitchen & bath'],['fun','Gaming, shelves & small things'],['gym','Gym & fitness'],['green','Plants & pets'],['out','Balcony & outdoor'],['yard','Pool, pergola & yard']];
 const isWallItem=it=>!!(FURN[it.kind]&&FURN[it.kind].wall);
 /* magnet for added walls: line up with the room walls and run the ends into the walls they meet */
 function snapWall(it,fl=cur()){
@@ -1802,7 +1884,7 @@ function buildFloor(fl,P,o){
     for(const q of cutRect(r,holes)){
     const s=mesh(new THREE.BoxGeometry(q.w,.22,q.h),mat(P.base3d),false);s.position.set(q.x+q.w/2,-.15,q.y+q.h/2);g.add(s);
     const turn=rot90!==!!ft.rot,fit=t=>{if(!t)return null;const c=t.clone();c.needsUpdate=true;c.repeat.set((turn?q.h:q.w)/ft.S,(turn?q.w:q.h)/ft.S);if(turn){c.rotation=Math.PI/2;c.center.set(.5,.5)}return c};
-    const m=mesh(new THREE.BoxGeometry(q.w,.04,q.h),new THREE.MeshStandardMaterial({map:fit(ft.t),normalMap:fit(ft.n),roughnessMap:fit(ft.r),normalScale:new THREE.Vector2(.8,.8),roughness:ft.r?(fk==='wood'||fk==='wood_dark'||fk==='herringbone'?.75:1):fk==='marble'?.18:fk.includes('tile')?.35:fk==='carpet'||fk==='grass'?1:.6}),false);m.userData.own=m.userData.ownMap=true;m.position.set(q.x+q.w/2,-.02,q.y+q.h/2);m.userData.id=r.id;g.add(m)}
+    const m=mesh(new THREE.BoxGeometry(q.w,.04,q.h),new THREE.MeshStandardMaterial({map:fit(ft.t),normalMap:fit(ft.n),roughnessMap:fit(ft.r),normalScale:new THREE.Vector2(.8,.8),roughness:ft.r?(fk==='wood'||fk==='wood_dark'||fk==='herringbone'?.75:1):fk==='marble'?.18:fk.includes('tile')?.35:fk==='carpet'||fk==='grass'||fk==='rubber'?1:.6}),false);m.userData.own=m.userData.ownMap=true;m.position.set(q.x+q.w/2,-.02,q.y+q.h/2);m.userData.id=r.id;g.add(m)}
     if(o.labels&&r.w>=.9&&r.h>=.7&&mainOf(fl,r)===r){const l=labelMesh(r.name,o.area!==false?`${groupArea(fl,r).toFixed(1)} m²`:'',clamp(Math.min(r.w,r.h)*.11,.2,.34),P);l.position.set(r.x+r.w/2,.02,r.y+r.h/2);g.add(l)}
   }
   const ops=openings(fl),wm=wallMats(P),glassM=glassMat(),railM=mat(C3.frame);
@@ -1926,7 +2008,7 @@ function pick3D(e){
   else if(d&&DEV[d.kind].tap==='toggle'){ON.has(d.id)?ON.delete(d.id):ON.add(d.id);hintMsg=`${d.name}: ${ON.has(d.id)?'on':'off'}`;clearTimeout(hintTimer);hintTimer=setTimeout(()=>{hintMsg=null;renderPlan()},2200)}
   renderAll();
 }
-function setView(v){ui.view=v;ui.rvEdit=false;ui.tool='select';ui.draft=null;renderAll()}
+function setView(v){ui.view=v;ui.rvEdit=false;ui.tool='select';ui.draft=null;renderAll();if(WALL.on)wallRender()}
 $('#v2Btn').onclick=()=>setView('2d');$('#v3Btn').onclick=()=>setView('3d');$('#vrBtn').onclick=()=>setView('rooms');
 $('#v3bar').addEventListener('click',e=>{const b=e.target.closest('[data-v3]');if(!b)return;const a=b.dataset.v3;
   if(a==='floor')ui.v3all=false;else if(a==='all')ui.v3all=true;else if(a==='full')ui.v3full=!ui.v3full;else if(a==='night')ui.night=!ui.night;else if(a==='explode'){ui.explode=!ui.explode;ui.v3all=true}
@@ -2313,7 +2395,7 @@ function wallRender(){if(!WALL.on)return;const w=W(),d=new Date(),col=wallColor(
   if(chips.length)add(w.info,'info',`<div class="${cls}" style="--ws:${cs}px;display:flex;flex-direction:column;gap:6px">${chips.join('')}</div>`);
   const sc=wlines(w.scenes);
   if(sc.length)add(w.scenesPos,'scenes',`<div class="wscenes">${sc.map(([id,label,em])=>{const s=stOf(id);return`<button class="wscene" data-scene="${esc(id)}">${em?`<span class="em">${esc(em)}</span>`:''}${esc(label||(s&&s.attributes.friendly_name)||id.split('.')[1].replace(/_/g,' '))}</button>`}).join('')}</div>`);
-  const cm=wlines(w.cams);
+  const cm=ui.view==='rooms'&&RV().cams!==false?[]:wlines(w.cams);
   if(cm.length){const cw={s:200,m:290,l:420,xl:560}[w.camSize]||290,cc=cm.length>3&&w.camSize!=='l'&&w.camSize!=='xl'?2:1;
     add(w.camPos,'cams',`<div class="wcams" style="--cw:${cw}px;--cc:${cc}">${cm.map(([id,label])=>{const s=stOf(id);return`<button class="wcam" data-campop="${esc(id)}"><img data-cam="${esc(id)}" alt="" hidden><i>${ha.on?(s?'Loading…':'Not found in HA'):'Camera picture appears when connected to HA'}</i><span>${esc(label||(s&&s.attributes.friendly_name)||id)}</span></button>`}).join('')}</div>`)}
   wallPatch(zones);

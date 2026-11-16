@@ -8,6 +8,8 @@ Draw your home, walk around it in 3D, and control your real devices from the pla
 
 **Now on HACS!** [Install with HACS](#install-with-hacs-about-2-minutes) and future updates arrive as one click. **Already installed by hand?** See [Updating](#updating-to-a-new-version). Your design is kept.
 
+- **🏋️ Gym & fitness (1.13.0).** A new **Gym & fitness** group in the palette: a pull-up & dip station, parallel bars, a multi-gym (cable trainer), a squat rack with barbell, a dumbbell rack, a weight bench, treadmill, exercise bike, rowing machine, kettlebells, a standing punching bag, a yoga mat and **gym floor mats** (foam/rubber puzzle tiles in 5 colors, any size). Rooms also have a new floor: **Rubber gym floor**. Great for a balcony gym.
+- **📷 No double cameras (1.13.0).** On the wall display, the camera pictures in the corner are hidden while you're in the Rooms view, because Rooms already shows them on top. They come back in 2D and 3D, and stay if you turned the cameras off in Rooms.
 - **✨ HD quality (1.12.0).** A new **✨ HD** button in the 3D bar makes the house look more realistic: sharper photo textures, crisp tiles, finer shadows and soft shading in corners and under furniture. It switches instantly and is remembered per device, so a strong computer can use HD while a wall tablet stays light. It's off by default. Don't want it at all? ⋯ → **HD quality** disables it for everyone, ⋯ → **HD button** hides the button, and the card option `hd: false` turns it off on one card (`hd: true` starts it on). [More](#hd-quality)
 - **▦ Rooms dashboard (1.9.0).** A new **Rooms** button next to 2D and 3D shows the whole house as a dashboard: a card for every room with its name, size and a button for each device, live from Home Assistant. Tap a light to switch it, tap an AC, TV or lock to open its controls, and use **💡 2/3** on a card to switch all the lights in that room. Temperature and humidity show at the top of each card. It also works on the wall display, and you can open the card straight into it with `view: rooms`. Tap **✏️ Customize** to hide rooms or devices you don't need there (1.10.0). Live camera pictures show at the top; tap one to see it big (1.11.0).
 
@@ -317,9 +319,16 @@ hd: false
 
 ## Updating to a new version
 
-Your design is stored in Home Assistant, not in the plugin, so updating never touches it.
+Your design is stored in Home Assistant, not in the plugin, so updating never touches it. Nothing in your design or dashboard needs to change: new features show up on their own.
 
-- **HACS:** when a new version is out, HACS shows an update under **Settings → Updates** (or in HACS). Click **Update**, then reload the page. On a phone, close and reopen the Home Assistant app.
+**With HACS (3 steps):**
+
+1. **Get the update.** Open **HACS**, find **Home 3D**, and click **Update** (it may also show under **Settings → Updates**). Don't see it? In HACS, open Home 3D, click **⋮ → Update information**, wait a few seconds and look again.
+2. **Load the new version in the browser:** press **Ctrl+Shift+R** (Mac: **Cmd+Shift+R**) on the dashboard.
+3. **On the phone or tablet app:** **Settings → Companion App → Debugging → Reset frontend cache**, then close the app completely and open it again. A wall tablet in a kiosk browser needs a reload too.
+
+To check what you have: HACS → Home 3D shows the installed version. The newest version and what changed are in the [CHANGELOG](CHANGELOG.md).
+
 - **Manual install:** see "Without HACS" above.
 - **Moving from the manual install to HACS:** install with HACS, then in your existing Home 3D dashboard's raw configuration editor replace the `type: iframe` card (and its `url:` line) with `type: custom:home-3d-card`. Keep everything else, including the `floor_designer:` part, which is your design. You can then delete `floor-designer.html` from `www`.
 

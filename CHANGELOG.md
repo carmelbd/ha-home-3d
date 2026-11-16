@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.13.0 (2026-11-17): Gym & fitness
+
+- **🏋️ New palette group: Gym & fitness.** Pull-up & dip station (power tower), parallel bars for dips, multi-gym cable trainer with weight stack, squat rack with barbell and plates, dumbbell rack with 10 dumbbells, weight bench, exercise bike, rowing machine, kettlebells, standing punching bag and yoga mat. The treadmill moved here too.
+- **Gym floor mats:** foam/rubber puzzle tiles, stretch them to any size, 5 colors and 50 cm, 60 cm or 1 m tiles.
+- **New room floor: Rubber gym floor** (black rubber with colored flecks, 1 m tiles).
+- **📷 No double cameras on the wall display.** In the Rooms view the cameras show only on top of the rooms, not also in the corner. In 2D and 3D the corner cameras are back. If you turned off 📷 Cameras in Rooms → ✏️ Customize, the corner cameras stay.
+- README: clearer update steps (HACS, browser reload, phone app cache).
+
+**To get it:** HACS → Home 3D → Update, then reload the dashboard (Ctrl/Cmd+Shift+R). In the phone app: Settings → Companion App → Debugging → Reset frontend cache, then reopen the app. Your design is not touched.
+
 ## 1.12.0 (2026-11-17): ✨ HD quality in Home Assistant
 
 - **✨ HD button in the 3D bar.** Sharper photo textures (2K), crisp drawn tiles, full-resolution rendering, finer sun shadows and ambient occlusion (soft shading in corners and under furniture). It used to be only in Home 3D Studio.
