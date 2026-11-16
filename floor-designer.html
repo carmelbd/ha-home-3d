@@ -1227,11 +1227,13 @@ function haLive(){clearTimeout(ha.liveT);ha.liveT=setTimeout(()=>{haSync();rende
   const s=ui.sel&&findObj(ui.sel),el=$('#liveSt');if(el&&s&&s.t==='devices')el.textContent=haLabel(s.o)},400)}
 async function haInit(){
   const h=hass(),conn=h.connection;
-  ha.dash=window.parent.location.pathname.split('/')[1];if(ha.dash==='lovelace')ha.dash=null; // the default dashboard has no url_path
+  /* the design lives in a dashboard's config: this one, or the one named by the card option `dashboard:` (so a card on any dashboard can show it) */
+  const cd=String((window.HOME3D_CONFIG||{}).dashboard||'').trim().replace(/^\/+|\/+$/g,'').split('/')[0];
+  ha.dash=cd||window.parent.location.pathname.split('/')[1];if(ha.dash==='lovelace')ha.dash=null; // the default dashboard has no url_path
   try{ha.cfg=await conn.sendMessagePromise({type:'lovelace/config',url_path:ha.dash})}catch(e){ha.cfg={}}
   const d=ha.cfg.floor_designer;
   if(d&&Array.isArray(d.floors)&&d.floors.length){doc=normalize(d);undoS=[];redoS=[];ui.floor=clamp(ui.floor,0,doc.floors.length-1);fixSel()}
-  else flash('First time here: open your design with ⋯ → Open design file');
+  else flash((window.HOME3D_CONFIG||{}).dashboard?`No design found in the dashboard “${(window.HOME3D_CONFIG||{}).dashboard}”. Check the dashboard: option`:'First time here: open your design with ⋯ → Open design file');
   doc.entities=Object.keys(h.states).sort();
   haSync();renderAll();
   conn.subscribeEvents(ev=>{const id=ev.data.entity_id;if(doc.floors.some(f=>f.devices.some(x=>x.entity===id)))haLive()},'state_changed');
@@ -2338,7 +2340,8 @@ const hs=location.hash;
 if(/^#f\d/.test(hs))ui.floor=clamp(+hs[2]-1,0,doc.floors.length-1);
 if(hs.includes('3d'))ui.view='3d';if(hs.includes('rooms'))ui.view='rooms';{const cv=(window.HOME3D_CONFIG||{}).view;if(['2d','3d','rooms'].includes(cv))ui.view=cv}if(hs.includes('all'))ui.v3all=true;if(hs.includes('full'))ui.v3full=true;if(hs.includes('night')){ui.night=true;for(const f of doc.floors)for(const d of f.devices)if(DEV[d.kind].domain==='light')ON.add(d.id)}
 if(hs.includes('sel')){const d=cur().devices[0];if(d)ui.sel=d.id}
-if(ha.on){ui.view='3d';$('#exportBtn').style.display='none'}
+if(ha.on){ui.view=hs.includes('rooms')?'rooms':hs.includes('2d')?'2d':'3d';$('#exportBtn').style.display='none'}
+{const cv=(window.HOME3D_CONFIG||{}).view;if(['2d','3d','rooms'].includes(cv))ui.view=cv}
 {let v=null;try{v=localStorage.getItem(KEY+'-view')}catch(e){}setViewMode(hs.includes('edit')?false:v!=null?v==='1':ha.on,true)}
 renderAll();
 if(ha.on)haInit().catch(e=>flash('Could not reach Home Assistant: '+(e.message||e)));

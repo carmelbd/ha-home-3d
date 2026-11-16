@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.10.1 (2026-11-16): The Rooms dashboard on any dashboard
+
+- New card option **`dashboard:`**. A Home 3D card on another dashboard (for example your main Overview) can now show your house: point it at your Home 3D dashboard, for example `dashboard: dashboard-home`, and add `view: rooms` for the Rooms dashboard. Before, such a card started empty.
+- **Fix:** inside Home Assistant the card always opened in 3D, so `view: rooms` and `view: 2d` were ignored. They work now.
+- README: how to add the Rooms dashboard as its own tab, or on another dashboard.
+
 ## 1.10.0 (2026-11-16): Choose what the dashboard shows
 
 - **✏️ Customize the Rooms dashboard.** Tap **✏️ Customize** at the top of the Rooms view, then tap any device or a room's 👁 to hide or show it. You can also turn off the "lights on" button, the device count and the list of rooms without devices. Your choices are saved with the design.

@@ -113,6 +113,26 @@ views:
 
 3. Open **Home 3D** in the sidebar. That's it. It opens in **view mode**: drag to rotate, scroll or pinch to zoom, and tap a light to switch it. Tap **✏️ Edit** (top right) to change the design and **✓ Done** to go back.
 
+**Want the Rooms dashboard as its own tab?** Add a second view to the same dashboard (in the raw configuration editor, under the first one):
+
+```yaml
+  - title: Rooms
+    path: rooms
+    type: panel
+    cards:
+      - type: custom:home-3d-card
+        view: rooms
+```
+
+**Or in another dashboard** (for example your main Overview): add the card there and tell it where your design is with `dashboard:`. That's the address of your Home 3D dashboard, the part after the first `/` in its URL (for `http://homeassistant.local:8123/dashboard-home/home` it's `dashboard-home`):
+
+```yaml
+type: custom:home-3d-card
+view: rooms
+dashboard: dashboard-home
+height: 800px
+```
+
 The card is also in the normal **Add card** list, under the name **Home 3D**. It works best in a view of type **Panel (single card)**, which gives it the whole screen. In other views you can set its height, for example `height: 700px`.
 
 <details>
