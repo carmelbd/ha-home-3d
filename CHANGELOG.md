@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.12.0 (2026-11-17): ✨ HD quality in Home Assistant
+
+- **✨ HD button in the 3D bar.** Sharper photo textures (2K), crisp drawn tiles, full-resolution rendering, finer sun shadows and ambient occlusion (soft shading in corners and under furniture). It used to be only in Home 3D Studio.
+- **Switches instantly**, without reloading the page, so you stay in the 3D view. Before, the Studio's HD button reloaded the page.
+- **Off by default in Home Assistant** and remembered per device, so a wall tablet can stay light while a computer uses HD. The extra shading scripts load only when HD is first turned on.
+- **Turn it off or hide it:** ⋯ → **HD quality** disables HD for everyone, ⋯ → **HD button in 3D** hides the button. Card option `hd: false` turns HD off on one card, `hd: true` starts it on.
+- **Fix:** with HD on, the sky behind a zoomed-out house showed grey stripes. Gone.
+
 ## 1.11.0 (2026-11-16): Cameras on the Rooms dashboard
 
 - **📷 Cameras on the Rooms dashboard.** Live camera pictures at the top of the Rooms view, refreshing like on the wall display (every 5 seconds by default, set in Wall settings). Tap one to see it big, with the pan-and-tilt arrows for Eufy and ONVIF cameras. The cameras come from the camera and doorbell devices on your plan and from the wall display's camera list.

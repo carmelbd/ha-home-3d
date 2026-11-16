@@ -8,6 +8,7 @@ Draw your home, walk around it in 3D, and control your real devices from the pla
 
 **Now on HACS!** [Install with HACS](#install-with-hacs-about-2-minutes) and future updates arrive as one click. **Already installed by hand?** See [Updating](#updating-to-a-new-version). Your design is kept.
 
+- **✨ HD quality (1.12.0).** A new **✨ HD** button in the 3D bar makes the house look more realistic: sharper photo textures, crisp tiles, finer shadows and soft shading in corners and under furniture. It switches instantly and is remembered per device, so a strong computer can use HD while a wall tablet stays light. It's off by default. Don't want it at all? ⋯ → **HD quality** disables it for everyone, ⋯ → **HD button** hides the button, and the card option `hd: false` turns it off on one card (`hd: true` starts it on). [More](#hd-quality)
 - **▦ Rooms dashboard (1.9.0).** A new **Rooms** button next to 2D and 3D shows the whole house as a dashboard: a card for every room with its name, size and a button for each device, live from Home Assistant. Tap a light to switch it, tap an AC, TV or lock to open its controls, and use **💡 2/3** on a card to switch all the lights in that room. Temperature and humidity show at the top of each card. It also works on the wall display, and you can open the card straight into it with `view: rooms`. Tap **✏️ Customize** to hide rooms or devices you don't need there (1.10.0). Live camera pictures show at the top; tap one to see it big (1.11.0).
 
 ![The Rooms dashboard: a card for each room with its devices](screenshots/rooms-view.jpg)
@@ -288,6 +289,24 @@ Each camera now has:
 
 - **RTSP cameras:** many cameras have an RTSP option in their app. In the Eufy app this is **NAS (RTSP)** on supported models. Add them with **Add Integration → Generic Camera** and a URL like `rtsp://user:password@camera-ip/live0`.
 - **ONVIF cameras:** add them with the **ONVIF** integration. If they can turn, they get the arrows too.
+
+## HD quality
+
+**✨ HD** in the 3D bar switches between normal and high quality, instantly, without reloading. HD loads bigger textures (about 2K instead of 1K), draws at full screen resolution with finer shadows, and adds ambient occlusion (soft shading where walls meet floors and under furniture). It needs more from the device, so it's **off by default** and each device keeps its own choice.
+
+| Where | What it does |
+| --- | --- |
+| **✨ HD** button (3D bar) | On/off on this device. Remembered in this browser. |
+| ⋯ → **HD quality: allowed / disabled** | Disabled turns HD off on every device and hides the button. Saved with the design. |
+| ⋯ → **HD button in 3D: shown / hidden** | Hides the button and keeps each device as it is. Saved with the design. |
+| Card option `hd: false` | HD off on this card, button hidden. Good for a slow wall tablet. |
+| Card option `hd: true` | This card starts in HD, until someone switches it off with the button on that device. |
+
+```yaml
+type: custom:home-3d-card
+view: 3d
+hd: false
+```
 
 ## Good to know
 
