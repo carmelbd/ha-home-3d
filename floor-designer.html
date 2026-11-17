@@ -59,7 +59,8 @@ h4:first-child{margin-top:2px}
 #v3 canvas{display:block;width:100%;height:100%;touch-action:none}
 /* ---------- Rooms view: the whole house as a dashboard ---------- */
 #rv{position:absolute;inset:0;overflow:hidden;background:var(--bg);z-index:2;color:var(--text)}
-#rvsc{position:absolute;inset:0;overflow:auto;padding:22px 24px 32px;-webkit-overflow-scrolling:touch}
+#rvsc{position:absolute;inset:0;overflow:auto;padding:22px 24px 32px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+body.wall #stage #rvsc{touch-action:pan-y}
 .rvsky{position:absolute;inset:0;overflow:hidden;pointer-events:none;display:none}#rv[data-th] .rvsky{display:block}
 .rvsky i{position:absolute;border-radius:50%;will-change:transform}
 #hint{z-index:6}
@@ -2055,8 +2056,10 @@ function ensure3D(){
   V.ctl=new THREE.OrbitControls(V.cam,V.r.domElement);V.ctl.maxPolarAngle=Math.PI*.48;V.ctl.addEventListener('change',draw3D);V.ctl.addEventListener('start',()=>{WALL.pause=Date.now()+20000});
   new ResizeObserver(size3D).observe($('#v3'));
   let down=null;const el=V.r.domElement;
-  el.addEventListener('pointerdown',e=>{down={x:e.clientX,y:e.clientY}});
-  el.addEventListener('pointerup',e=>{if(down&&Math.hypot(e.clientX-down.x,e.clientY-down.y)<5)pick3D(e);down=null});
+  const pts=new Set();let multi=false;
+  el.addEventListener('pointerdown',e=>{pts.add(e.pointerId);if(pts.size>1)multi=true;else multi=false;down={x:e.clientX,y:e.clientY,t:Date.now()}});
+  el.addEventListener('pointercancel',e=>{pts.delete(e.pointerId);down=null});
+  el.addEventListener('pointerup',e=>{pts.delete(e.pointerId);if(down&&!multi&&pts.size===0&&Date.now()-down.t<600&&Math.hypot(e.clientX-down.x,e.clientY-down.y)<(e.pointerType==='touch'?10:5))pick3D(e);if(!pts.size)down=null});
   return true}
 function size3D(){if(!V.r)return;const b=$('#v3').getBoundingClientRect();if(!b.width||!b.height)return;V.r.setSize(b.width,b.height);fxSize();V.cam.aspect=b.width/b.height;V.cam.updateProjectionMatrix();draw3D()}
 function draw3D(){if(!V.r||!V.root)return;if(HQ&&fxOn())fxDraw();else V.r.render(V.scene,V.cam)}
@@ -2371,7 +2374,8 @@ const WALL_DEF={view:'3d',all:true,full:false,clock:'digital',pos:'tl',size:'l',
   buttons:'tap',labels:false,area:false,devices:true,control:true,
   rotate:'off',night:'auto',saver:0,saverStyle:'clock',wake:true,bar:['v2d','v3d','vrooms','all','night','lights','reset']};
 const BAR_OPTS=[['v2d','2D'],['v3d','3D'],['vrooms','▦ Rooms'],['all','🏠 Whole house'],['night','🌙 Night'],['lights','💡 All lights'],['reset','⟲ Reset view']];
-function wallBarButtons(){const w=W(),on=Array.isArray(w.bar)?w.bar:WALL_DEF.bar;for(const[k]of BAR_OPTS){const b=$(`#wallBar [data-w=${k}]`);if(b)b.hidden=!on.includes(k)}
+function wallLocked(){const c=(window.HOME3D_CONFIG||{});if(c.wall_lock!=null)return !!c.wall_lock;if(c.wall==='lock')return true;let v=WALL.lockMem;try{v=localStorage.getItem(KEY+'-wall-lock')??v}catch(e){}return v==='1'}
+function wallBarButtons(){const w=W(),on=Array.isArray(w.bar)?w.bar:WALL_DEF.bar;{const x=$('#wallBar [data-w=exit]');if(x)x.hidden=wallLocked()}for(const[k]of BAR_OPTS){const b=$(`#wallBar [data-w=${k}]`);if(b)b.hidden=!on.includes(k)}
   for(const[k,v]of[['v2d','2d'],['v3d','3d'],['vrooms','rooms']]){const b=$(`#wallBar [data-w=${k}]`);if(b)b.classList.toggle('on',ui.view===v)}}
 const W=()=>doc.wall=Object.assign({},WALL_DEF,doc.wall||{});
 const WALL={on:false,prev:null,pause:0,barT:null,taps:[],idle:Date.now(),wake:null,raf:0,tick:null};
@@ -2533,7 +2537,7 @@ async function wallWake(){if(!WALL.on||!W().wake||!navigator.wakeLock)return;try
 function wallApply(){const w=W();ui.view=w.view;ui.v3all=w.all;ui.v3full=w.full;ui.preview=true;ui.sel=null;ui.tool='select';ui.draft=null;wallNight();wallBarButtons();
   $('#wallBar').querySelector('[data-w=night]').classList.toggle('on',ui.night);
   renderAll();requestAnimationFrame(()=>{size3D();if(ui.view==='3d')render3DView(true);wallSpin()});wallRender();wallBar(w.buttons!=='never')}
-function setWall(on){if(on===WALL.on)return;WALL.on=on;try{localStorage.setItem(KEY+'-wall',on?'1':'0')}catch(e){}
+function setWall(on){if(on===WALL.on)return;if(!on&&wallLocked())return;WALL.on=on;try{localStorage.setItem(KEY+'-wall',on?'1':'0')}catch(e){}
   {const x=$('#wallBar [data-w=exit]');if(x){clearTimeout(WALL.exitT);x.classList.remove('confirm');x.textContent='✕ Exit'}}document.body.classList.toggle('wall',on);$('#wall').hidden=!on;$('#wallBar').hidden=!on;
   if(on){WALL.prev={view:ui.view,all:ui.v3all,full:ui.v3full,night:ui.night,preview:ui.preview};WALL.idle=Date.now();
     WALL.view=isView();setViewMode(true,true);wallFrame(true);
@@ -2558,9 +2562,13 @@ function wallTouch(){if(!WALL.on)return;WALL.idle=Date.now();
   if(W().buttons==='tap'||WALL.taps.length>=3)wallBar(true)}
 document.addEventListener('pointerdown',e=>{if(!WALL.on)return;if(!$('#saver').hidden){$('#saver').hidden=true;WALL.idle=Date.now();e.stopPropagation();e.preventDefault();return}wallTouch()},true);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&WALL.on)wallWake()});
+function wallScrollable(t){for(let e=t;e&&e!==document.body;e=e.parentElement){if(e.tagName==='DIALOG'||e.tagName==='TEXTAREA'||e.tagName==='SELECT')return true;if(e.scrollHeight>e.clientHeight+1&&/auto|scroll/.test(getComputedStyle(e).overflowY))return true}return false}
+document.addEventListener('touchmove',e=>{if(!WALL.on)return;if(e.touches.length>1||!wallScrollable(e.target))e.preventDefault()},{passive:false,capture:true});
+document.addEventListener('touchstart',e=>{if(!WALL.on)return;if(e.target.tagName==='CANVAS'||e.touches.length>1)e.preventDefault()},{passive:false,capture:true});
+for(const g of['gesturestart','gesturechange'])document.addEventListener(g,e=>{if(WALL.on)e.preventDefault()},{passive:false});
 $('#wallBtn').onclick=()=>setWall(true);
 $('#wallBar').addEventListener('click',e=>{const b=e.target.closest('[data-w]');if(!b)return;const a=b.dataset.w;wallBar(true);const w=doc.wall=W();
-  if(a==='exit'){if(b.classList.contains('confirm')){setWall(false);return}
+  if(a==='exit'){if(wallLocked())return;if(b.classList.contains('confirm')){setWall(false);return}
     b.classList.add('confirm');b.textContent='✕ Tap again to exit';clearTimeout(WALL.exitT);WALL.exitT=setTimeout(()=>{b.classList.remove('confirm');b.textContent='✕ Exit'},3000);return}
   if(a==='set'){wallForm();$('#wallSet').showModal();return}
   if(a==='view'){w.view={'2d':'3d','3d':'rooms',rooms:'2d'}[ui.view]||'3d';save();wallApply();return}
@@ -2585,10 +2593,11 @@ const WS_FIELDS=[['quick'],
   ['sec','Cameras'],['camPos','Cameras position',POS],['camSize','Camera size',[['s','Small'],['m','Medium'],['l','Large'],['xl','Huge']]],['camRefresh','Refresh picture every',[[2,'2 seconds'],[5,'5 seconds'],[10,'10 seconds'],[30,'30 seconds']]],
   ['cams','Cameras — one per line: entity | label (tap a camera to see it big)','area','camera.front_door | Front door&#10;camera.pool | Pool','cams'],
   ['sec','Buttons & screen'],['bar','Buttons on the bar (⚙ Settings and ✕ Exit are always there)','checks'],['roomsEdit'],['buttons','Buttons',[['tap','Show when I tap, then hide'],['never','Hidden (tap 3 times to show)'],['always','Always show']]],
-  ['saver','Screensaver',[[0,'Off'],[2,'After 2 min'],[5,'After 5 min'],[15,'After 15 min'],[30,'After 30 min']]],['saverStyle','Screensaver look',[['clock','Black with a clock'],['dim','Dim the house']]],['wake','Keep the screen on',[[true,'Yes (when the browser allows it)'],[false,'No']]]];
+  ['lock'],['saver','Screensaver',[[0,'Off'],[2,'After 2 min'],[5,'After 5 min'],[15,'After 15 min'],[30,'After 30 min']]],['saverStyle','Screensaver look',[['clock','Black with a clock'],['dim','Dim the house']]],['wake','Keep the screen on',[[true,'Yes (when the browser allows it)'],[false,'No']]]];
 function wallForm(){const w=W();$('#wsForm').innerHTML=WS_FIELDS.map(([k,l,c,ph,fill])=>{
   if(k==='quick')return`<div class="wsq"><button data-wq="clean">🧹 House only — hide clock, weather & everything</button><button data-wq="all">✨ Show clock, weather & info</button></div>`;
   if(k==='sec')return`<div class="seclbl">${l}</div>`;
+  if(k==='lock')return`<label class="f" style="grid-column:1/-1"><span>🔒 Lock this screen on the wall display (only this device)</span><select data-wlock><option value="0"${wallLocked()?'':' selected'}>No — ✕ Exit is on the bar</option><option value="1"${wallLocked()?' selected':''}>Yes — hide ✕ Exit, always open here</option></select></label>`;
   if(k==='roomsEdit')return`<div class="wsq"><button data-wq="rooms">✏️ Choose rooms & devices on the Rooms dashboard</button></div>`;
   if(c==='checks'){const on=Array.isArray(w.bar)?w.bar:WALL_DEF.bar;return`<div class="f" style="grid-column:1/-1"><span>${l}</span><div class="wsck">${BAR_OPTS.map(([v,t])=>`<label><input type="checkbox" data-wsb="${v}"${on.includes(v)?' checked':''}> ${t}</label>`).join('')}</div></div>`}
   if(c==='color')return`<label class="f"><span>${l}</span><select data-ws="color">${[['auto','Automatic'],['#ffffff','White'],['#1b2230','Black'],['#f5b400','Gold'],['#5b8cff','Blue']].map(([v,t])=>`<option value="${v}"${w.color===v?' selected':''}>${t}</option>`).join('')}${['auto','#ffffff','#1b2230','#f5b400','#5b8cff'].includes(w.color)?'':`<option value="${esc(w.color)}" selected>Custom</option>`}</select></label>`;
@@ -2605,6 +2614,7 @@ $('#wsForm').addEventListener('click',e=>{const b=e.target.closest('[data-wq]');
     w[q]=[w[q].trim(),...add].filter(Boolean).join('\n');if(q==='scenes'&&w.scenesPos==='off')w.scenesPos='bl';if(q==='cams'&&w.camPos==='off')w.camPos='br'}
   save();wallForm();WALL.fcT=0;wallApply()});
 $('#wsForm').addEventListener('change',e=>{const t=e.target;
+  if(t.dataset.wlock!=null){try{localStorage.setItem(KEY+'-wall-lock',t.value)}catch(e){}WALL.lockMem=t.value;wallBarButtons();wallBar(true);return}
   if(t.dataset.wsb){const w=doc.wall=W(),cur=new Set(Array.isArray(w.bar)?w.bar:WALL_DEF.bar);t.checked?cur.add(t.dataset.wsb):cur.delete(t.dataset.wsb);w.bar=BAR_OPTS.map(x=>x[0]).filter(x=>cur.has(x));save();wallBarButtons();wallBar(true);return}
   const k=t.dataset.ws;if(!k)return;const w=doc.wall=W();let v=t.value;
   if(typeof WALL_DEF[k]==='boolean')v=v==='true';else if(typeof WALL_DEF[k]==='number')v=+v;w[k]=v;save();
@@ -2614,6 +2624,7 @@ $('#wsClose').onclick=()=>$('#wallSet').close();
 $('#wallSet').addEventListener('click',e=>{if(e.target===$('#wallSet'))$('#wallSet').close()});
 /* in Home Assistant the page sits in a card: in wall mode the card covers the whole HA window (sidebar and top bar) */
 function wallFrame(on){const fe=window.frameElement;if(!fe)return;
+  try{const pd=fe.ownerDocument;for(const x of[pd.documentElement,pd.body]){if(on){if(x.dataset.h3dOv==null)x.dataset.h3dOv=x.style.cssText;x.style.overflow='hidden';x.style.overscrollBehavior='none';x.style.touchAction='none'}else if(x.dataset.h3dOv!=null){x.style.cssText=x.dataset.h3dOv;delete x.dataset.h3dOv}}}catch(e){}
   if(on){if(fe.dataset.h3dStyle==null)fe.dataset.h3dStyle=fe.getAttribute('style')||'';fe.style.cssText=fe.dataset.h3dStyle+';position:fixed;inset:0;width:100vw;height:100vh;height:100dvh;z-index:10000;background:#000'}
   else if(fe.dataset.h3dStyle!=null){fe.setAttribute('style',fe.dataset.h3dStyle);delete fe.dataset.h3dStyle}}
 const hs=location.hash;
@@ -2625,7 +2636,7 @@ if(ha.on){ui.view=hs.includes('rooms')?'rooms':hs.includes('2d')?'2d':'3d';$('#e
 {let v=null;try{v=localStorage.getItem(KEY+'-view')}catch(e){}setViewMode(hs.includes('edit')?false:v!=null?v==='1':ha.on,true)}
 renderAll();
 if(ha.on)haInit().catch(e=>flash('Could not reach Home Assistant: '+(e.message||e)));
-if(hs.includes('wall')||(window.HOME3D_CONFIG||{}).wall||(()=>{try{return localStorage.getItem(KEY+'-wall')==='1'}catch(e){return false}})())setWall(true);
+if(hs.includes('wall')||(window.HOME3D_CONFIG||{}).wall||wallLocked()||(()=>{try{return localStorage.getItem(KEY+'-wall')==='1'}catch(e){return false}})())setWall(true);
 if(hs==='#export')$('#exportBtn').click();
 </script>
 </body>

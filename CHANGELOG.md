@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.14.1 (2026-11-17): Wall display stays put on iPad
+
+- **Fixed: dragging in 3D on an iPad jumped to another screen.** On the wall display, finger drags and pinches now stay inside the house. They no longer scroll Home Assistant behind it, start the app's pull-to-refresh or swipe back to another page. The Rooms dashboard still scrolls normally.
+- **Fixed: a pinch could switch a device.** Lifting your fingers after a two-finger zoom no longer counts as a tap.
+- **🔒 Lock the wall display.** ⚙ Settings → **Lock this screen on the wall display** keeps one device in the wall display: ✕ Exit is hidden, and it always opens there. Only that device is locked. To unlock, set it back to No. For a card, use `wall: lock` (or `wall_lock: true`).
+
+**To get it:** HACS → Home 3D → Update, then reload (Ctrl/Cmd+Shift+R). In the app: Settings → Companion App → Debugging → Reset frontend cache, then reopen the app.
+
 ## 1.14.0 (2026-11-17): Dashboard styles
 
 - **🎨 Styles for the Rooms dashboard.** Rooms → ✏️ Customize → 🎨 Style:

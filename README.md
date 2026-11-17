@@ -8,6 +8,7 @@ Draw your home, walk around it in 3D, and control your real devices from the pla
 
 **Now on HACS!** [Install with HACS](#install-with-hacs-about-2-minutes) and future updates arrive as one click. **Already installed by hand?** See [Updating](#updating-to-a-new-version). Your design is kept.
 
+- **🔒 Steady wall display (1.14.1).** On an iPad, dragging the 3D house no longer jumps to another screen, and a pinch no longer switches a device. ⚙ Settings → **Lock this screen on the wall display** keeps a wall tablet in the wall display, with ✕ Exit hidden. The card option `wall: lock` does the same.
 - **🎨 Dashboard styles (1.14.0).** Give the Rooms dashboard a look: **Northern lights** (moving aurora in a night sky), **Apple** (clean, like the Home app, follows light/dark mode), **Liquid glass** (frosted glass cards over moving color), **Midnight gold**, **Neon** and **Nordic**, or keep **Classic**. Rooms → ✏️ Customize → 🎨 Style. The choice is saved with the design, so every screen shows it. A card can use its own style with `rooms_theme: aurora` (or `apple`, `glass`, `midnight`, `neon`, `nordic`).
 
 <p><img src="screenshots/rooms-style-aurora.jpg" width="49%" alt="Rooms dashboard, Northern lights style"> <img src="screenshots/rooms-style-glass.jpg" width="49%" alt="Rooms dashboard, Liquid glass style"></p>
@@ -184,6 +185,13 @@ To open straight into the wall display, give the card `wall: true`:
 ```yaml
 type: custom:home-3d-card
 wall: true
+```
+
+To keep a wall tablet in the wall display for good, use `wall: lock`. It always opens there and ✕ Exit is hidden. You can also lock one device from **⚙ Settings → Lock this screen on the wall display**. While the wall display is on, finger drags stay inside the house, so they can't scroll Home Assistant behind it or swipe to another page.
+
+```yaml
+type: custom:home-3d-card
+wall: lock
 ```
 
 To open the card straight into a view, add `view: rooms` (the Rooms dashboard), `view: 3d` or `view: 2d`. On the wall display, the **2D**, **3D** and **▦ Rooms** buttons switch views, and **⚙ Settings → View** picks the one it starts with. **⚙ Settings → Buttons on the bar** chooses which buttons the bar shows.
